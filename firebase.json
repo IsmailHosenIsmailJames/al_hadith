@@ -1,0 +1,39 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "alhadithmultilanguage",
+          "appId": "1:564254338567:android:b158bef5a43893774604a2",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "alhadithmultilanguage",
+          "configurations": {
+            "android": "1:564254338567:android:b158bef5a43893774604a2",
+            "ios": "1:564254338567:ios:9efc06de2ea27e554604a2",
+            "macos": "1:564254338567:ios:9efc06de2ea27e554604a2",
+            "web": "1:564254338567:web:923d106629a80d6e4604a2",
+            "windows": "1:564254338567:web:49c3392e1767bd404604a2"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

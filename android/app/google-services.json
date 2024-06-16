@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "564254338567",
+    "firebase_url": "https://alhadithmultilanguage-default-rtdb.firebaseio.com",
+    "project_id": "alhadithmultilanguage",
+    "storage_bucket": "alhadithmultilanguage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:564254338567:android:b158bef5a43893774604a2",
+        "android_client_info": {
+          "package_name": "com.ismail.al_hadith"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsfOJe8Tzr3f55afJ6OUU4Frr3Tac50LI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
