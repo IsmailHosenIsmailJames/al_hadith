@@ -27,7 +27,12 @@ class _ChapterViewState extends State<ChapterView> {
                 AppBar(
                   backgroundColor: Colors.transparent,
                   foregroundColor: Colors.white,
-                  leading: Icon(Icons.arrow_back_ios_new_rounded),
+                  leading: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new_rounded),
+                  ),
                   title: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,38 +106,49 @@ class _ChapterViewState extends State<ChapterView> {
                           right: 20,
                           bottom: 10,
                         ),
-                        padding: EdgeInsets.all(20),
+
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
-                              child: Text(
-                                chapter.chapterId.toString(),
-                                style: TextStyle(fontSize: 20),
-                              ),
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.all(20),
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadiusGeometry.circular(10),
                             ),
-                            Gap(16),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-
-                              children: [
-                                Text(
-                                  chapter.title,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                          ),
+                          onPressed: () {},
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                child: Text(
+                                  chapter.chapterId.toString(),
+                                  style: TextStyle(fontSize: 20),
                                 ),
-                                Text("হাদিসের রেঞ্জ: ${chapter.hadisRange}"),
-                              ],
-                            ),
-                          ],
+                              ),
+                              Gap(16),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                                children: [
+                                  Text(
+                                    chapter.title,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text("হাদিসের রেঞ্জ: ${chapter.hadisRange}"),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

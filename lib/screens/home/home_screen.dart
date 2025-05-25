@@ -1,7 +1,7 @@
 import 'package:al_hadith/database/app_database.dart';
 import 'package:al_hadith/main.dart';
 import 'package:al_hadith/res/sample_resources.dart';
-import 'package:al_hadith/screens/home/chapthers/chapter_view.dart';
+import 'package:al_hadith/screens/chapthers/chapter_view.dart';
 import 'package:al_hadith/screens/home/controller/home_controller.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
