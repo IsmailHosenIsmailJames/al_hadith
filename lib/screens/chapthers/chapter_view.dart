@@ -1,4 +1,6 @@
 import 'package:al_hadith/database/app_database.dart';
+import 'package:al_hadith/main.dart';
+import 'package:al_hadith/screens/hadith/hadith_view.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,7 @@ class _ChapterViewState extends State<ChapterView> {
                     ),
                     color: Theme.of(context).colorScheme.surface,
                   ),
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.only(left: 10, right: 10, top: 10),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -101,9 +103,8 @@ class _ChapterViewState extends State<ChapterView> {
                       Chapter chapter = chapters[index];
                       return Container(
                         margin: EdgeInsets.only(
-                          left: 20,
-                          top: 10,
-                          right: 20,
+                          left: 10,
+                          right: 10,
                           bottom: 10,
                         ),
 
@@ -120,7 +121,35 @@ class _ChapterViewState extends State<ChapterView> {
                               borderRadius: BorderRadiusGeometry.circular(10),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () async {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => Dialog(
+                                child: Container(
+                                  height: 100,
+                                  alignment: Alignment.center,
+                                  child: CircularProgressIndicator.adaptive(),
+                                ),
+                              ),
+                            );
+                            final List<Hadith> hadithList = await db
+                                .getAllHadiths();
+                            await Future.delayed(Duration(milliseconds: 200));
+                            // ignore: use_build_context_synchronously
+                            Navigator.pop(context);
+                            Navigator.push(
+                              // ignore: use_build_context_synchronously
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HadithView(
+                                  hadithList: hadithList,
+                                  chapter: chapter,
+                                  book: widget.book,
+                                ),
+                              ),
+                            );
+                          },
                           child: Row(
                             children: [
                               CircleAvatar(

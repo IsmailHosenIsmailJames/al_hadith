@@ -954,16 +954,849 @@ class ChaptersCompanion extends UpdateCompanion<Chapter> {
   }
 }
 
+class $HadithsTable extends Hadiths with TableInfo<$HadithsTable, Hadith> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HadithsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _bookIdMeta = const VerificationMeta('bookId');
+  @override
+  late final GeneratedColumn<int> bookId = GeneratedColumn<int>(
+    'book_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bookNameMeta = const VerificationMeta(
+    'bookName',
+  );
+  @override
+  late final GeneratedColumn<String> bookName = GeneratedColumn<String>(
+    'book_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterIdMeta = const VerificationMeta(
+    'chapterId',
+  );
+  @override
+  late final GeneratedColumn<int> chapterId = GeneratedColumn<int>(
+    'chapter_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sectionIdMeta = const VerificationMeta(
+    'sectionId',
+  );
+  @override
+  late final GeneratedColumn<int> sectionId = GeneratedColumn<int>(
+    'section_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hadithKeyMeta = const VerificationMeta(
+    'hadithKey',
+  );
+  @override
+  late final GeneratedColumn<String> hadithKey = GeneratedColumn<String>(
+    'hadith_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hadithIdMeta = const VerificationMeta(
+    'hadithId',
+  );
+  @override
+  late final GeneratedColumn<int> hadithId = GeneratedColumn<int>(
+    'hadith_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _narratorMeta = const VerificationMeta(
+    'narrator',
+  );
+  @override
+  late final GeneratedColumn<String> narrator = GeneratedColumn<String>(
+    'narrator',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bnMeta = const VerificationMeta('bn');
+  @override
+  late final GeneratedColumn<String> bn = GeneratedColumn<String>(
+    'bn',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _arMeta = const VerificationMeta('ar');
+  @override
+  late final GeneratedColumn<String> ar = GeneratedColumn<String>(
+    'ar',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _arDiaclessMeta = const VerificationMeta(
+    'arDiacless',
+  );
+  @override
+  late final GeneratedColumn<String> arDiacless = GeneratedColumn<String>(
+    'ar_diacless',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gradeIdMeta = const VerificationMeta(
+    'gradeId',
+  );
+  @override
+  late final GeneratedColumn<int> gradeId = GeneratedColumn<int>(
+    'grade_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gradeMeta = const VerificationMeta('grade');
+  @override
+  late final GeneratedColumn<String> grade = GeneratedColumn<String>(
+    'grade',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gradeColorMeta = const VerificationMeta(
+    'gradeColor',
+  );
+  @override
+  late final GeneratedColumn<String> gradeColor = GeneratedColumn<String>(
+    'grade_color',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    bookId,
+    bookName,
+    chapterId,
+    sectionId,
+    hadithKey,
+    hadithId,
+    narrator,
+    bn,
+    ar,
+    arDiacless,
+    note,
+    gradeId,
+    grade,
+    gradeColor,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'hadith';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Hadith> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('book_id')) {
+      context.handle(
+        _bookIdMeta,
+        bookId.isAcceptableOrUnknown(data['book_id']!, _bookIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookIdMeta);
+    }
+    if (data.containsKey('book_name')) {
+      context.handle(
+        _bookNameMeta,
+        bookName.isAcceptableOrUnknown(data['book_name']!, _bookNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookNameMeta);
+    }
+    if (data.containsKey('chapter_id')) {
+      context.handle(
+        _chapterIdMeta,
+        chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chapterIdMeta);
+    }
+    if (data.containsKey('section_id')) {
+      context.handle(
+        _sectionIdMeta,
+        sectionId.isAcceptableOrUnknown(data['section_id']!, _sectionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sectionIdMeta);
+    }
+    if (data.containsKey('hadith_key')) {
+      context.handle(
+        _hadithKeyMeta,
+        hadithKey.isAcceptableOrUnknown(data['hadith_key']!, _hadithKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hadithKeyMeta);
+    }
+    if (data.containsKey('hadith_id')) {
+      context.handle(
+        _hadithIdMeta,
+        hadithId.isAcceptableOrUnknown(data['hadith_id']!, _hadithIdMeta),
+      );
+    }
+    if (data.containsKey('narrator')) {
+      context.handle(
+        _narratorMeta,
+        narrator.isAcceptableOrUnknown(data['narrator']!, _narratorMeta),
+      );
+    }
+    if (data.containsKey('bn')) {
+      context.handle(_bnMeta, bn.isAcceptableOrUnknown(data['bn']!, _bnMeta));
+    }
+    if (data.containsKey('ar')) {
+      context.handle(_arMeta, ar.isAcceptableOrUnknown(data['ar']!, _arMeta));
+    }
+    if (data.containsKey('ar_diacless')) {
+      context.handle(
+        _arDiaclessMeta,
+        arDiacless.isAcceptableOrUnknown(data['ar_diacless']!, _arDiaclessMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('grade_id')) {
+      context.handle(
+        _gradeIdMeta,
+        gradeId.isAcceptableOrUnknown(data['grade_id']!, _gradeIdMeta),
+      );
+    }
+    if (data.containsKey('grade')) {
+      context.handle(
+        _gradeMeta,
+        grade.isAcceptableOrUnknown(data['grade']!, _gradeMeta),
+      );
+    }
+    if (data.containsKey('grade_color')) {
+      context.handle(
+        _gradeColorMeta,
+        gradeColor.isAcceptableOrUnknown(data['grade_color']!, _gradeColorMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Hadith map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Hadith(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      bookId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}book_id'],
+      )!,
+      bookName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_name'],
+      )!,
+      chapterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter_id'],
+      )!,
+      sectionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}section_id'],
+      )!,
+      hadithKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hadith_key'],
+      )!,
+      hadithId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hadith_id'],
+      ),
+      narrator: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}narrator'],
+      ),
+      bn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bn'],
+      ),
+      ar: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ar'],
+      ),
+      arDiacless: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ar_diacless'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      gradeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}grade_id'],
+      ),
+      grade: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}grade'],
+      ),
+      gradeColor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}grade_color'],
+      ),
+    );
+  }
+
+  @override
+  $HadithsTable createAlias(String alias) {
+    return $HadithsTable(attachedDatabase, alias);
+  }
+}
+
+class Hadith extends DataClass implements Insertable<Hadith> {
+  final int id;
+  final int bookId;
+  final String bookName;
+  final int chapterId;
+  final int sectionId;
+  final String hadithKey;
+  final int? hadithId;
+  final String? narrator;
+  final String? bn;
+  final String? ar;
+  final String? arDiacless;
+  final String? note;
+  final int? gradeId;
+  final String? grade;
+  final String? gradeColor;
+  const Hadith({
+    required this.id,
+    required this.bookId,
+    required this.bookName,
+    required this.chapterId,
+    required this.sectionId,
+    required this.hadithKey,
+    this.hadithId,
+    this.narrator,
+    this.bn,
+    this.ar,
+    this.arDiacless,
+    this.note,
+    this.gradeId,
+    this.grade,
+    this.gradeColor,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['book_id'] = Variable<int>(bookId);
+    map['book_name'] = Variable<String>(bookName);
+    map['chapter_id'] = Variable<int>(chapterId);
+    map['section_id'] = Variable<int>(sectionId);
+    map['hadith_key'] = Variable<String>(hadithKey);
+    if (!nullToAbsent || hadithId != null) {
+      map['hadith_id'] = Variable<int>(hadithId);
+    }
+    if (!nullToAbsent || narrator != null) {
+      map['narrator'] = Variable<String>(narrator);
+    }
+    if (!nullToAbsent || bn != null) {
+      map['bn'] = Variable<String>(bn);
+    }
+    if (!nullToAbsent || ar != null) {
+      map['ar'] = Variable<String>(ar);
+    }
+    if (!nullToAbsent || arDiacless != null) {
+      map['ar_diacless'] = Variable<String>(arDiacless);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || gradeId != null) {
+      map['grade_id'] = Variable<int>(gradeId);
+    }
+    if (!nullToAbsent || grade != null) {
+      map['grade'] = Variable<String>(grade);
+    }
+    if (!nullToAbsent || gradeColor != null) {
+      map['grade_color'] = Variable<String>(gradeColor);
+    }
+    return map;
+  }
+
+  HadithsCompanion toCompanion(bool nullToAbsent) {
+    return HadithsCompanion(
+      id: Value(id),
+      bookId: Value(bookId),
+      bookName: Value(bookName),
+      chapterId: Value(chapterId),
+      sectionId: Value(sectionId),
+      hadithKey: Value(hadithKey),
+      hadithId: hadithId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hadithId),
+      narrator: narrator == null && nullToAbsent
+          ? const Value.absent()
+          : Value(narrator),
+      bn: bn == null && nullToAbsent ? const Value.absent() : Value(bn),
+      ar: ar == null && nullToAbsent ? const Value.absent() : Value(ar),
+      arDiacless: arDiacless == null && nullToAbsent
+          ? const Value.absent()
+          : Value(arDiacless),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      gradeId: gradeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gradeId),
+      grade: grade == null && nullToAbsent
+          ? const Value.absent()
+          : Value(grade),
+      gradeColor: gradeColor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gradeColor),
+    );
+  }
+
+  factory Hadith.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Hadith(
+      id: serializer.fromJson<int>(json['id']),
+      bookId: serializer.fromJson<int>(json['bookId']),
+      bookName: serializer.fromJson<String>(json['bookName']),
+      chapterId: serializer.fromJson<int>(json['chapterId']),
+      sectionId: serializer.fromJson<int>(json['sectionId']),
+      hadithKey: serializer.fromJson<String>(json['hadithKey']),
+      hadithId: serializer.fromJson<int?>(json['hadithId']),
+      narrator: serializer.fromJson<String?>(json['narrator']),
+      bn: serializer.fromJson<String?>(json['bn']),
+      ar: serializer.fromJson<String?>(json['ar']),
+      arDiacless: serializer.fromJson<String?>(json['arDiacless']),
+      note: serializer.fromJson<String?>(json['note']),
+      gradeId: serializer.fromJson<int?>(json['gradeId']),
+      grade: serializer.fromJson<String?>(json['grade']),
+      gradeColor: serializer.fromJson<String?>(json['gradeColor']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bookId': serializer.toJson<int>(bookId),
+      'bookName': serializer.toJson<String>(bookName),
+      'chapterId': serializer.toJson<int>(chapterId),
+      'sectionId': serializer.toJson<int>(sectionId),
+      'hadithKey': serializer.toJson<String>(hadithKey),
+      'hadithId': serializer.toJson<int?>(hadithId),
+      'narrator': serializer.toJson<String?>(narrator),
+      'bn': serializer.toJson<String?>(bn),
+      'ar': serializer.toJson<String?>(ar),
+      'arDiacless': serializer.toJson<String?>(arDiacless),
+      'note': serializer.toJson<String?>(note),
+      'gradeId': serializer.toJson<int?>(gradeId),
+      'grade': serializer.toJson<String?>(grade),
+      'gradeColor': serializer.toJson<String?>(gradeColor),
+    };
+  }
+
+  Hadith copyWith({
+    int? id,
+    int? bookId,
+    String? bookName,
+    int? chapterId,
+    int? sectionId,
+    String? hadithKey,
+    Value<int?> hadithId = const Value.absent(),
+    Value<String?> narrator = const Value.absent(),
+    Value<String?> bn = const Value.absent(),
+    Value<String?> ar = const Value.absent(),
+    Value<String?> arDiacless = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    Value<int?> gradeId = const Value.absent(),
+    Value<String?> grade = const Value.absent(),
+    Value<String?> gradeColor = const Value.absent(),
+  }) => Hadith(
+    id: id ?? this.id,
+    bookId: bookId ?? this.bookId,
+    bookName: bookName ?? this.bookName,
+    chapterId: chapterId ?? this.chapterId,
+    sectionId: sectionId ?? this.sectionId,
+    hadithKey: hadithKey ?? this.hadithKey,
+    hadithId: hadithId.present ? hadithId.value : this.hadithId,
+    narrator: narrator.present ? narrator.value : this.narrator,
+    bn: bn.present ? bn.value : this.bn,
+    ar: ar.present ? ar.value : this.ar,
+    arDiacless: arDiacless.present ? arDiacless.value : this.arDiacless,
+    note: note.present ? note.value : this.note,
+    gradeId: gradeId.present ? gradeId.value : this.gradeId,
+    grade: grade.present ? grade.value : this.grade,
+    gradeColor: gradeColor.present ? gradeColor.value : this.gradeColor,
+  );
+  Hadith copyWithCompanion(HadithsCompanion data) {
+    return Hadith(
+      id: data.id.present ? data.id.value : this.id,
+      bookId: data.bookId.present ? data.bookId.value : this.bookId,
+      bookName: data.bookName.present ? data.bookName.value : this.bookName,
+      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      sectionId: data.sectionId.present ? data.sectionId.value : this.sectionId,
+      hadithKey: data.hadithKey.present ? data.hadithKey.value : this.hadithKey,
+      hadithId: data.hadithId.present ? data.hadithId.value : this.hadithId,
+      narrator: data.narrator.present ? data.narrator.value : this.narrator,
+      bn: data.bn.present ? data.bn.value : this.bn,
+      ar: data.ar.present ? data.ar.value : this.ar,
+      arDiacless: data.arDiacless.present
+          ? data.arDiacless.value
+          : this.arDiacless,
+      note: data.note.present ? data.note.value : this.note,
+      gradeId: data.gradeId.present ? data.gradeId.value : this.gradeId,
+      grade: data.grade.present ? data.grade.value : this.grade,
+      gradeColor: data.gradeColor.present
+          ? data.gradeColor.value
+          : this.gradeColor,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Hadith(')
+          ..write('id: $id, ')
+          ..write('bookId: $bookId, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('sectionId: $sectionId, ')
+          ..write('hadithKey: $hadithKey, ')
+          ..write('hadithId: $hadithId, ')
+          ..write('narrator: $narrator, ')
+          ..write('bn: $bn, ')
+          ..write('ar: $ar, ')
+          ..write('arDiacless: $arDiacless, ')
+          ..write('note: $note, ')
+          ..write('gradeId: $gradeId, ')
+          ..write('grade: $grade, ')
+          ..write('gradeColor: $gradeColor')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    bookId,
+    bookName,
+    chapterId,
+    sectionId,
+    hadithKey,
+    hadithId,
+    narrator,
+    bn,
+    ar,
+    arDiacless,
+    note,
+    gradeId,
+    grade,
+    gradeColor,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Hadith &&
+          other.id == this.id &&
+          other.bookId == this.bookId &&
+          other.bookName == this.bookName &&
+          other.chapterId == this.chapterId &&
+          other.sectionId == this.sectionId &&
+          other.hadithKey == this.hadithKey &&
+          other.hadithId == this.hadithId &&
+          other.narrator == this.narrator &&
+          other.bn == this.bn &&
+          other.ar == this.ar &&
+          other.arDiacless == this.arDiacless &&
+          other.note == this.note &&
+          other.gradeId == this.gradeId &&
+          other.grade == this.grade &&
+          other.gradeColor == this.gradeColor);
+}
+
+class HadithsCompanion extends UpdateCompanion<Hadith> {
+  final Value<int> id;
+  final Value<int> bookId;
+  final Value<String> bookName;
+  final Value<int> chapterId;
+  final Value<int> sectionId;
+  final Value<String> hadithKey;
+  final Value<int?> hadithId;
+  final Value<String?> narrator;
+  final Value<String?> bn;
+  final Value<String?> ar;
+  final Value<String?> arDiacless;
+  final Value<String?> note;
+  final Value<int?> gradeId;
+  final Value<String?> grade;
+  final Value<String?> gradeColor;
+  const HadithsCompanion({
+    this.id = const Value.absent(),
+    this.bookId = const Value.absent(),
+    this.bookName = const Value.absent(),
+    this.chapterId = const Value.absent(),
+    this.sectionId = const Value.absent(),
+    this.hadithKey = const Value.absent(),
+    this.hadithId = const Value.absent(),
+    this.narrator = const Value.absent(),
+    this.bn = const Value.absent(),
+    this.ar = const Value.absent(),
+    this.arDiacless = const Value.absent(),
+    this.note = const Value.absent(),
+    this.gradeId = const Value.absent(),
+    this.grade = const Value.absent(),
+    this.gradeColor = const Value.absent(),
+  });
+  HadithsCompanion.insert({
+    this.id = const Value.absent(),
+    required int bookId,
+    required String bookName,
+    required int chapterId,
+    required int sectionId,
+    required String hadithKey,
+    this.hadithId = const Value.absent(),
+    this.narrator = const Value.absent(),
+    this.bn = const Value.absent(),
+    this.ar = const Value.absent(),
+    this.arDiacless = const Value.absent(),
+    this.note = const Value.absent(),
+    this.gradeId = const Value.absent(),
+    this.grade = const Value.absent(),
+    this.gradeColor = const Value.absent(),
+  }) : bookId = Value(bookId),
+       bookName = Value(bookName),
+       chapterId = Value(chapterId),
+       sectionId = Value(sectionId),
+       hadithKey = Value(hadithKey);
+  static Insertable<Hadith> custom({
+    Expression<int>? id,
+    Expression<int>? bookId,
+    Expression<String>? bookName,
+    Expression<int>? chapterId,
+    Expression<int>? sectionId,
+    Expression<String>? hadithKey,
+    Expression<int>? hadithId,
+    Expression<String>? narrator,
+    Expression<String>? bn,
+    Expression<String>? ar,
+    Expression<String>? arDiacless,
+    Expression<String>? note,
+    Expression<int>? gradeId,
+    Expression<String>? grade,
+    Expression<String>? gradeColor,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookId != null) 'book_id': bookId,
+      if (bookName != null) 'book_name': bookName,
+      if (chapterId != null) 'chapter_id': chapterId,
+      if (sectionId != null) 'section_id': sectionId,
+      if (hadithKey != null) 'hadith_key': hadithKey,
+      if (hadithId != null) 'hadith_id': hadithId,
+      if (narrator != null) 'narrator': narrator,
+      if (bn != null) 'bn': bn,
+      if (ar != null) 'ar': ar,
+      if (arDiacless != null) 'ar_diacless': arDiacless,
+      if (note != null) 'note': note,
+      if (gradeId != null) 'grade_id': gradeId,
+      if (grade != null) 'grade': grade,
+      if (gradeColor != null) 'grade_color': gradeColor,
+    });
+  }
+
+  HadithsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? bookId,
+    Value<String>? bookName,
+    Value<int>? chapterId,
+    Value<int>? sectionId,
+    Value<String>? hadithKey,
+    Value<int?>? hadithId,
+    Value<String?>? narrator,
+    Value<String?>? bn,
+    Value<String?>? ar,
+    Value<String?>? arDiacless,
+    Value<String?>? note,
+    Value<int?>? gradeId,
+    Value<String?>? grade,
+    Value<String?>? gradeColor,
+  }) {
+    return HadithsCompanion(
+      id: id ?? this.id,
+      bookId: bookId ?? this.bookId,
+      bookName: bookName ?? this.bookName,
+      chapterId: chapterId ?? this.chapterId,
+      sectionId: sectionId ?? this.sectionId,
+      hadithKey: hadithKey ?? this.hadithKey,
+      hadithId: hadithId ?? this.hadithId,
+      narrator: narrator ?? this.narrator,
+      bn: bn ?? this.bn,
+      ar: ar ?? this.ar,
+      arDiacless: arDiacless ?? this.arDiacless,
+      note: note ?? this.note,
+      gradeId: gradeId ?? this.gradeId,
+      grade: grade ?? this.grade,
+      gradeColor: gradeColor ?? this.gradeColor,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bookId.present) {
+      map['book_id'] = Variable<int>(bookId.value);
+    }
+    if (bookName.present) {
+      map['book_name'] = Variable<String>(bookName.value);
+    }
+    if (chapterId.present) {
+      map['chapter_id'] = Variable<int>(chapterId.value);
+    }
+    if (sectionId.present) {
+      map['section_id'] = Variable<int>(sectionId.value);
+    }
+    if (hadithKey.present) {
+      map['hadith_key'] = Variable<String>(hadithKey.value);
+    }
+    if (hadithId.present) {
+      map['hadith_id'] = Variable<int>(hadithId.value);
+    }
+    if (narrator.present) {
+      map['narrator'] = Variable<String>(narrator.value);
+    }
+    if (bn.present) {
+      map['bn'] = Variable<String>(bn.value);
+    }
+    if (ar.present) {
+      map['ar'] = Variable<String>(ar.value);
+    }
+    if (arDiacless.present) {
+      map['ar_diacless'] = Variable<String>(arDiacless.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (gradeId.present) {
+      map['grade_id'] = Variable<int>(gradeId.value);
+    }
+    if (grade.present) {
+      map['grade'] = Variable<String>(grade.value);
+    }
+    if (gradeColor.present) {
+      map['grade_color'] = Variable<String>(gradeColor.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HadithsCompanion(')
+          ..write('id: $id, ')
+          ..write('bookId: $bookId, ')
+          ..write('bookName: $bookName, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('sectionId: $sectionId, ')
+          ..write('hadithKey: $hadithKey, ')
+          ..write('hadithId: $hadithId, ')
+          ..write('narrator: $narrator, ')
+          ..write('bn: $bn, ')
+          ..write('ar: $ar, ')
+          ..write('arDiacless: $arDiacless, ')
+          ..write('note: $note, ')
+          ..write('gradeId: $gradeId, ')
+          ..write('grade: $grade, ')
+          ..write('gradeColor: $gradeColor')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $BooksTable books = $BooksTable(this);
   late final $ChaptersTable chapters = $ChaptersTable(this);
+  late final $HadithsTable hadiths = $HadithsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [books, chapters];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    books,
+    chapters,
+    hadiths,
+  ];
 }
 
 typedef $$BooksTableCreateCompanionBuilder =
@@ -1442,6 +2275,388 @@ typedef $$ChaptersTableProcessedTableManager =
       Chapter,
       PrefetchHooks Function()
     >;
+typedef $$HadithsTableCreateCompanionBuilder =
+    HadithsCompanion Function({
+      Value<int> id,
+      required int bookId,
+      required String bookName,
+      required int chapterId,
+      required int sectionId,
+      required String hadithKey,
+      Value<int?> hadithId,
+      Value<String?> narrator,
+      Value<String?> bn,
+      Value<String?> ar,
+      Value<String?> arDiacless,
+      Value<String?> note,
+      Value<int?> gradeId,
+      Value<String?> grade,
+      Value<String?> gradeColor,
+    });
+typedef $$HadithsTableUpdateCompanionBuilder =
+    HadithsCompanion Function({
+      Value<int> id,
+      Value<int> bookId,
+      Value<String> bookName,
+      Value<int> chapterId,
+      Value<int> sectionId,
+      Value<String> hadithKey,
+      Value<int?> hadithId,
+      Value<String?> narrator,
+      Value<String?> bn,
+      Value<String?> ar,
+      Value<String?> arDiacless,
+      Value<String?> note,
+      Value<int?> gradeId,
+      Value<String?> grade,
+      Value<String?> gradeColor,
+    });
+
+class $$HadithsTableFilterComposer
+    extends Composer<_$AppDatabase, $HadithsTable> {
+  $$HadithsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get bookId => $composableBuilder(
+    column: $table.bookId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sectionId => $composableBuilder(
+    column: $table.sectionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hadithKey => $composableBuilder(
+    column: $table.hadithKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hadithId => $composableBuilder(
+    column: $table.hadithId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get narrator => $composableBuilder(
+    column: $table.narrator,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bn => $composableBuilder(
+    column: $table.bn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ar => $composableBuilder(
+    column: $table.ar,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get arDiacless => $composableBuilder(
+    column: $table.arDiacless,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gradeId => $composableBuilder(
+    column: $table.gradeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get grade => $composableBuilder(
+    column: $table.grade,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gradeColor => $composableBuilder(
+    column: $table.gradeColor,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HadithsTableOrderingComposer
+    extends Composer<_$AppDatabase, $HadithsTable> {
+  $$HadithsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get bookId => $composableBuilder(
+    column: $table.bookId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookName => $composableBuilder(
+    column: $table.bookName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapterId => $composableBuilder(
+    column: $table.chapterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sectionId => $composableBuilder(
+    column: $table.sectionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hadithKey => $composableBuilder(
+    column: $table.hadithKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hadithId => $composableBuilder(
+    column: $table.hadithId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get narrator => $composableBuilder(
+    column: $table.narrator,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bn => $composableBuilder(
+    column: $table.bn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ar => $composableBuilder(
+    column: $table.ar,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get arDiacless => $composableBuilder(
+    column: $table.arDiacless,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gradeId => $composableBuilder(
+    column: $table.gradeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get grade => $composableBuilder(
+    column: $table.grade,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gradeColor => $composableBuilder(
+    column: $table.gradeColor,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HadithsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HadithsTable> {
+  $$HadithsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get bookId =>
+      $composableBuilder(column: $table.bookId, builder: (column) => column);
+
+  GeneratedColumn<String> get bookName =>
+      $composableBuilder(column: $table.bookName, builder: (column) => column);
+
+  GeneratedColumn<int> get chapterId =>
+      $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<int> get sectionId =>
+      $composableBuilder(column: $table.sectionId, builder: (column) => column);
+
+  GeneratedColumn<String> get hadithKey =>
+      $composableBuilder(column: $table.hadithKey, builder: (column) => column);
+
+  GeneratedColumn<int> get hadithId =>
+      $composableBuilder(column: $table.hadithId, builder: (column) => column);
+
+  GeneratedColumn<String> get narrator =>
+      $composableBuilder(column: $table.narrator, builder: (column) => column);
+
+  GeneratedColumn<String> get bn =>
+      $composableBuilder(column: $table.bn, builder: (column) => column);
+
+  GeneratedColumn<String> get ar =>
+      $composableBuilder(column: $table.ar, builder: (column) => column);
+
+  GeneratedColumn<String> get arDiacless => $composableBuilder(
+    column: $table.arDiacless,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get gradeId =>
+      $composableBuilder(column: $table.gradeId, builder: (column) => column);
+
+  GeneratedColumn<String> get grade =>
+      $composableBuilder(column: $table.grade, builder: (column) => column);
+
+  GeneratedColumn<String> get gradeColor => $composableBuilder(
+    column: $table.gradeColor,
+    builder: (column) => column,
+  );
+}
+
+class $$HadithsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HadithsTable,
+          Hadith,
+          $$HadithsTableFilterComposer,
+          $$HadithsTableOrderingComposer,
+          $$HadithsTableAnnotationComposer,
+          $$HadithsTableCreateCompanionBuilder,
+          $$HadithsTableUpdateCompanionBuilder,
+          (Hadith, BaseReferences<_$AppDatabase, $HadithsTable, Hadith>),
+          Hadith,
+          PrefetchHooks Function()
+        > {
+  $$HadithsTableTableManager(_$AppDatabase db, $HadithsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HadithsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HadithsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HadithsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> bookId = const Value.absent(),
+                Value<String> bookName = const Value.absent(),
+                Value<int> chapterId = const Value.absent(),
+                Value<int> sectionId = const Value.absent(),
+                Value<String> hadithKey = const Value.absent(),
+                Value<int?> hadithId = const Value.absent(),
+                Value<String?> narrator = const Value.absent(),
+                Value<String?> bn = const Value.absent(),
+                Value<String?> ar = const Value.absent(),
+                Value<String?> arDiacless = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int?> gradeId = const Value.absent(),
+                Value<String?> grade = const Value.absent(),
+                Value<String?> gradeColor = const Value.absent(),
+              }) => HadithsCompanion(
+                id: id,
+                bookId: bookId,
+                bookName: bookName,
+                chapterId: chapterId,
+                sectionId: sectionId,
+                hadithKey: hadithKey,
+                hadithId: hadithId,
+                narrator: narrator,
+                bn: bn,
+                ar: ar,
+                arDiacless: arDiacless,
+                note: note,
+                gradeId: gradeId,
+                grade: grade,
+                gradeColor: gradeColor,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int bookId,
+                required String bookName,
+                required int chapterId,
+                required int sectionId,
+                required String hadithKey,
+                Value<int?> hadithId = const Value.absent(),
+                Value<String?> narrator = const Value.absent(),
+                Value<String?> bn = const Value.absent(),
+                Value<String?> ar = const Value.absent(),
+                Value<String?> arDiacless = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int?> gradeId = const Value.absent(),
+                Value<String?> grade = const Value.absent(),
+                Value<String?> gradeColor = const Value.absent(),
+              }) => HadithsCompanion.insert(
+                id: id,
+                bookId: bookId,
+                bookName: bookName,
+                chapterId: chapterId,
+                sectionId: sectionId,
+                hadithKey: hadithKey,
+                hadithId: hadithId,
+                narrator: narrator,
+                bn: bn,
+                ar: ar,
+                arDiacless: arDiacless,
+                note: note,
+                gradeId: gradeId,
+                grade: grade,
+                gradeColor: gradeColor,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HadithsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HadithsTable,
+      Hadith,
+      $$HadithsTableFilterComposer,
+      $$HadithsTableOrderingComposer,
+      $$HadithsTableAnnotationComposer,
+      $$HadithsTableCreateCompanionBuilder,
+      $$HadithsTableUpdateCompanionBuilder,
+      (Hadith, BaseReferences<_$AppDatabase, $HadithsTable, Hadith>),
+      Hadith,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1450,4 +2665,6 @@ class $AppDatabaseManager {
       $$BooksTableTableManager(_db, _db.books);
   $$ChaptersTableTableManager get chapters =>
       $$ChaptersTableTableManager(_db, _db.chapters);
+  $$HadithsTableTableManager get hadiths =>
+      $$HadithsTableTableManager(_db, _db.hadiths);
 }

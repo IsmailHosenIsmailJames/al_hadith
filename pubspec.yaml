@@ -20,6 +20,7 @@ dependencies:
   gap: ^3.0.1
   flutter_animate: ^4.5.2
   get: ^5.0.0-release-candidate-9.3.2
+  flutter_svg: ^2.1.0
 
 
 dev_dependencies:

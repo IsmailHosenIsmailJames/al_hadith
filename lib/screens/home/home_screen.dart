@@ -33,8 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: AppColors.primary,
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(50),
-                bottomRight: Radius.circular(50),
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
               ),
               image: DecorationImage(
                 alignment: Alignment.bottomCenter,
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   value,
                           itemBuilder: (context, index) {
                             return Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.all(10.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -136,13 +136,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Gap(30),
                 Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.all(20),
+                  margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.light
                         ? Colors.grey.shade100
                         : Colors.grey.shade900,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(15),
                     boxShadow: [boxShadow],
                   ),
                   child: Row(
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Gap(10),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20, bottom: 20),
+                  padding: const EdgeInsets.only(left: 10, bottom: 10),
                   child: Text(
                     "সব হাদিসের বই",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -195,8 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           Book book = data[index];
                           return Container(
                             margin: EdgeInsets.only(
-                              left: 20,
-                              right: 20,
+                              left: 10,
+                              right: 10,
                               bottom: 10,
                             ),
 

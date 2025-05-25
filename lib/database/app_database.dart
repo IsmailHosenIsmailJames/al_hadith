@@ -4,7 +4,7 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Books, Chapters])
+@DriftDatabase(tables: [Books, Chapters, Hadiths])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 
@@ -36,7 +36,27 @@ class AppDatabase extends _$AppDatabase {
     return (select(chapters)..where((c) => c.bookId.equals(bookId))).get();
   }
 
-  Future<Chapter?> getChapterById(int chapterId) =>
-      (select(chapters)..where((c) => c.id.equals(chapterId)))
-          .getSingleOrNull(); // Assuming 'id' is the PK for Chapter
+  Future<Chapter?> getChapterById(int chapterId) => (select(
+    chapters,
+  )..where((c) => c.id.equals(chapterId))).getSingleOrNull();
+
+  Future<List<Hadith>> getAllHadiths() => select(hadiths).get();
+
+  Future<List<Hadith>> getHadithsForChapter(int chapterId) {
+    return (select(hadiths)..where((h) => h.chapterId.equals(chapterId))).get();
+  }
+
+  Future<List<Hadith>> getHadithsForBook(int bookId) {
+    return (select(hadiths)..where((h) => h.bookId.equals(bookId))).get();
+  }
+
+  Future<Hadith?> getHadithByInternalId(int id) {
+    return (select(hadiths)..where((h) => h.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<Hadith?> getHadithByHadithId(int hadithId) {
+    return (select(
+      hadiths,
+    )..where((h) => h.hadithId.equals(hadithId))).getSingleOrNull();
+  }
 }
