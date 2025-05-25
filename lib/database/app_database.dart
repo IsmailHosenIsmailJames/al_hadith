@@ -4,7 +4,7 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Books])
+@DriftDatabase(tables: [Books, Chapters])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 
@@ -29,4 +29,14 @@ class AppDatabase extends _$AppDatabase {
 
     return tableNames;
   }
+
+  Future<List<Chapter>> getAllChapters() => select(chapters).get();
+
+  Future<List<Chapter>> getChaptersForBook(int bookId) {
+    return (select(chapters)..where((c) => c.bookId.equals(bookId))).get();
+  }
+
+  Future<Chapter?> getChapterById(int chapterId) =>
+      (select(chapters)..where((c) => c.id.equals(chapterId)))
+          .getSingleOrNull(); // Assuming 'id' is the PK for Chapter
 }

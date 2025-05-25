@@ -1,6 +1,7 @@
 import 'package:al_hadith/database/app_database.dart';
 import 'package:al_hadith/main.dart';
 import 'package:al_hadith/res/sample_resources.dart';
+import 'package:al_hadith/screens/home/chapthers/chapter_view.dart';
 import 'package:al_hadith/screens/home/controller/home_controller.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -198,72 +199,99 @@ class _HomeScreenState extends State<HomeScreen> {
                               right: 20,
                               bottom: 10,
                             ),
-                            padding: EdgeInsets.all(10),
+
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? Colors.white
-                                  : Colors.grey.shade900,
-
                               boxShadow: [boxShadow],
                             ),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Color(
-                                    int.parse(
-                                      "ff${book.colorCode.substring(1)}",
-                                      radix: 16,
-                                    ),
-                                  ),
-                                  foregroundColor: Colors.white,
-                                  child: Text(
-                                    book.abvrCode,
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.all(10),
+                                backgroundColor:
+                                    Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? Colors.white
+                                    : Colors.grey.shade900,
+                                foregroundColor:
+                                    Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? Colors.grey.shade900
+                                    : Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                Gap(15),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      book.title,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
+                              ),
+                              onPressed: () async {
+                                final List<Chapter> chapters = await db
+                                    .getChaptersForBook(book.id);
+                                Navigator.push(
+                                  // ignore: use_build_context_synchronously
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChapterView(
+                                      chapters: chapters,
+                                      book: book,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Color(
+                                      int.parse(
+                                        "ff${book.colorCode.substring(1)}",
+                                        radix: 16,
                                       ),
                                     ),
-                                    Text(
-                                      book.titleAr,
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                Spacer(),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      book.numberOfHadis.toString(),
+                                    foregroundColor: Colors.white,
+                                    child: Text(
+                                      book.abvrCode,
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(
-                                      "হাদিস",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                  Gap(15),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        book.title,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        book.titleAr,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        book.numberOfHadis.toString(),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "হাদিস",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         }),
