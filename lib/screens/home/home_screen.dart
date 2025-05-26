@@ -1,5 +1,4 @@
 import 'package:al_hadith/database/app_database.dart';
-import 'package:al_hadith/main.dart';
 import 'package:al_hadith/res/sample_resources.dart';
 import 'package:al_hadith/screens/chapthers/chapter_view.dart';
 import 'package:al_hadith/screens/home/controller/home_controller.dart';

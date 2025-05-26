@@ -4,6 +4,8 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
+final AppDatabase db = AppDatabase();
+
 @DriftDatabase(tables: [Books, Chapters, Hadiths])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());

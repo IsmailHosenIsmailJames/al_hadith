@@ -1,5 +1,4 @@
 import 'package:al_hadith/database/app_database.dart';
-import 'package:al_hadith/main.dart';
 import 'package:al_hadith/res/sample_resources.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:flutter/material.dart';
