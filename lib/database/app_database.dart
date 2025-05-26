@@ -59,4 +59,42 @@ class AppDatabase extends _$AppDatabase {
       hadiths,
     )..where((h) => h.hadithId.equals(hadithId))).getSingleOrNull();
   }
+
+  Future<List<Hadith>> getHadithsPaginated({
+    required int limit,
+    int? offset,
+    int? chapterId,
+    int? bookId,
+  }) {
+    final query = select(hadiths);
+
+    if (chapterId != null) {
+      query.where((h) => h.chapterId.equals(chapterId));
+    } else if (bookId != null) {
+      query.where((h) => h.bookId.equals(bookId));
+    }
+
+    query.orderBy([
+      (h) => OrderingTerm(expression: h.id, mode: OrderingMode.asc),
+    ]);
+
+    query.limit(limit, offset: offset);
+
+    return query.get();
+  }
+
+  Future<int?> getTotalHadithsCount({int? chapterId, int? bookId}) async {
+    final countExpression = countAll(
+      filter: chapterId != null
+          ? hadiths.chapterId.equals(chapterId)
+          : (bookId != null ? hadiths.bookId.equals(bookId) : null),
+    );
+
+    final query = selectOnly(hadiths)..addColumns([countExpression]);
+
+    final result = await query
+        .map((row) => row.read(countExpression))
+        .getSingle();
+    return result;
+  }
 }
