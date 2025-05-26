@@ -1,8 +1,10 @@
 import 'package:al_hadith/database/app_database.dart';
+import 'package:al_hadith/res/sample_resources.dart';
 import 'package:al_hadith/screens/hadith/hadith_view.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 
 class ChapterView extends StatefulWidget {
@@ -134,12 +136,23 @@ class _ChapterViewState extends State<ChapterView> {
                           },
                           child: Row(
                             children: [
-                              CircleAvatar(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                child: Text(
-                                  chapter.chapterId.toString(),
-                                  style: TextStyle(fontSize: 20),
+                              SizedBox(
+                                width: 34.64,
+                                height: 37.83,
+                                child: Stack(
+                                  children: [
+                                    SvgPicture.string(hexagon),
+                                    Center(
+                                      child: Text(
+                                        chapter.chapterId.toString(),
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Gap(16),

@@ -5,6 +5,7 @@ import 'package:al_hadith/screens/home/controller/home_controller.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
@@ -236,22 +237,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundColor: Color(
-                                      int.parse(
-                                        "ff${book.colorCode.substring(1)}",
-                                        radix: 16,
-                                      ),
-                                    ),
-                                    foregroundColor: Colors.white,
-                                    child: Text(
-                                      book.abvrCode,
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  SizedBox(
+                                    height: 35,
+                                    width: 35,
+                                    child: Stack(
+                                      children: [
+                                        SvgPicture.string(
+                                          hexagon,
+                                          colorFilter: ColorFilter.mode(
+                                            Color(
+                                              int.parse(
+                                                "ff${book.colorCode.substring(1)}",
+                                                radix: 16,
+                                              ),
+                                            ),
+                                            BlendMode.srcIn,
+                                          ),
+                                          fit: BoxFit.fitHeight,
+                                        ),
+                                        Center(
+                                          child: FittedBox(
+                                            child: Text(
+                                              book.abvrCode,
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
+
                                   Gap(15),
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
