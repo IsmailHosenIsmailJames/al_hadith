@@ -1,5 +1,4 @@
 import 'package:al_hadith/database/app_database.dart';
-import 'package:al_hadith/main.dart';
 import 'package:al_hadith/screens/hadith/hadith_view.dart';
 import 'package:al_hadith/theme/app_colors.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -122,28 +121,11 @@ class _ChapterViewState extends State<ChapterView> {
                             ),
                           ),
                           onPressed: () async {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) => Dialog(
-                                child: Container(
-                                  height: 100,
-                                  alignment: Alignment.center,
-                                  child: CircularProgressIndicator.adaptive(),
-                                ),
-                              ),
-                            );
-                            final List<Hadith> hadithList = await db
-                                .getAllHadiths();
-                            await Future.delayed(Duration(milliseconds: 200));
-                            // ignore: use_build_context_synchronously
-                            Navigator.pop(context);
                             Navigator.push(
                               // ignore: use_build_context_synchronously
                               context,
                               MaterialPageRoute(
                                 builder: (context) => HadithView(
-                                  hadithList: hadithList,
                                   chapter: chapter,
                                   book: widget.book,
                                 ),
@@ -166,11 +148,15 @@ class _ChapterViewState extends State<ChapterView> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
 
                                 children: [
-                                  Text(
-                                    chapter.title,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width - 116,
+                                    child: Text(
+                                      chapter.title,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                   Text("হাদিসের রেঞ্জ: ${chapter.hadisRange}"),
