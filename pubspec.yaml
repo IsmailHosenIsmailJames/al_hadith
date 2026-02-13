@@ -1,37 +1,33 @@
 name: al_hadith
-description: "A new Flutter project."
-publish_to: 'none'
+description: "Al Hadith in 9 Languages with all major Hadith Collections"
+
+publish_to: 'none' 
 
 version: 1.0.0+1
-
 environment:
-  sdk: ^3.8.0
+  sdk: ^3.11.0
+
 
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  drift: ^2.26.1
-  sqlite3_flutter_libs: ^0.5.33 
+  drift: ^2.31.0
+  drift_flutter: ^0.2.8
   path_provider: ^2.1.5
-  path: ^1.9.1
-  drift_flutter: ^0.2.4
-  fluentui_system_icons: ^1.1.273
-  gap: ^3.0.1
-  flutter_animate: ^4.5.2
-  get: ^5.0.0-release-candidate-9.3.2
-  flutter_svg: ^2.1.0
-
-
+  go_router: ^17.1.0
+  bloc: ^9.2.0
+  flutter_bloc: ^9.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  drift_dev: ^2.26.1
-  build_runner: ^2.4.15
-  flutter_lints: ^5.0.0
+
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.31.0
+  build_runner: ^2.10.5
 
 flutter:
   uses-material-design: true
+
   assets:
-    - assets/database/hadith_bn_test.db
-    - assets/images/
+    - assets/all_info.json

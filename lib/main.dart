@@ -1,27 +1,26 @@
-import 'package:al_hadith/screens/navs/navs.dart';
-import 'package:al_hadith/theme/app_colors.dart';
+import 'package:al_hadith/src/routes/app_routes.dart';
+import 'package:al_hadith/src/setup/screens/setup_language_selection_screen.dart';
+import 'package:al_hadith/src/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MainApp());
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  runApp(const MyApp(initialRoute: SetupLanguageSelectionScreen.routeName));
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.light,
-        ),
-      ),
-      themeMode: ThemeMode.light,
-      home: Navs(),
+      title: 'Al Hadith',
+      theme: ThemeData(colorScheme: .fromSeed(seedColor: AppColors.primary)),
+      routerConfig: AppRoutes.getAppRoutes(initialRoute),
     );
   }
 }
