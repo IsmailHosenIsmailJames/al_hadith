@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,6 +11,12 @@ import '../bloc/setup_cubit.dart';
 class HadithResourceDownloadScreen extends StatefulWidget {
   static const String routeName = '/hadith_resource_download';
   const HadithResourceDownloadScreen({super.key});
+
+  /// Check if the user has completed setup before.
+  static Future<bool> isSetupComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('setup_complete') ?? false;
+  }
 
   @override
   State<HadithResourceDownloadScreen> createState() =>
@@ -20,6 +29,7 @@ class _HadithResourceDownloadScreenState
   late AnimationController _checkAnimController;
   late Animation<double> _checkScale;
   bool _downloadStarted = false;
+  Timer? _autoNavTimer;
 
   @override
   void initState() {
@@ -36,6 +46,7 @@ class _HadithResourceDownloadScreenState
 
   @override
   void dispose() {
+    _autoNavTimer?.cancel();
     _checkAnimController.dispose();
     super.dispose();
   }
@@ -52,6 +63,11 @@ class _HadithResourceDownloadScreenState
     }
   }
 
+  Future<void> _markSetupComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('setup_complete', true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -65,6 +81,10 @@ class _HadithResourceDownloadScreenState
             listener: (context, state) {
               if (state.downloadComplete) {
                 _checkAnimController.forward();
+                _markSetupComplete();
+                _autoNavTimer = Timer(const Duration(seconds: 3), () {
+                  if (mounted) context.go(HomeScreen.routeName);
+                });
               }
             },
             builder: (context, state) {
@@ -202,7 +222,10 @@ class _HadithResourceDownloadScreenState
             width: 200,
             height: 50,
             child: ElevatedButton.icon(
-              onPressed: () => context.go(HomeScreen.routeName),
+              onPressed: () {
+                _autoNavTimer?.cancel();
+                context.go(HomeScreen.routeName);
+              },
               icon: const Icon(Icons.home_rounded, size: 20),
               label: const Text(
                 'Go to Home',
