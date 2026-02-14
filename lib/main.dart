@@ -1,26 +1,49 @@
-import 'package:al_hadith/src/routes/app_routes.dart';
-import 'package:al_hadith/src/setup/screens/setup_language_selection_screen.dart';
-import 'package:al_hadith/src/theme/app_colors.dart';
+import 'package:al_hadith/src/core/locale/locale_cubit.dart';
+import 'package:al_hadith/src/core/routes/app_router.dart';
+import 'package:al_hadith/src/core/theme/theme_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(const MyApp(initialRoute: SetupLanguageSelectionScreen.routeName));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final String initialRoute;
-  const MyApp({super.key, required this.initialRoute});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Al Hadith',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: AppColors.primary)),
-      routerConfig: AppRoutes.getAppRoutes(initialRoute),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => LocaleCubit()),
+      ],
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return BlocBuilder<LocaleCubit, Locale>(
+            builder: (context, locale) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                title: 'Al Hadith',
+                theme: themeState.themeData,
+                routerConfig: appRouter,
+                locale: locale,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: supportedLocales,
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
