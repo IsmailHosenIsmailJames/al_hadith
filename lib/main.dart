@@ -1,5 +1,6 @@
 import 'package:al_hadith/src/core/locale/locale_cubit.dart';
 import 'package:al_hadith/src/core/routes/app_router.dart';
+import 'package:al_hadith/src/setup/bloc/setup_cubit.dart';
 import 'package:al_hadith/src/core/theme/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => LocaleCubit()),
+        BlocProvider(create: (_) => SetupCubit()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
