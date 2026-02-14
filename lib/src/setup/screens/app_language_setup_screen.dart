@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/locale/locale_cubit.dart';
@@ -57,101 +58,99 @@ class _AppLanguageSetupScreenState extends State<AppLanguageSetupScreen>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: theme.dividerColor)),
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: _selectedCode3 == null ? null : _onContinue,
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Continue',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward_rounded, size: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeIn,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                const SizedBox(height: 48),
-                // Header icon
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: cs.primaryContainer.withValues(alpha: 0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.translate_rounded,
-                    size: 32,
-                    color: cs.primary,
-                  ),
+          child: Column(
+            children: [
+              const Gap(24),
+              // Header icon
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: cs.primaryContainer.withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Choose Your Language',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: cs.onSurface,
-                  ),
+                child: Icon(
+                  Icons.translate_rounded,
+                  size: 32,
+                  color: cs.primary,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Select the language for the app interface',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: cs.onSurface.withValues(alpha: 0.6),
-                  ),
+              ),
+              const Gap(20),
+              Text(
+                'Choose Your Language',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface,
                 ),
-                const SizedBox(height: 32),
+              ),
+              const Gap(8),
+              Text(
+                'Select the language for the app interface',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+              Gap(16),
+              const Divider(thickness: 1, height: 1),
 
-                // Language grid
-                Expanded(
-                  child: GridView.builder(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: size.width > 600 ? 3 : 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 1.6,
-                    ),
-                    itemCount: LanguageInfo.all.length,
-                    itemBuilder: (context, index) {
-                      final lang = LanguageInfo.all[index];
-                      final isSelected = _selectedCode3 == lang.code3;
-                      return _LanguageCard(
-                        lang: lang,
-                        isSelected: isSelected,
-                        onTap: () =>
-                            setState(() => _selectedCode3 = lang.code3),
-                      );
-                    },
+              // Language grid
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: size.width > 600 ? 3 : 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 1.5,
                   ),
-                ),
 
-                // Continue button
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 32, top: 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _selectedCode3 == null ? null : _onContinue,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Continue',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward_rounded, size: 20),
-                        ],
-                      ),
-                    ),
-                  ),
+                  itemCount: LanguageInfo.all.length,
+                  itemBuilder: (context, index) {
+                    final lang = LanguageInfo.all[index];
+                    final isSelected = _selectedCode3 == lang.code3;
+                    return _LanguageCard(
+                      lang: lang,
+                      isSelected: isSelected,
+                      onTap: () => setState(() => _selectedCode3 = lang.code3),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+
+              // Continue button
+            ],
           ),
         ),
       ),
@@ -168,7 +167,7 @@ class _AppLanguageSetupScreenState extends State<AppLanguageSetupScreen>
     context.read<SetupCubit>().selectAppLanguage(_selectedCode3!);
 
     // Navigate
-    context.go(HadithResourcesSelectionScreen.routeName);
+    context.push(HadithResourcesSelectionScreen.routeName);
   }
 }
 
@@ -208,7 +207,7 @@ class _LanguageCard extends StatelessWidget {
               color: isSelected
                   ? cs.primary
                   : cs.outline.withValues(alpha: 0.3),
-              width: isSelected ? 2.0 : 1.0,
+              width: isSelected ? 3.0 : 1.0,
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -216,14 +215,10 @@ class _LanguageCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(lang.flag, style: const TextStyle(fontSize: 26)),
-              const SizedBox(height: 6),
+              const Gap(6),
               Text(
                 lang.nativeName,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isSelected ? cs.primary : cs.onSurface,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

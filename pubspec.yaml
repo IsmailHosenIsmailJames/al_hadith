@@ -24,6 +24,7 @@ dependencies:
   archive: ^4.0.7
   google_fonts: ^8.0.1
   intl: ^0.20.2
+  gap: ^3.0.1
 
 dev_dependencies:
   flutter_test:

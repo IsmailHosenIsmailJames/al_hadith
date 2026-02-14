@@ -35,8 +35,8 @@ class HadithResourcesSelectionScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(
                     top: 8,
                     bottom: 100,
-                    left: 12,
-                    right: 12,
+                    left: 8,
+                    right: 8,
                   ),
                   itemCount: langCodes.length,
                   itemBuilder: (context, index) {
@@ -118,7 +118,7 @@ class HadithResourcesSelectionScreen extends StatelessWidget {
                               // Select/Deselect all
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                  horizontal: 12,
                                 ),
                                 child: Row(
                                   children: [
@@ -164,7 +164,7 @@ class HadithResourcesSelectionScreen extends StatelessWidget {
                                       ListTileControlAffinity.leading,
                                   dense: true,
                                   contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
+                                    horizontal: 12,
                                   ),
                                   title: Text(
                                     r.name,
@@ -197,12 +197,9 @@ class HadithResourcesSelectionScreen extends StatelessWidget {
           ),
 
           // Bottom bar with size summary & confirm button
-          bottomSheet: Container(
+          bottomNavigationBar: Container(
             decoration: BoxDecoration(
-              color: cs.surface,
-              border: Border(
-                top: BorderSide(color: cs.outline.withValues(alpha: 0.15)),
-              ),
+              border: Border(top: BorderSide(color: theme.dividerColor)),
               boxShadow: [
                 BoxShadow(
                   color: cs.shadow.withValues(alpha: 0.08),

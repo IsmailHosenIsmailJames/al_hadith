@@ -11,24 +11,28 @@ class AppColorPalette {
     required this.id,
     required this.name,
     required this.shades,
-  }) : assert(shades.length == 9, 'AppColorPalette requires exactly 9 shades');
+  }) : assert(
+         shades.length == 10,
+         'AppColorPalette requires exactly 10 shades',
+       );
 
   // Semantic accessors (lightest → darkest)
-  Color get lightest => shades[0];
-  Color get veryLight => shades[1];
-  Color get light => shades[2];
-  Color get mediumLight => shades[3];
-  Color get medium => shades[4];
-  Color get mediumDark => shades[5];
-  Color get dark => shades[6];
-  Color get veryDark => shades[7];
-  Color get darkest => shades[8];
+  Color get white => shades[0];
+  Color get lightest => shades[1];
+  Color get veryLight => shades[2];
+  Color get light => shades[3];
+  Color get mediumLight => shades[4];
+  Color get medium => shades[5];
+  Color get mediumDark => shades[6];
+  Color get dark => shades[7];
+  Color get veryDark => shades[8];
+  Color get darkest => shades[9];
 
   // Theme-mapping helpers
-  Color get background => lightest;
+  Color get background => white;
   Color get surface => veryLight;
   Color get surfaceVariant => light;
-  Color get primary => medium;
+  Color get primary => dark;
   Color get primaryContainer => mediumLight;
   Color get secondary => mediumDark;
   Color get onPrimary => lightest;
@@ -55,6 +59,7 @@ class AppColorPalette {
     id: 'forest_green',
     name: 'Forest Green',
     shades: const [
+      Color(0xFFF5FFF7),
       Color(0xFFD8F3DC),
       Color(0xFFB7E4C7),
       Color(0xFF95D5B2),
@@ -72,6 +77,7 @@ class AppColorPalette {
     id: 'ocean_blue',
     name: 'Ocean Blue',
     shades: const [
+      Color(0xFFF4FDFF),
       Color(0xFFCAF0F8),
       Color(0xFFADE8F4),
       Color(0xFF90E0EF),
@@ -89,6 +95,7 @@ class AppColorPalette {
     id: 'sunset_amber',
     name: 'Sunset Amber',
     shades: const [
+      Color(0xFFFFFBF4),
       Color(0xFFFFF3E0),
       Color(0xFFFFE0B2),
       Color(0xFFFFCC80),
@@ -106,6 +113,7 @@ class AppColorPalette {
     id: 'royal_purple',
     name: 'Royal Purple',
     shades: const [
+      Color(0xFFFEF6FF),
       Color(0xFFF3E5F5),
       Color(0xFFE1BEE7),
       Color(0xFFCE93D8),
@@ -123,6 +131,7 @@ class AppColorPalette {
     id: 'rose_pink',
     name: 'Rose Pink',
     shades: const [
+      Color(0xFFFFF5F8),
       Color(0xFFFCE4EC),
       Color(0xFFF8BBD0),
       Color(0xFFF48FB1),
@@ -140,6 +149,7 @@ class AppColorPalette {
     id: 'midnight_dark',
     name: 'Midnight Dark',
     shades: const [
+      Color(0xFFF1F1F1),
       Color(0xFFE0E0E0),
       Color(0xFFBDBDBD),
       Color(0xFF9E9E9E),
