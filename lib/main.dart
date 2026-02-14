@@ -1,5 +1,8 @@
 import 'package:al_hadith/src/core/locale/locale_cubit.dart';
 import 'package:al_hadith/src/core/routes/app_router.dart';
+import 'package:al_hadith/src/hadith_list/bloc/hadith_list_cubit.dart';
+import 'package:al_hadith/src/hadith_sections/bloc/sections_cubit.dart';
+import 'package:al_hadith/src/home/bloc/home_cubit.dart';
 import 'package:al_hadith/src/home/screens/home_screen.dart';
 import 'package:al_hadith/src/setup/bloc/setup_cubit.dart';
 import 'package:al_hadith/src/core/theme/theme_cubit.dart';
@@ -47,6 +50,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => LocaleCubit()),
         BlocProvider(create: (_) => SetupCubit()),
+        BlocProvider(create: (_) => HomeCubit()),
+        BlocProvider(create: (_) => SectionsCubit()),
+        BlocProvider(create: (_) => HadithListCubit()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
