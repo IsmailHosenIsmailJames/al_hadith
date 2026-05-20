@@ -1,0 +1,135 @@
+class HadithResource {
+  final String book;
+  final String name;
+  final int hadithCount;
+  final int sectionCount;
+  final String checksum;
+  final String zipPath;
+  final int fileSize;
+  final int zipSize;
+
+  // Local state properties for UI and download management
+  bool isDownloaded;
+  bool isExtracting;
+  double progress; // Ranges from 0.0 to 1.0
+  String? error;
+
+  HadithResource({
+    required this.book,
+    required this.name,
+    required this.hadithCount,
+    required this.sectionCount,
+    required this.checksum,
+    required this.zipPath,
+    required this.fileSize,
+    required this.zipSize,
+    this.isDownloaded = false,
+    this.isExtracting = false,
+    this.progress = 0.0,
+    this.error,
+  });
+
+  factory HadithResource.fromJson(Map<String, dynamic> json) {
+    return HadithResource(
+      book: json['book'] as String,
+      name: json['name'] as String,
+      hadithCount: json['hadith_count'] as int,
+      sectionCount: json['section_count'] as int,
+      checksum: json['checksum'] as String,
+      zipPath: json['zip_path'] as String,
+      fileSize: json['file_size'] as int,
+      zipSize: json['zip_size'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'book': book,
+      'name': name,
+      'hadith_count': hadithCount,
+      'section_count': sectionCount,
+      'checksum': checksum,
+      'zip_path': zipPath,
+      'file_size': fileSize,
+      'zip_size': zipSize,
+    };
+  }
+
+  // Helper properties
+  String get formattedZipSize {
+    if (zipSize < 1024) return '$zipSize B';
+    if (zipSize < 1024 * 1024) return '${(zipSize / 1024).toStringAsFixed(1)} KB';
+    return '${(zipSize / (1024 * 1024)).toStringAsFixed(2)} MB';
+  }
+
+  String get formattedFileSize {
+    if (fileSize < 1024) return '$fileSize B';
+    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    return '${(fileSize / (1024 * 1024)).toStringAsFixed(2)} MB';
+  }
+
+  HadithResource copyWith({
+    bool? isDownloaded,
+    bool? isExtracting,
+    double? progress,
+    String? error,
+  }) {
+    return HadithResource(
+      book: book,
+      name: name,
+      hadithCount: hadithCount,
+      sectionCount: sectionCount,
+      checksum: checksum,
+      zipPath: zipPath,
+      fileSize: fileSize,
+      zipSize: zipSize,
+      isDownloaded: isDownloaded ?? this.isDownloaded,
+      isExtracting: isExtracting ?? this.isExtracting,
+      progress: progress ?? this.progress,
+      error: error ?? this.error,
+    );
+  }
+}
+
+class HadithLanguage {
+  final String code;
+  final String displayName;
+  final String nativeName;
+  final String flagEmoji;
+  final List<HadithResource> resources;
+
+  HadithLanguage({
+    required this.code,
+    required this.displayName,
+    required this.nativeName,
+    required this.flagEmoji,
+    required this.resources,
+  });
+
+  static const Map<String, Map<String, String>> languageMetadata = {
+    'ara': {'display': 'Arabic', 'native': 'العربية', 'flag': '🇸🇦'},
+    'ben': {'display': 'Bengali', 'native': 'বাংলা', 'flag': '🇧🇩'},
+    'eng': {'display': 'English', 'native': 'English', 'flag': '🇬🇧'},
+    'fra': {'display': 'French', 'native': 'Français', 'flag': '🇫🇷'},
+    'ind': {'display': 'Indonesian', 'native': 'Bahasa Indonesia', 'flag': '🇮🇩'},
+    'rus': {'display': 'Russian', 'native': 'Русский', 'flag': '🇷🇺'},
+    'tam': {'display': 'Tamil', 'native': 'தமிழ்', 'flag': '🇮🇳'},
+    'tur': {'display': 'Turkish', 'native': 'Türkçe', 'flag': '🇹🇷'},
+    'urd': {'display': 'Urdu', 'native': 'اردو', 'flag': '🇵🇰'},
+  };
+
+  factory HadithLanguage.fromCode(String code, List<HadithResource> resources) {
+    final meta = languageMetadata[code] ?? {
+      'display': 'Language ($code)',
+      'native': code,
+      'flag': '🏳️',
+    };
+    return HadithLanguage(
+      code: code,
+      displayName: meta['display']!,
+      nativeName: meta['native']!,
+      flagEmoji: meta['flag']!,
+      resources: resources,
+    );
+  }
+}
