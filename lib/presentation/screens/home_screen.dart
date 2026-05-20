@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
+import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,15 +15,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _views = [
-    const HadithsDashboardView(),
-    _buildSectionsView(),
-    _buildCollectionsView(),
-    _buildProfileView(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<Widget> views = [
+      const HadithsDashboardView(),
+      const HadithSectionsView(),
+      _buildCollectionsView(),
+      _buildProfileView(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Al Hadith')
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: _buildDrawer(context),
       body: AnimatedSwitcher(
         duration: 300.ms,
-        child: _views[_currentIndex],
+        child: views[_currentIndex],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.grid_view_outlined),
               activeIcon: Icon(Icons.grid_view, color: AppTheme.primaryMint),
-              label: 'Sections',
+              label: 'Chapters',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bookmark_outline),
@@ -101,20 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Bottom Navigation view builders
 
-  static Widget _buildSectionsView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.grid_view, size: 64, color: AppTheme.primaryMint),
-          const Gap(16),
-          const Text('Hadiths Sections', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const Gap(8),
-          const Text('Grouped sections from all books.', style: TextStyle(color: AppTheme.textSecondary)),
-        ],
-      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0.0),
-    );
-  }
+
 
   static Widget _buildCollectionsView() {
     return Center(
