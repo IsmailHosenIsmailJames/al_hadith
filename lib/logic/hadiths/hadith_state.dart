@@ -18,6 +18,12 @@ class HadithState {
   // Search filter inside sections
   final String sectionsSearchQuery;
 
+  // Collections (Bookmarks, Pins, Notes)
+  final Set<String> bookmarkedRefs;
+  final Set<String> pinnedRefs;
+  final Map<String, String> hadithNotes;
+  final Map<String, HadithItem> collectionsHadiths; // reference -> loaded detail
+
   HadithState({
     this.isLoading = false,
     this.downloadedBooks = const [],
@@ -29,6 +35,10 @@ class HadithState {
     this.activeSections = const [],
     this.sectionsErrorMessage,
     this.sectionsSearchQuery = '',
+    this.bookmarkedRefs = const {},
+    this.pinnedRefs = const {},
+    this.hadithNotes = const {},
+    this.collectionsHadiths = const {},
   });
 
   HadithState copyWith({
@@ -42,18 +52,26 @@ class HadithState {
     List<HadithSection>? activeSections,
     String? sectionsErrorMessage,
     String? sectionsSearchQuery,
+    Set<String>? bookmarkedRefs,
+    Set<String>? pinnedRefs,
+    Map<String, String>? hadithNotes,
+    Map<String, HadithItem>? collectionsHadiths,
   }) {
     return HadithState(
       isLoading: isLoading ?? this.isLoading,
       downloadedBooks: downloadedBooks ?? this.downloadedBooks,
-      history: history ?? this.history, // We support resetting to null if omitted but usually we preserve
+      history: history ?? this.history,
       readCounts: readCounts ?? this.readCounts,
-      errorMessage: errorMessage, // Nullable to easily clear errors
+      errorMessage: errorMessage,
       selectedBookKey: selectedBookKey ?? this.selectedBookKey,
       isLoadingSections: isLoadingSections ?? this.isLoadingSections,
       activeSections: activeSections ?? this.activeSections,
       sectionsErrorMessage: sectionsErrorMessage,
       sectionsSearchQuery: sectionsSearchQuery ?? this.sectionsSearchQuery,
+      bookmarkedRefs: bookmarkedRefs ?? this.bookmarkedRefs,
+      pinnedRefs: pinnedRefs ?? this.pinnedRefs,
+      hadithNotes: hadithNotes ?? this.hadithNotes,
+      collectionsHadiths: collectionsHadiths ?? this.collectionsHadiths,
     );
   }
 

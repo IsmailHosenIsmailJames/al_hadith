@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:al_hadith/data/repositories/hadith_repository.dart';
 import 'package:al_hadith/data/repositories/resource_repository.dart';
@@ -43,12 +44,37 @@ class HadithCubit extends Cubit<HadithState> {
       // 3. Load the last reading session
       final lastSession = _historyService.getLastReadSession();
 
+      // 4. Load Collections
+      final bookmarks = _historyService.getBookmarks().toSet();
+      final pins = _historyService.getPins().toSet();
+      final notes = _historyService.getNotes();
+
+      final Map<String, HadithItem> detailMap = {};
+      final allRefs = {...bookmarks, ...pins, ...notes.keys};
+      for (final ref in allRefs) {
+        final parts = ref.split('_');
+        if (parts.length == 2) {
+          final bKey = parts[0];
+          final hNum = int.tryParse(parts[1]);
+          if (hNum != null) {
+            final item = await _hadithRepository.getHadithByNumber(bKey, hNum);
+            if (item != null) {
+              detailMap[ref] = item;
+            }
+          }
+        }
+      }
+
       emit(state.copyWith(
         isLoading: false,
         downloadedBooks: downloaded,
         history: lastSession,
         readCounts: countsMap,
         errorMessage: null,
+        bookmarkedRefs: bookmarks,
+        pinnedRefs: pins,
+        hadithNotes: notes,
+        collectionsHadiths: detailMap,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -140,5 +166,67 @@ class HadithCubit extends Cubit<HadithState> {
     updatedCounts[bookKey] = 0;
 
     emit(state.copyWith(readCounts: updatedCounts));
+  }
+
+  // --- Collections (Bookmarks, Pins, Notes) Logic ---
+
+  /// Reloads all collections from preferences and SQLite in parallel
+  Future<void> loadCollections() async {
+    try {
+      final bookmarks = _historyService.getBookmarks().toSet();
+      final pins = _historyService.getPins().toSet();
+      final notes = _historyService.getNotes();
+
+      final Map<String, HadithItem> detailMap = {};
+      final allRefs = {...bookmarks, ...pins, ...notes.keys};
+      for (final ref in allRefs) {
+        final parts = ref.split('_');
+        if (parts.length == 2) {
+          final bKey = parts[0];
+          final hNum = int.tryParse(parts[1]);
+          if (hNum != null) {
+            final item = await _hadithRepository.getHadithByNumber(bKey, hNum);
+            if (item != null) {
+              detailMap[ref] = item;
+            }
+          }
+        }
+      }
+
+      emit(state.copyWith(
+        bookmarkedRefs: bookmarks,
+        pinnedRefs: pins,
+        hadithNotes: notes,
+        collectionsHadiths: detailMap,
+      ));
+    } catch (_) {}
+  }
+
+  /// Toggles bookmark status
+  Future<void> toggleBookmark(String bookKey, int hadithNumber) async {
+    await _historyService.toggleBookmark(bookKey, hadithNumber);
+    await loadCollections();
+  }
+
+  /// Toggles pin status
+  Future<void> togglePin(String bookKey, int hadithNumber) async {
+    await _historyService.togglePin(bookKey, hadithNumber);
+    await loadCollections();
+  }
+
+  /// Saves a custom text note for a specific Hadith
+  Future<void> saveHadithNote(String bookKey, int hadithNumber, String noteText) async {
+    if (noteText.trim().isEmpty) {
+      await deleteHadithNote(bookKey, hadithNumber);
+    } else {
+      await _historyService.saveNote(bookKey, hadithNumber, noteText);
+      await loadCollections();
+    }
+  }
+
+  /// Deletes a custom note
+  Future<void> deleteHadithNote(String bookKey, int hadithNumber) async {
+    await _historyService.deleteNote(bookKey, hadithNumber);
+    await loadCollections();
   }
 }

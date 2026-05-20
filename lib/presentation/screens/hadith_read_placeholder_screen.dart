@@ -806,10 +806,167 @@ class _HadithCard extends StatelessWidget {
     this.isListItem = false,
   });
 
+  void _showNoteDialog(
+    BuildContext context,
+    String bookKey,
+    int hadithNumber,
+    String currentNote,
+  ) {
+    final textController = TextEditingController(text: currentNote);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              color: AppTheme.darkSurface,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border(
+                top: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Study Notes',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                const Gap(16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.darkCanvas,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF1E293B)),
+                  ),
+                  child: TextField(
+                    controller: textController,
+                    maxLines: 5,
+                    autofocus: true,
+                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                    decoration: const InputDecoration(
+                      hintText: 'Write your notes, reflection or study guide here...',
+                      hintStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(16),
+                    ),
+                  ),
+                ),
+                const Gap(20),
+                Row(
+                  children: [
+                    if (currentNote.isNotEmpty) ...[
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.redAccent,
+                          side: const BorderSide(color: Colors.redAccent),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () {
+                          context.read<HadithCubit>().deleteHadithNote(bookKey, hadithNumber);
+                          Navigator.pop(ctx);
+                        },
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text('Delete'),
+                      ),
+                      const Gap(12),
+                    ],
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryMint,
+                          foregroundColor: AppTheme.darkCanvas,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () {
+                          context.read<HadithCubit>().saveHadithNote(
+                            bookKey,
+                            hadithNumber,
+                            textController.text,
+                          );
+                          Navigator.pop(ctx);
+                        },
+                        icon: const Icon(Icons.save_rounded, size: 18),
+                        label: const Text('Save Note'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCardAction({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 18),
+            const Gap(4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color.withValues(alpha: 0.8),
+                fontSize: 9.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final historyService = context.read<HistoryService>();
     final isRead = historyService.isHadithRead(bookKey, hadith.hadithNumber);
+
+    // Watch Collections states for live color feedback
+    final state = context.watch<HadithCubit>().state;
+    final ref = '${bookKey}_${hadith.hadithNumber}';
+    final isBookmarked = state.bookmarkedRefs.contains(ref);
+    final isPinned = state.pinnedRefs.contains(ref);
+    final noteText = state.hadithNotes[ref];
+    final hasNote = noteText != null && noteText.trim().isNotEmpty;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -913,24 +1070,6 @@ class _HadithCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Gap(8),
-                    // Share button inline
-                    GestureDetector(
-                      onTap: () => onShare(hadith),
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppTheme.darkSurface,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFF1E293B)),
-                        ),
-                        child: const Icon(
-                          Icons.share_rounded,
-                          color: AppTheme.textSecondary,
-                          size: 14,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
                 const Gap(16),
@@ -944,6 +1083,62 @@ class _HadithCard extends StatelessWidget {
                     letterSpacing: 0.1,
                   ),
                 ),
+                // Custom Note Display Speech Bubble
+                if (hasNote) ...[
+                  const Gap(16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryMint.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.edit_note_rounded, color: AppTheme.primaryMint, size: 18),
+                            const Gap(6),
+                            const Text(
+                              'My Notes',
+                              style: TextStyle(
+                                color: AppTheme.primaryMint,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () => _showNoteDialog(context, bookKey, hadith.hadithNumber, noteText),
+                              child: const Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Gap(8),
+                        Text(
+                          noteText,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 // Grades
                 if (hadith.grades.isNotEmpty) ...[
                   const Gap(20),
@@ -997,11 +1192,61 @@ class _HadithCard extends StatelessWidget {
                     }).toList(),
                   ),
                 ],
+                // Bottom Action Bar Row
+                const Gap(16),
+                const Divider(color: Color(0xFF1E293B), height: 1),
+                const Gap(10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildCardAction(
+                      icon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+                      color: isBookmarked ? AppTheme.primaryMint : AppTheme.textSecondary,
+                      label: 'Bookmark',
+                      onTap: () => context.read<HadithCubit>().toggleBookmark(bookKey, hadith.hadithNumber),
+                    ),
+                    _buildCardAction(
+                      icon: isPinned ? Icons.push_pin_rounded : Icons.push_pin_outlined,
+                      color: isPinned ? Colors.orangeAccent : AppTheme.textSecondary,
+                      label: 'Pin',
+                      onTap: () => context.read<HadithCubit>().togglePin(bookKey, hadith.hadithNumber),
+                    ),
+                    _buildCardAction(
+                      icon: hasNote ? Icons.note_alt_rounded : Icons.note_alt_outlined,
+                      color: hasNote ? Colors.tealAccent : AppTheme.textSecondary,
+                      label: 'Note',
+                      onTap: () => _showNoteDialog(context, bookKey, hadith.hadithNumber, noteText ?? ''),
+                    ),
+                    _buildCardAction(
+                      icon: Icons.content_copy_rounded,
+                      color: AppTheme.textSecondary,
+                      label: 'Copy',
+                      onTap: () {
+                        final copyText = 'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\nShared via Al Hadith App';
+                        Clipboard.setData(ClipboardData(text: copyText));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Hadith copied to clipboard!'),
+                            backgroundColor: AppTheme.primaryMint,
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildCardAction(
+                      icon: Icons.share_rounded,
+                      color: AppTheme.textSecondary,
+                      label: 'Share',
+                      onTap: () => onShare(hadith),
+                    ),
+                  ],
+                ),
                 // Page view swipe hint (only in page mode, first card)
                 if (!isListItem &&
                     indexInSection == 0 &&
                     totalInSection > 1) ...[
-                  const Gap(20),
+                  const Gap(14),
                   const Divider(color: Color(0xFF1E293B), height: 1),
                   const Gap(10),
                   const Row(

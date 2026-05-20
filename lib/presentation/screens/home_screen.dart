@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
+import 'package:al_hadith/presentation/widgets/hadith_collections_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> views = [
       const HadithsDashboardView(),
       const HadithSectionsView(),
-      _buildCollectionsView(),
+      const HadithCollectionsView(),
       _buildProfileView(),
     ];
 
@@ -101,23 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Bottom Navigation view builders
-
-
-
-  static Widget _buildCollectionsView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.bookmark, size: 64, color: AppTheme.primaryMint),
-          const Gap(16),
-          const Text('Collections', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const Gap(8),
-          const Text('Bookmarks, Pin, & Notes tabs.', style: TextStyle(color: AppTheme.textSecondary)),
-        ],
-      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0.0),
-    );
-  }
 
   static Widget _buildProfileView() {
     return Center(

@@ -48,6 +48,12 @@ class HistoryService {
   // Key to store read progress lists per book, e.g., 'progress_eng-bukhari' -> Set of read hadith numbers
   static String _keyBookProgress(String bookKey) => 'book_progress_$bookKey';
 
+  // Collections keys
+  static const String _keyBookmarks = 'collections_bookmarks';
+  static const String _keyPins = 'collections_pins';
+  static const String _keyNotesKeys = 'collections_notes_keys';
+  static String _keyNoteText(String ref) => 'collections_note_text_$ref';
+
   HistoryService(this._prefs);
 
   /// Saves the active read session to preferences
@@ -141,5 +147,101 @@ class HistoryService {
   /// Clear all read metrics for a book (resets progress)
   Future<bool> resetBookProgress(String bookKey) {
     return _prefs.remove(_keyBookProgress(bookKey));
+  }
+
+  // --- Collections (Bookmarks, Pins, Notes) ---
+
+  /// Retrieves list of all bookmarked hadith reference strings
+  List<String> getBookmarks() {
+    return _prefs.getStringList(_keyBookmarks) ?? [];
+  }
+
+  /// Toggles bookmark status for a specific hadith
+  Future<bool> toggleBookmark(String bookKey, int hadithNumber) async {
+    final ref = '${bookKey}_$hadithNumber';
+    final list = getBookmarks();
+    if (list.contains(ref)) {
+      list.remove(ref);
+    } else {
+      list.add(ref);
+    }
+    return _prefs.setStringList(_keyBookmarks, list);
+  }
+
+  /// Checks if a specific hadith is bookmarked
+  bool isBookmarked(String bookKey, int hadithNumber) {
+    return getBookmarks().contains('${bookKey}_$hadithNumber');
+  }
+
+  /// Retrieves list of all pinned hadith reference strings
+  List<String> getPins() {
+    return _prefs.getStringList(_keyPins) ?? [];
+  }
+
+  /// Toggles pin status for a specific hadith
+  Future<bool> togglePin(String bookKey, int hadithNumber) async {
+    final ref = '${bookKey}_$hadithNumber';
+    final list = getPins();
+    if (list.contains(ref)) {
+      list.remove(ref);
+    } else {
+      list.add(ref);
+    }
+    return _prefs.setStringList(_keyPins, list);
+  }
+
+  /// Checks if a specific hadith is pinned
+  bool isPinned(String bookKey, int hadithNumber) {
+    return getPins().contains('${bookKey}_$hadithNumber');
+  }
+
+  /// Retrieves all notes as a map of references to text contents
+  Map<String, String> getNotes() {
+    final keys = _prefs.getStringList(_keyNotesKeys) ?? [];
+    final Map<String, String> notesMap = {};
+    for (final ref in keys) {
+      final text = _prefs.getString(_keyNoteText(ref));
+      if (text != null) {
+        notesMap[ref] = text;
+      }
+    }
+    return notesMap;
+  }
+
+  /// Saves a custom note content for a specific hadith
+  Future<bool> saveNote(String bookKey, int hadithNumber, String text) async {
+    final ref = '${bookKey}_$hadithNumber';
+    
+    // Save note text
+    await _prefs.setString(_keyNoteText(ref), text);
+
+    // Save reference in keys list if not present
+    final keys = _prefs.getStringList(_keyNotesKeys) ?? [];
+    if (!keys.contains(ref)) {
+      keys.add(ref);
+      await _prefs.setStringList(_keyNotesKeys, keys);
+    }
+    return true;
+  }
+
+  /// Deletes a custom note for a specific hadith
+  Future<bool> deleteNote(String bookKey, int hadithNumber) async {
+    final ref = '${bookKey}_$hadithNumber';
+    
+    // Remove note text
+    await _prefs.remove(_keyNoteText(ref));
+
+    // Remove reference from keys list
+    final keys = _prefs.getStringList(_keyNotesKeys) ?? [];
+    if (keys.contains(ref)) {
+      keys.remove(ref);
+      await _prefs.setStringList(_keyNotesKeys, keys);
+    }
+    return true;
+  }
+
+  /// Retrieves the note text content for a specific hadith
+  String? getNoteText(String bookKey, int hadithNumber) {
+    return _prefs.getString(_keyNoteText('${bookKey}_$hadithNumber'));
   }
 }
