@@ -104,10 +104,10 @@ class ResourceStep extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryMint.withOpacity(0.12),
+                            color: AppTheme.primaryMint.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: AppTheme.primaryMint.withOpacity(0.3),
+                              color: AppTheme.primaryMint.withValues(alpha: 0.3),
                               width: 1.0,
                             ),
                           ),
@@ -142,12 +142,12 @@ class ResourceStep extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isChecked 
-                        ? AppTheme.darkSurfaceCard.withOpacity(0.4) 
-                        : AppTheme.darkSurface.withOpacity(0.5),
+                        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.4) 
+                        : AppTheme.darkSurface.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isChecked 
-                          ? AppTheme.primaryMint.withOpacity(0.3) 
+                          ? AppTheme.primaryMint.withValues(alpha: 0.3) 
                           : const Color(0xFF1E293B),
                       width: isChecked ? 1.5 : 1.0,
                     ),
@@ -240,9 +240,9 @@ class ResourceStep extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryMint.withOpacity(0.12),
+                            color: AppTheme.primaryMint.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppTheme.primaryMint.withOpacity(0.5), width: 1.0),
+                            border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.5), width: 1.0),
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,

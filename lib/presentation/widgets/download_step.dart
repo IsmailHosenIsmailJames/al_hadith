@@ -35,7 +35,7 @@ class DownloadStep extends StatelessWidget {
                 color: AppTheme.darkSurface,
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primaryMint.withOpacity(0.05),
+                    color: AppTheme.primaryMint.withValues(alpha: 0.05),
                     blurRadius: 24,
                   ),
                 ],

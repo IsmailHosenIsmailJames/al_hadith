@@ -95,7 +95,7 @@ class AppTheme {
           backgroundColor: primaryMint,
           foregroundColor: darkCanvas,
           elevation: 4,
-          shadowColor: primaryMint.withOpacity(0.3),
+          shadowColor: primaryMint.withValues(alpha: 0.3),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

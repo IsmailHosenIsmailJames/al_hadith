@@ -3,10 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/core/router/app_router.dart';
+import 'package:al_hadith/core/database/database_helper.dart';
 import 'package:al_hadith/data/repositories/resource_repository.dart';
+import 'package:al_hadith/data/repositories/hadith_repository.dart';
 import 'package:al_hadith/data/services/download_service.dart';
 import 'package:al_hadith/data/services/preferences_service.dart';
+import 'package:al_hadith/data/services/history_service.dart';
 import 'package:al_hadith/logic/setup/setup_cubit.dart';
+import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 
 void main() async {
   // Ensure Flutter engine is fully bootstrapped
@@ -15,9 +19,12 @@ void main() async {
   // Initialize SharedPreferences persistently
   final sharedPrefs = await SharedPreferences.getInstance();
   final prefsService = PreferencesService(sharedPrefs);
+  final historyService = HistoryService(sharedPrefs);
 
   // Initialize services and repositories
+  final dbHelper = DatabaseHelper();
   final resourceRepository = ResourceRepository();
+  final hadithRepository = HadithRepository(dbHelper);
   final downloadService = DownloadService(prefsService);
   final appRouter = AppRouter(prefsService);
 
@@ -25,7 +32,9 @@ void main() async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<PreferencesService>.value(value: prefsService),
+        RepositoryProvider<HistoryService>.value(value: historyService),
         RepositoryProvider<ResourceRepository>.value(value: resourceRepository),
+        RepositoryProvider<HadithRepository>.value(value: hadithRepository),
         RepositoryProvider<DownloadService>.value(value: downloadService),
       ],
       child: MultiBlocProvider(
@@ -35,6 +44,13 @@ void main() async {
               repository: resourceRepository,
               downloadService: downloadService,
               prefs: prefsService,
+            ),
+          ),
+          BlocProvider<HadithCubit>(
+            create: (context) => HadithCubit(
+              hadithRepository: hadithRepository,
+              resourceRepository: resourceRepository,
+              historyService: historyService,
             ),
           ),
         ],

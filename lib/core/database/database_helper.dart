@@ -17,6 +17,13 @@ class DatabaseHelper {
     return p.join(docDir.path, 'hadith_databases');
   }
 
+  /// Checks if the database file exists inside our local folder
+  Future<bool> isDatabaseAvailable(String bookKey) async {
+    final dbFolder = await _getDatabaseFolderPath();
+    final dbPath = p.join(dbFolder, '$bookKey.sqlite');
+    return File(dbPath).exists();
+  }
+
   /// Open a database for a specific book key (e.g. 'eng-bukhari')
   Future<Database> getDatabase(String bookKey) async {
     if (_activeDatabases.containsKey(bookKey)) {

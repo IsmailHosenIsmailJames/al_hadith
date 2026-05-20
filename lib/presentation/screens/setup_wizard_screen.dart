@@ -191,7 +191,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                   onPressed: () => context.read<SetupCubit>().startDownload(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
-                    shadowColor: Colors.redAccent.withOpacity(0.3),
+                    shadowColor: Colors.redAccent.withValues(alpha: 0.3),
                   ),
                   child: const Text('Retry Setup Download'),
                 ),
@@ -253,11 +253,11 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.primaryMint.withOpacity(0.12),
+              color: AppTheme.primaryMint.withValues(alpha: 0.12),
               border: Border.all(color: AppTheme.primaryMint, width: 2.0),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primaryMint.withOpacity(0.2),
+                  color: AppTheme.primaryMint.withValues(alpha: 0.2),
                   blurRadius: 32,
                 )
               ],
@@ -307,7 +307,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.primaryMint.withOpacity(0.15 + (value * 0.15)),
+                      color: AppTheme.primaryMint.withValues(alpha: 0.15 + (value * 0.15)),
                       blurRadius: 10 + (value * 12),
                       spreadRadius: value * 3,
                     ),

@@ -7,6 +7,7 @@ class HadithResource {
   final String zipPath;
   final int fileSize;
   final int zipSize;
+  final String languageCode; // ISO 639-2 code, e.g. 'eng', 'urd'
 
   // Local state properties for UI and download management
   bool isDownloaded;
@@ -23,13 +24,25 @@ class HadithResource {
     required this.zipPath,
     required this.fileSize,
     required this.zipSize,
+    this.languageCode = '',
     this.isDownloaded = false,
     this.isExtracting = false,
     this.progress = 0.0,
     this.error,
   });
 
-  factory HadithResource.fromJson(Map<String, dynamic> json) {
+  /// Convenience getters resolved from HadithLanguage metadata
+  String get langDisplayName {
+    final meta = HadithLanguage.languageMetadata[languageCode];
+    return meta?['display'] ?? languageCode.toUpperCase();
+  }
+
+  String get langFlag {
+    final meta = HadithLanguage.languageMetadata[languageCode];
+    return meta?['flag'] ?? '🏳️';
+  }
+
+  factory HadithResource.fromJson(Map<String, dynamic> json, {String languageCode = ''}) {
     return HadithResource(
       book: json['book'] as String,
       name: json['name'] as String,
@@ -39,6 +52,7 @@ class HadithResource {
       zipPath: json['zip_path'] as String,
       fileSize: json['file_size'] as int,
       zipSize: json['zip_size'] as int,
+      languageCode: languageCode,
     );
   }
 
@@ -69,6 +83,7 @@ class HadithResource {
   }
 
   HadithResource copyWith({
+    String? languageCode,
     bool? isDownloaded,
     bool? isExtracting,
     double? progress,
@@ -83,6 +98,7 @@ class HadithResource {
       zipPath: zipPath,
       fileSize: fileSize,
       zipSize: zipSize,
+      languageCode: languageCode ?? this.languageCode,
       isDownloaded: isDownloaded ?? this.isDownloaded,
       isExtracting: isExtracting ?? this.isExtracting,
       progress: progress ?? this.progress,

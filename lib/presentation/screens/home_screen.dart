@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
+import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _views = [
-    _buildHadithsView(),
+    const HadithsDashboardView(),
     _buildSectionsView(),
     _buildCollectionsView(),
     _buildProfileView(),
@@ -56,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -99,20 +100,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Bottom Navigation view builders
-  static Widget _buildHadithsView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.book, size: 64, color: AppTheme.primaryMint),
-          const Gap(16),
-          const Text('Hadiths Library', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const Gap(8),
-          const Text('History & Book lists will load here.', style: TextStyle(color: AppTheme.textSecondary)),
-        ],
-      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0.0),
-    );
-  }
 
   static Widget _buildSectionsView() {
     return Center(

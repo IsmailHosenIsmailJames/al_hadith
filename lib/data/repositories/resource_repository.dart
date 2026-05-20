@@ -48,7 +48,7 @@ class ResourceRepository {
     data.forEach((langCode, resourcesJson) {
       if (resourcesJson is List) {
         final resources = resourcesJson
-            .map((item) => HadithResource.fromJson(item as Map<String, dynamic>))
+            .map((item) => HadithResource.fromJson(item as Map<String, dynamic>, languageCode: langCode))
             .toList();
         languages.add(HadithLanguage.fromCode(langCode, resources));
       }

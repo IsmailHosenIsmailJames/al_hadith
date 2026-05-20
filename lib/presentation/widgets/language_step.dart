@@ -62,7 +62,7 @@ class LanguageStep extends StatelessWidget {
                   curve: Curves.easeInOut,
                   decoration: BoxDecoration(
                     color: isSelected 
-                        ? AppTheme.primaryMint.withOpacity(0.08) 
+                        ? AppTheme.primaryMint.withValues(alpha: 0.08) 
                         : AppTheme.darkSurface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
@@ -73,7 +73,7 @@ class LanguageStep extends StatelessWidget {
                     ),
                     boxShadow: isSelected ? [
                       BoxShadow(
-                        color: AppTheme.primaryMint.withOpacity(0.15),
+                        color: AppTheme.primaryMint.withValues(alpha: 0.15),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       )
