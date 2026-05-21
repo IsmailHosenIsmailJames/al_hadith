@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/auth/auth_cubit.dart';
@@ -56,7 +57,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: AppTheme.primaryGradient,
-              border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.3), width: 3),
+              border: Border.all(
+                color: AppTheme.primaryMint.withValues(alpha: 0.3),
+                width: 3,
+              ),
             ),
             child: authState.photoUrl != null
                 ? ClipOval(
@@ -70,7 +74,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   )
-                : const Icon(Icons.person, size: 40, color: AppTheme.darkCanvas),
+                : const Icon(
+                    Icons.person,
+                    size: 40,
+                    color: AppTheme.darkCanvas,
+                  ),
           ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
 
           const Gap(16),
@@ -85,10 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Gap(4),
           Text(
             authState.email,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppTheme.textSecondary,
-            ),
+            style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
           ),
 
           const Gap(28),
@@ -102,7 +107,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           BlocBuilder<SettingsCubit, SettingsState>(
             builder: (context, settingsState) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.darkSurface,
                   borderRadius: BorderRadius.circular(16),
@@ -116,21 +124,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: AppTheme.primaryMint.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.sync_rounded, color: AppTheme.primaryMint, size: 20),
+                      child: const Icon(
+                        Icons.sync_rounded,
+                        color: AppTheme.primaryMint,
+                        size: 20,
+                      ),
                     ),
                     const Gap(12),
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Auto Sync',
-                              style: TextStyle(
-                                  color: AppTheme.textPrimary,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold)),
+                          Text(
+                            'Auto Sync',
+                            style: TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Gap(2),
-                          Text('Automatically backup data on changes',
-                              style: TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+                          Text(
+                            'Automatically backup data on changes',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 11,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -140,7 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         context.read<SettingsCubit>().setAutoSyncEnabled(val);
                       },
                       activeThumbColor: AppTheme.primaryMint,
-                      activeTrackColor: AppTheme.primaryMint.withValues(alpha: 0.3),
+                      activeTrackColor: AppTheme.primaryMint.withValues(
+                        alpha: 0.3,
+                      ),
                       inactiveThumbColor: AppTheme.textSecondary,
                       inactiveTrackColor: const Color(0xFF1E293B),
                     ),
@@ -161,20 +183,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   context: context,
                   builder: (ctx) => AlertDialog(
                     backgroundColor: AppTheme.darkSurface,
-                    title: const Text('Sign Out',
-                        style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
+                    title: const Text(
+                      'Sign Out',
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     content: const Text(
-                        'Your data will be backed up before signing out.',
-                        style: TextStyle(color: AppTheme.textSecondary)),
+                      'Your data will be backed up before signing out.',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(color: AppTheme.textSecondary),
+                        ),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                        ),
                         onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Sign Out', style: TextStyle(color: Colors.white)),
+                        child: const Text(
+                          'Sign Out',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
@@ -186,11 +222,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.redAccent),
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-              icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 18),
-              label: const Text('Sign Out',
-                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              icon: const Icon(
+                Icons.logout_rounded,
+                color: Colors.redAccent,
+                size: 18,
+              ),
+              label: const Text(
+                'Sign Out',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ).animate().fadeIn(duration: 300.ms, delay: 300.ms),
 
@@ -232,7 +279,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           strokeWidth: 2.5,
                         ),
                       )
-                    : const Icon(Icons.cloud_done_rounded, color: AppTheme.primaryMint, size: 22),
+                    : const Icon(
+                        Icons.cloud_done_rounded,
+                        color: AppTheme.primaryMint,
+                        size: 22,
+                      ),
               ),
               const Gap(14),
               Expanded(
@@ -242,16 +293,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       authState.isSyncing ? 'Syncing...' : 'Cloud Backup',
                       style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
+                        color: AppTheme.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const Gap(2),
                     Text(
                       authState.lastSyncTime != null
                           ? 'Last synced: ${_formatTime(authState.lastSyncTime!)}'
                           : 'Tap to sync your data now',
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -277,7 +332,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: AppTheme.primaryMint,
                 foregroundColor: AppTheme.darkCanvas,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               icon: const Icon(Icons.sync_rounded, size: 18),
               label: Text(
@@ -323,21 +380,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppTheme.primaryMint.withValues(alpha: 0.1),
-              border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.3), width: 2),
+              border: Border.all(
+                color: AppTheme.primaryMint.withValues(alpha: 0.3),
+                width: 2,
+              ),
             ),
-            child: const Icon(Icons.cloud_outlined, size: 36, color: AppTheme.primaryMint),
+            child: const Icon(
+              Icons.cloud_outlined,
+              size: 36,
+              color: AppTheme.primaryMint,
+            ),
           ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
 
           const Gap(20),
           const Text(
             'Backup & Sync',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+            ),
           ),
           const Gap(8),
           const Text(
             'Sign in to backup your bookmarks, notes,\nread progress, and collections to the cloud.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 13, height: 1.5),
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 13,
+              height: 1.5,
+            ),
           ),
 
           const Gap(32),
@@ -353,17 +425,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 side: const BorderSide(color: Color(0xFF1E293B)),
                 backgroundColor: AppTheme.darkSurface,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-              icon: Image.network(
-                'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                width: 20,
+              icon: SvgPicture.asset(
+                'assets/img/google-color-svgrepo-com.svg',
                 height: 20,
-                errorBuilder: (ctx, err, stack) =>
-                    const Icon(Icons.g_mobiledata, color: Colors.white, size: 24),
+                width: 20,
               ),
-              label: const Text('Continue with Google',
-                  style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600)),
+              label: const Text(
+                'Continue with Google',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ).animate().fadeIn(duration: 300.ms, delay: 100.ms),
 
@@ -375,7 +452,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(child: Divider(color: Color(0xFF1E293B))),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Text('OR', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                child: Text(
+                  'OR',
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                ),
               ),
               Expanded(child: Divider(color: Color(0xFF1E293B))),
             ],
@@ -404,7 +484,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: AppTheme.textSecondary,
                 size: 18,
               ),
-              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              onPressed: () =>
+                  setState(() => _obscurePassword = !_obscurePassword),
             ),
           ),
 
@@ -421,16 +502,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       final password = _passwordController.text;
                       if (email.isEmpty || password.isEmpty) return;
                       if (_isRegisterMode) {
-                        context.read<AuthCubit>().registerWithEmail(email, password);
+                        context.read<AuthCubit>().registerWithEmail(
+                          email,
+                          password,
+                        );
                       } else {
-                        context.read<AuthCubit>().signInWithEmail(email, password);
+                        context.read<AuthCubit>().signInWithEmail(
+                          email,
+                          password,
+                        );
                       }
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
                 foregroundColor: AppTheme.darkCanvas,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               child: authState.status == AuthStatus.loading
                   ? const SizedBox(
@@ -443,7 +532,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     )
                   : Text(
                       _isRegisterMode ? 'Create Account' : 'Sign In',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
             ),
           ),
@@ -455,14 +547,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _isRegisterMode ? 'Already have an account?' : "Don't have an account?",
-                style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                _isRegisterMode
+                    ? 'Already have an account?'
+                    : "Don't have an account?",
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                ),
               ),
               TextButton(
-                onPressed: () => setState(() => _isRegisterMode = !_isRegisterMode),
+                onPressed: () =>
+                    setState(() => _isRegisterMode = !_isRegisterMode),
                 child: Text(
                   _isRegisterMode ? 'Sign In' : 'Register',
-                  style: const TextStyle(color: AppTheme.primaryMint, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: AppTheme.primaryMint,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -475,7 +576,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final email = _emailController.text.trim();
                 if (email.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Enter your email above to reset password')),
+                    const SnackBar(
+                      content: Text('Enter your email above to reset password'),
+                    ),
                   );
                   return;
                 }
@@ -483,8 +586,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     backgroundColor: AppTheme.primaryMint,
-                    content: Text('Password reset link sent! Check your email.',
-                        style: TextStyle(color: AppTheme.darkCanvas)),
+                    content: Text(
+                      'Password reset link sent! Check your email.',
+                      style: TextStyle(color: AppTheme.darkCanvas),
+                    ),
                   ),
                 );
               },
@@ -502,16 +607,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: BoxDecoration(
                 color: Colors.redAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: Colors.redAccent.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.redAccent, size: 18),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.redAccent,
+                    size: 18,
+                  ),
                   const Gap(10),
                   Expanded(
                     child: Text(
                       authState.errorMessage!,
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -546,7 +660,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+          hintStyle: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: 13,
+          ),
           prefixIcon: Icon(icon, color: AppTheme.textSecondary, size: 18),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
