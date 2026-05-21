@@ -113,6 +113,17 @@ class PreferencesService {
     return _prefs.setBool(_keyWakeLockEnabled, enabled);
   }
 
+  // Auto Sync setting
+  static const String _keyAutoSync = 'auto_sync_enabled';
+
+  bool isAutoSyncEnabled() {
+    return _prefs.getBool(_keyAutoSync) ?? true; // Default: ON
+  }
+
+  Future<bool> setAutoSyncEnabled(bool enabled) {
+    return _prefs.setBool(_keyAutoSync, enabled);
+  }
+
   // Clear preferences (useful for reset / testing)
   Future<bool> clearAll() {
     return _prefs.clear();

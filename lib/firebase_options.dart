@@ -67,6 +67,8 @@ class DefaultFirebaseOptions {
     projectId: 'alhadithmultilanguage',
     databaseURL: 'https://alhadithmultilanguage-default-rtdb.firebaseio.com',
     storageBucket: 'alhadithmultilanguage.appspot.com',
+    androidClientId: '564254338567-8q1518bjmkh00u0j8qe555di8suinjo7.apps.googleusercontent.com',
+    iosClientId: '564254338567-l71ils9bkaln80e3sof0t1t1i6psl1rk.apps.googleusercontent.com',
     iosBundleId: 'com.ismail.alHadith',
   );
 
@@ -77,6 +79,8 @@ class DefaultFirebaseOptions {
     projectId: 'alhadithmultilanguage',
     databaseURL: 'https://alhadithmultilanguage-default-rtdb.firebaseio.com',
     storageBucket: 'alhadithmultilanguage.appspot.com',
+    androidClientId: '564254338567-8q1518bjmkh00u0j8qe555di8suinjo7.apps.googleusercontent.com',
+    iosClientId: '564254338567-l71ils9bkaln80e3sof0t1t1i6psl1rk.apps.googleusercontent.com',
     iosBundleId: 'com.ismail.alHadith',
   );
 
@@ -90,4 +94,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'alhadithmultilanguage.appspot.com',
     measurementId: 'G-ZBEMHT3K1V',
   );
+
 }

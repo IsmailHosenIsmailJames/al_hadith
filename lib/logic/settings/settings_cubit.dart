@@ -17,6 +17,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       translationFontSize: _prefs.getTranslationFontSize(),
       arabicFontFamily: _prefs.getArabicFontFamily(),
       wakeLockEnabled: _prefs.isWakeLockEnabled(),
+      autoSyncEnabled: _prefs.isAutoSyncEnabled(),
     ));
 
     // Apply wake lock on startup if enabled
@@ -61,5 +62,10 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> setDwellTimerSeconds(int seconds) async {
     emit(state.copyWith(dwellTimerSeconds: seconds));
+  }
+
+  Future<void> setAutoSyncEnabled(bool enabled) async {
+    await _prefs.setAutoSyncEnabled(enabled);
+    emit(state.copyWith(autoSyncEnabled: enabled));
   }
 }

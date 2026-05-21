@@ -5,19 +5,23 @@ import 'package:al_hadith/data/repositories/hadith_repository.dart';
 import 'package:al_hadith/data/repositories/resource_repository.dart';
 import 'package:al_hadith/data/services/history_service.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
+import 'package:al_hadith/logic/auth/auth_cubit.dart';
 
 class HadithCubit extends Cubit<HadithState> {
   final HadithRepository _hadithRepository;
   final ResourceRepository _resourceRepository;
   final HistoryService _historyService;
+  final AuthCubit? _authCubit;
 
   HadithCubit({
     required HadithRepository hadithRepository,
     required ResourceRepository resourceRepository,
     required HistoryService historyService,
+    AuthCubit? authCubit,
   })  : _hadithRepository = hadithRepository,
         _resourceRepository = resourceRepository,
         _historyService = historyService,
+        _authCubit = authCubit,
         super(HadithState());
 
   /// Loads the main Hadiths dashboard list, history session, and book progress maps.
@@ -138,6 +142,7 @@ class HadithCubit extends Cubit<HadithState> {
         history: lastSession,
         readCounts: updatedCounts,
       ));
+      _authCubit?.autoUpload();
     } catch (_) {}
   }
 
@@ -157,6 +162,7 @@ class HadithCubit extends Cubit<HadithState> {
     updatedCounts[bookKey] = _historyService.getReadHadithsCount(bookKey);
 
     emit(state.copyWith(readCounts: updatedCounts));
+    _authCubit?.autoUpload();
   }
 
   /// Resets reading count metrics for a specific database
@@ -166,6 +172,7 @@ class HadithCubit extends Cubit<HadithState> {
     updatedCounts[bookKey] = 0;
 
     emit(state.copyWith(readCounts: updatedCounts));
+    _authCubit?.autoUpload();
   }
 
   // --- Collections (Bookmarks, Pins, Notes) Logic ---
@@ -206,12 +213,14 @@ class HadithCubit extends Cubit<HadithState> {
   Future<void> toggleBookmark(String bookKey, int hadithNumber) async {
     await _historyService.toggleBookmark(bookKey, hadithNumber);
     await loadCollections();
+    _authCubit?.autoUpload();
   }
 
   /// Toggles pin status
   Future<void> togglePin(String bookKey, int hadithNumber) async {
     await _historyService.togglePin(bookKey, hadithNumber);
     await loadCollections();
+    _authCubit?.autoUpload();
   }
 
   /// Saves a custom text note for a specific Hadith
@@ -221,6 +230,7 @@ class HadithCubit extends Cubit<HadithState> {
     } else {
       await _historyService.saveNote(bookKey, hadithNumber, noteText);
       await loadCollections();
+      _authCubit?.autoUpload();
     }
   }
 
@@ -228,6 +238,7 @@ class HadithCubit extends Cubit<HadithState> {
   Future<void> deleteHadithNote(String bookKey, int hadithNumber) async {
     await _historyService.deleteNote(bookKey, hadithNumber);
     await loadCollections();
+    _authCubit?.autoUpload();
   }
 
   /// Toggles target book selection for search scope

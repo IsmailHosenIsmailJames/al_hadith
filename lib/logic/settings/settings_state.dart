@@ -6,6 +6,7 @@ class SettingsState {
   final bool wakeLockEnabled;
   final bool autoMarkRead; // Auto mark hadith as read after dwell time
   final int dwellTimerSeconds; // Dwell time in seconds
+  final bool autoSyncEnabled; // Auto backup to Firebase RTDB
 
   const SettingsState({
     this.themeMode = 'dark',
@@ -15,6 +16,7 @@ class SettingsState {
     this.wakeLockEnabled = false,
     this.autoMarkRead = true,
     this.dwellTimerSeconds = 5,
+    this.autoSyncEnabled = true,
   });
 
   SettingsState copyWith({
@@ -25,6 +27,7 @@ class SettingsState {
     bool? wakeLockEnabled,
     bool? autoMarkRead,
     int? dwellTimerSeconds,
+    bool? autoSyncEnabled,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
@@ -34,6 +37,7 @@ class SettingsState {
       wakeLockEnabled: wakeLockEnabled ?? this.wakeLockEnabled,
       autoMarkRead: autoMarkRead ?? this.autoMarkRead,
       dwellTimerSeconds: dwellTimerSeconds ?? this.dwellTimerSeconds,
+      autoSyncEnabled: autoSyncEnabled ?? this.autoSyncEnabled,
     );
   }
 }

@@ -144,6 +144,12 @@ class HistoryService {
     return readList.contains(hadithNumber.toString());
   }
 
+  /// Gets the raw list of read hadith number strings for a book (for backup export)
+  List<String> getReadHadithsList(String bookKey) {
+    final key = _keyBookProgress(bookKey);
+    return _prefs.getStringList(key) ?? [];
+  }
+
   /// Clear all read metrics for a book (resets progress)
   Future<bool> resetBookProgress(String bookKey) {
     return _prefs.remove(_keyBookProgress(bookKey));

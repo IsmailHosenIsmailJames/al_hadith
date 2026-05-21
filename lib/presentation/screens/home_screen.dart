@@ -7,6 +7,7 @@ import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_collections_view.dart';
+import 'package:al_hadith/presentation/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const HadithsDashboardView(),
       const HadithSectionsView(),
       const HadithCollectionsView(),
-      _buildProfileView(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -103,27 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Bottom Navigation view builders
-
-  static Widget _buildProfileView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.person, size: 64, color: AppTheme.primaryMint),
-          const Gap(16),
-          const Text(
-            'User Profile',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const Gap(8),
-          const Text(
-            'Sync your progress & backup collections.',
-            style: TextStyle(color: AppTheme.textSecondary),
-          ),
-        ],
-      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0.0),
-    );
-  }
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
