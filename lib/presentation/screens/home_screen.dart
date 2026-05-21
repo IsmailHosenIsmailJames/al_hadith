@@ -255,11 +255,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               accountName: const Text(
-                'Al Hadith App',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                'Al Hadith',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
               accountEmail: const Text(
-                'Offline SQLite-based Hadith Reader',
+                'Read, search & study authentic Hadith offline with multilingual support & sync',
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
             ),
