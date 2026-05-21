@@ -172,6 +172,43 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  /// Delete both account and all cloud sync data permanently (Google Play compliance)
+  Future<void> deleteAccountAndData() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    emit(state.copyWith(status: AuthStatus.loading, clearError: true));
+    try {
+      final uid = user.uid;
+
+      // 1. Purge remote database records
+      await _backupService.deleteBackup(uid);
+
+      // 2. Delete the user account from Firebase Auth
+      await user.delete();
+
+      // 3. Clear Google sign-in local state
+      await GoogleSignIn().signOut();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'For security, please sign out and sign back in before deleting your account.',
+        ));
+      } else {
+        emit(state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: e.message ?? 'Account deletion failed.',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Account deletion failed: ${e.toString()}',
+      ));
+    }
+  }
+
   String _getAuthErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':

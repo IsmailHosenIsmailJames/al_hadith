@@ -318,6 +318,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
+                  _buildDrawerItem(
+                    icon: Icons.privacy_tip_outlined,
+                    title: 'Privacy Policy',
+                    subtitle: 'Read our Google Play data policies',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl(
+                        'https://ismailhosenismailjames.github.io/compressed_hadith_sqlite/privacy.html',
+                      );
+                    },
+                  ),
                   const Divider(color: Color(0xFF1E293B), thickness: 1),
                   _buildDrawerItem(
                     icon: Icons.info_outline,

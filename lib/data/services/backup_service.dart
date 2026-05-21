@@ -37,6 +37,12 @@ class BackupService {
     await ref.set(payload);
   }
 
+  /// Deletes all remote data from RTDB for the given user
+  Future<void> deleteBackup(String uid) async {
+    final ref = _userRef(uid);
+    await ref.remove();
+  }
+
   /// Downloads data from RTDB and restores it locally
   Future<void> restoreBackup(String uid) async {
     final ref = _userRef(uid);

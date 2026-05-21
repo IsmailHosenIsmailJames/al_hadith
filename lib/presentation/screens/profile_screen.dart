@@ -241,6 +241,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ).animate().fadeIn(duration: 300.ms, delay: 300.ms),
 
+          // Delete Account Button (Google Play Compliance)
+          const Gap(12),
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: AppTheme.darkSurface,
+                    title: const Text(
+                      'Delete Account & Data',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    content: const Text(
+                      'Are you absolutely sure? This will permanently delete your user account and purge all your synced bookmarks, notes, and progress from the cloud. This action cannot be undone.',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(color: AppTheme.textSecondary),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text(
+                          'Delete Forever',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true && context.mounted) {
+                  await context.read<AuthCubit>().deleteAccountAndData();
+                }
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.redAccent.withValues(alpha: 0.8),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.2)),
+                ),
+              ),
+              icon: const Icon(
+                Icons.delete_forever_rounded,
+                color: Colors.redAccent,
+                size: 18,
+              ),
+              label: const Text(
+                'Delete Account & Sync Data',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ).animate().fadeIn(duration: 300.ms, delay: 350.ms),
+
           const Gap(32),
         ],
       ),
