@@ -54,6 +54,7 @@ dependencies:
   firebase_database: ^12.4.1
   google_sign_in: ^6.2.2
   flutter_svg: ^2.3.0
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

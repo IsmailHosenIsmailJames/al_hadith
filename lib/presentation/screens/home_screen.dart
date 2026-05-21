@@ -8,6 +8,7 @@ import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_collections_view.dart';
 import 'package:al_hadith/presentation/screens/profile_screen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -242,11 +243,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   shape: BoxShape.circle,
                   gradient: AppTheme.primaryGradient,
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.menu_book,
-                    size: 36,
-                    color: AppTheme.darkCanvas,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.asset(
+                      'assets/img/logo.png',
+                      height: 100,
+                      width: 100,
+                    ),
                   ),
                 ),
               ),
@@ -327,11 +331,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Version 1.0.0 (Beta)',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+              child: FutureBuilder(
+                future: PackageInfo.fromPlatform(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(
+                      'Version ${snapshot.data!.version}',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12,
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
             ),
           ],
