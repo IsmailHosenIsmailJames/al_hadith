@@ -95,18 +95,17 @@ class HadithRepository {
     return HadithItem.fromMap(hadithMap, grades: grades);
   }
 
-  /// Dynamic Full-Text Search (FTS5) across the offline database
+  /// Offline text search across the database using SQL LIKE
   Future<List<HadithItem>> searchHadiths(String bookKey, String query, {int limit = 30}) async {
     final db = await _dbHelper.getDatabase(bookKey);
 
-    // Query virtual FTS table
+    // Use LIKE for broad text matching (works on all SQLite builds)
+    final searchPattern = '%$query%';
     final List<Map<String, dynamic>> searchResults = await db.rawQuery('''
-      SELECT h.* 
-      FROM hadiths_fts f
-      JOIN hadiths h ON f.rowid = h.id
-      WHERE text MATCH ?
+      SELECT * FROM hadiths
+      WHERE text LIKE ?
       LIMIT ?
-    ''', [query, limit]);
+    ''', [searchPattern, limit]);
 
     if (searchResults.isEmpty) return [];
 

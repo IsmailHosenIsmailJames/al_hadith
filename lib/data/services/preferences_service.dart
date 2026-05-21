@@ -97,7 +97,7 @@ class PreferencesService {
 
   // Arabic Font Family
   String getArabicFontFamily() {
-    return _prefs.getString(_keyArabicFontFamily) ?? 'me_quran';
+    return _prefs.getString(_keyArabicFontFamily) ?? 'Me Quran';
   }
 
   Future<bool> setArabicFontFamily(String family) {

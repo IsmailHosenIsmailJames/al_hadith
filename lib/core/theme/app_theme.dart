@@ -3,16 +3,28 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Brand color scheme based on HSL tailoring
-  static const Color darkCanvas = Color(0xFF0A0C10); // HSL(220, 30%, 5%) - Deep dark background
-  static const Color darkSurface = Color(0xFF121620); // HSL(220, 20%, 10%) - Card surface
-  static const Color darkSurfaceCard = Color(0xFF1A1F2C); // HSL(220, 18%, 14%) - Subcard / list tiles
-  
-  static const Color primaryMint = Color(0xFF00D1A0); // HSL(166, 100%, 41%) - Glowing teal highlight
-  static const Color secondaryIndigo = Color(0xFF6366F1); // HSL(239, 84%, 66%) - Indigo accent
-  
+  static const Color darkCanvas = Color(
+    0xFF0A0C10,
+  ); // HSL(220, 30%, 5%) - Deep dark background
+  static const Color darkSurface = Color(
+    0xFF121620,
+  ); // HSL(220, 20%, 10%) - Card surface
+  static const Color darkSurfaceCard = Color(
+    0xFF1A1F2C,
+  ); // HSL(220, 18%, 14%) - Subcard / list tiles
+
+  static const Color primaryMint = Color(
+    0xFF00D1A0,
+  ); // HSL(166, 100%, 41%) - Glowing teal highlight
+  static const Color secondaryIndigo = Color(
+    0xFF6366F1,
+  ); // HSL(239, 84%, 66%) - Indigo accent
+
   static const Color textPrimary = Color(0xFFF3F4F6); // Soft white
   static const Color textSecondary = Color(0xFF9CA3AF); // Muted silver
-  static const Color textDark = Color(0xFF111827); // Deep black-grey for light background if needed
+  static const Color textDark = Color(
+    0xFF111827,
+  ); // Deep black-grey for light background if needed
 
   // Gradient configurations for the wow factor
   static const Gradient primaryGradient = LinearGradient(
@@ -114,9 +126,7 @@ class AppTheme {
           return Colors.transparent;
         }),
         checkColor: WidgetStateProperty.all(darkCanvas),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       ),
     );
   }

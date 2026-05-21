@@ -1,0 +1,543 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:al_hadith/core/theme/app_theme.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/logic/settings/settings_state.dart';
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  static const List<Map<String, String>> arabicFonts = [
+    {'key': 'Me Quran', 'display': 'Me Quran'},
+    {'key': 'QPC Hafs', 'display': 'QPC Hafs'},
+    {'key': 'Indopak Nastaleeq', 'display': 'Indopak Nastaleeq'},
+    {'key': 'Amiri', 'display': 'Amiri'},
+    {'key': 'Noto Naskh Arabic', 'display': 'Noto Naskh Arabic'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: AppTheme.darkCanvas,
+          appBar: AppBar(
+            backgroundColor: AppTheme.darkSurface,
+            elevation: 0,
+            title: const Text(
+              'Settings',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          body: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            children: [
+              // ── Appearance ──
+              // _buildSectionHeader('Appearance'),
+              // _buildThemeSelector(context, state),
+              // const Gap(8),
+
+              // ── Font Settings ──
+              _buildSectionHeader('Font Settings'),
+              _buildArabicFontPicker(context, state),
+              const Gap(8),
+              _buildSliderTile(
+                context,
+                icon: Icons.format_size_rounded,
+                title: 'Arabic Font Size',
+                subtitle: '${state.arabicFontSize.toInt()} pt',
+                value: state.arabicFontSize,
+                min: 16,
+                max: 42,
+                preview: _buildArabicPreview(state),
+                onChanged: (v) =>
+                    context.read<SettingsCubit>().setArabicFontSize(v.roundToDouble()),
+              ),
+              const Gap(8),
+              _buildSliderTile(
+                context,
+                icon: Icons.text_fields_rounded,
+                title: 'Translation Font Size',
+                subtitle: '${state.translationFontSize.toInt()} pt',
+                value: state.translationFontSize,
+                min: 12,
+                max: 30,
+                preview: _buildTranslationPreview(state),
+                onChanged: (v) =>
+                    context.read<SettingsCubit>().setTranslationFontSize(v.roundToDouble()),
+              ),
+              const Gap(8),
+
+              // ── Reading Behavior ──
+              _buildSectionHeader('Reading Behavior'),
+              _buildToggleTile(
+                context,
+                icon: Icons.screen_lock_portrait_rounded,
+                title: 'Keep Screen Awake',
+                subtitle: 'Prevent screen from sleeping while reading',
+                value: state.wakeLockEnabled,
+                onChanged: (v) => context.read<SettingsCubit>().setWakeLockEnabled(v),
+              ),
+              _buildToggleTile(
+                context,
+                icon: Icons.auto_stories_rounded,
+                title: 'Auto Mark as Read',
+                subtitle: 'Automatically mark hadith read after dwell time',
+                value: state.autoMarkRead,
+                onChanged: (v) => context.read<SettingsCubit>().setAutoMarkRead(v),
+              ),
+              if (state.autoMarkRead)
+                _buildSliderTile(
+                  context,
+                  icon: Icons.timer_outlined,
+                  title: 'Dwell Timer',
+                  subtitle: '${state.dwellTimerSeconds} seconds',
+                  value: state.dwellTimerSeconds.toDouble(),
+                  min: 2,
+                  max: 15,
+                  onChanged: (v) =>
+                      context.read<SettingsCubit>().setDwellTimerSeconds(v.toInt()),
+                ),
+              const Gap(8),
+
+              // ── About ──
+              _buildSectionHeader('About'),
+              _buildInfoTile(
+                icon: Icons.info_outline_rounded,
+                title: 'Version',
+                trailing: '1.0.0',
+              ),
+              _buildInfoTile(
+                icon: Icons.code_rounded,
+                title: 'Developed by',
+                trailing: 'Ismail Hosen',
+              ),
+              const Gap(32),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          color: AppTheme.primaryMint,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    ).animate().fadeIn(duration: 300.ms);
+  }
+
+  // Widget _buildThemeSelector(BuildContext context, SettingsState state) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 16),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+  //       borderRadius: BorderRadius.circular(16),
+  //       border: Border.all(color: const Color(0xFF1E293B)),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         const Row(
+  //           children: [
+  //             Icon(Icons.palette_rounded, color: AppTheme.primaryMint, size: 18),
+  //             Gap(10),
+  //             Text(
+  //               'Theme',
+  //               style: TextStyle(
+  //                 color: AppTheme.textPrimary,
+  //                 fontSize: 14,
+  //                 fontWeight: FontWeight.bold,
+  //                 // color: AppTheme.textPrimary,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         const Gap(14),
+  //         Row(
+  //           children: [
+  //             _buildThemeOption(
+  //               context,
+  //               icon: Icons.dark_mode_rounded,
+  //               label: 'Dark',
+  //               isSelected: state.themeMode == 'dark',
+  //               onTap: () => context.read<SettingsCubit>().setThemeMode('dark'),
+  //             ),
+  //             const Gap(12),
+  //             _buildThemeOption(
+  //               context,
+  //               icon: Icons.light_mode_rounded,
+  //               label: 'Light',
+  //               isSelected: state.themeMode == 'light',
+  //               onTap: () => context.read<SettingsCubit>().setThemeMode('light'),
+  //             ),
+  //             const Gap(12),
+  //             _buildThemeOption(
+  //               context,
+  //               icon: Icons.brightness_auto_rounded,
+  //               label: 'System',
+  //               isSelected: state.themeMode == 'system',
+  //               onTap: () => context.read<SettingsCubit>().setThemeMode('system'),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  // }
+  // 
+  // Widget _buildThemeOption(
+  //   BuildContext context, {
+  //   required IconData icon,
+  //   required String label,
+  //   required bool isSelected,
+  //   required VoidCallback onTap,
+  // }) {
+  //   return Expanded(
+  //     child: GestureDetector(
+  //       onTap: onTap,
+  //       child: AnimatedContainer(
+  //         duration: const Duration(milliseconds: 250),
+  //         padding: const EdgeInsets.symmetric(vertical: 14),
+  //         decoration: BoxDecoration(
+  //           color: isSelected
+  //               ? AppTheme.primaryMint.withValues(alpha: 0.12)
+  //               : AppTheme.darkSurface,
+  //           borderRadius: BorderRadius.circular(12),
+  //           border: Border.all(
+  //             color: isSelected ? AppTheme.primaryMint : const Color(0xFF1E293B),
+  //             width: isSelected ? 1.5 : 1,
+  //           ),
+  //         ),
+  //         child: Column(
+  //           children: [
+  //             Icon(
+  //               icon,
+  //               color: isSelected ? AppTheme.primaryMint : AppTheme.textSecondary,
+  //               size: 22,
+  //             ),
+  //             const Gap(6),
+  //             Text(
+  //               label,
+  //               style: TextStyle(
+  //                 color: isSelected ? AppTheme.primaryMint : AppTheme.textSecondary,
+  //                 fontSize: 11,
+  //                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildArabicFontPicker(BuildContext context, SettingsState state) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.font_download_rounded, color: AppTheme.primaryMint, size: 18),
+              Gap(10),
+              Text(
+                'Arabic Font Family',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const Gap(12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: arabicFonts.map((font) {
+              final isSelected = state.arabicFontFamily == font['key'];
+              return ChoiceChip(
+                label: Text(
+                  font['display']!,
+                  style: TextStyle(
+                    color: isSelected ? AppTheme.darkCanvas : AppTheme.textPrimary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                selected: isSelected,
+                backgroundColor: AppTheme.darkSurface,
+                selectedColor: AppTheme.primaryMint,
+                showCheckmark: false,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: isSelected ? AppTheme.primaryMint : const Color(0xFF1E293B),
+                  ),
+                ),
+                onSelected: (_) {
+                  context.read<SettingsCubit>().setArabicFontFamily(font['key']!);
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  }
+
+  Widget _buildArabicPreview(SettingsState state) {
+    final isLocalFont = state.arabicFontFamily == 'Me Quran' ||
+        state.arabicFontFamily == 'QPC Hafs' ||
+        state.arabicFontFamily == 'Indopak Nastaleeq';
+
+    final textStyle = isLocalFont
+        ? TextStyle(
+            fontFamily: state.arabicFontFamily,
+            fontSize: state.arabicFontSize,
+            color: AppTheme.textPrimary,
+            height: 1.8,
+          )
+        : GoogleFonts.getFont(
+            state.arabicFontFamily,
+            fontSize: state.arabicFontSize,
+            color: AppTheme.textPrimary,
+            height: 1.8,
+          );
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Text(
+        'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.rtl,
+        style: textStyle,
+      ),
+    );
+  }
+
+  Widget _buildTranslationPreview(SettingsState state) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Text(
+        'The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended.',
+        style: TextStyle(
+          fontSize: state.translationFontSize,
+          color: AppTheme.textPrimary,
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSliderTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required double value,
+    required double min,
+    required double max,
+    required ValueChanged<double> onChanged,
+    Widget? preview,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: AppTheme.primaryMint, size: 18),
+              const Gap(10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryMint.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppTheme.primaryMint,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: AppTheme.primaryMint,
+              inactiveTrackColor: const Color(0xFF1E293B),
+              thumbColor: AppTheme.primaryMint,
+              overlayColor: AppTheme.primaryMint.withValues(alpha: 0.15),
+              trackHeight: 3,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+            ),
+            child: Slider(
+              value: value,
+              min: min,
+              max: max,
+              divisions: (max - min).toInt(),
+              onChanged: onChanged,
+            ),
+          ),
+          if (preview != null) ...[
+            const Gap(4),
+            preview,
+          ],
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  }
+
+  Widget _buildToggleTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppTheme.primaryMint, size: 18),
+          const Gap(14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Gap(2),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 11.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            activeThumbColor: AppTheme.primaryMint,
+            activeTrackColor: AppTheme.primaryMint.withValues(alpha: 0.3),
+            inactiveThumbColor: AppTheme.textSecondary,
+            inactiveTrackColor: const Color(0xFF1E293B),
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String title,
+    required String trailing,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppTheme.primaryMint, size: 18),
+          const Gap(14),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Text(
+            trailing,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  }
+}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
@@ -27,31 +29,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Al Hadith')
-            .animate()
-            .fadeIn(duration: 600.ms)
-            .scale(delay: 100.ms),
+        title: const Text(
+          'Al Hadith',
+        ).animate().fadeIn(duration: 600.ms).scale(delay: 100.ms),
         actions: [
           IconButton(
             icon: const Icon(Icons.search, color: AppTheme.primaryMint),
             onPressed: () {
-              // Search action placeholder
+              context.push('/search');
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings_outlined, color: AppTheme.textSecondary),
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: AppTheme.textSecondary,
+            ),
             onPressed: () {
-              // Settings action placeholder
+              context.push('/settings');
             },
           ),
           const Gap(8),
         ],
       ),
       drawer: _buildDrawer(context),
-      body: AnimatedSwitcher(
-        duration: 300.ms,
-        child: views[_currentIndex],
-      ),
+      body: AnimatedSwitcher(duration: 300.ms, child: views[_currentIndex]),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: const Border(
@@ -110,11 +111,130 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const Icon(Icons.person, size: 64, color: AppTheme.primaryMint),
           const Gap(16),
-          const Text('User Profile', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const Text(
+            'User Profile',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
           const Gap(8),
-          const Text('Sync your progress & backup collections.', style: TextStyle(color: AppTheme.textSecondary)),
+          const Text(
+            'Sync your progress & backup collections.',
+            style: TextStyle(color: AppTheme.textSecondary),
+          ),
         ],
       ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0.0),
+    );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
+    }
+  }
+
+  void _showAboutDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF1E293B), width: 1.5),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryMint.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.info_outline_rounded,
+                color: AppTheme.primaryMint,
+                size: 24,
+              ),
+            ),
+            const Gap(12),
+            const Text(
+              'About Al Hadith',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Al Hadith is a premium, fully offline reader powered by optimized local SQLite databases. It features state-of-the-art Custom Arabic Fonts, customizable sizes, real-time query filtering, and automated bookmarking/progress tracking.',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+            Gap(12),
+            Text(
+              'Hadith Resources:',
+              style: TextStyle(
+                color: AppTheme.primaryMint,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Gap(4),
+            Text(
+              'Fetched remotely and cached locally from fawazahmed0\'s open-source database repository. Under MIT License.',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 11,
+                height: 1.4,
+              ),
+            ),
+            Gap(12),
+            Text(
+              'Built With:',
+              style: TextStyle(
+                color: AppTheme.primaryMint,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Gap(4),
+            Text(
+              'Flutter, Bloc Pattern, sqflite, path_provider, and Google Outfit fonts.',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 11,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Close',
+              style: TextStyle(
+                color: AppTheme.primaryMint,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -143,7 +263,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   gradient: AppTheme.primaryGradient,
                 ),
                 child: const Center(
-                  child: Icon(Icons.menu_book, size: 36, color: AppTheme.darkCanvas),
+                  child: Icon(
+                    Icons.menu_book,
+                    size: 36,
+                    color: AppTheme.darkCanvas,
+                  ),
                 ),
               ),
               accountName: const Text(
@@ -163,38 +287,62 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.library_books,
                     title: 'Manage Resources',
                     subtitle: 'Download, delete & update books',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/resources');
+                    },
                   ),
                   _buildDrawerItem(
                     icon: Icons.bug_report_outlined,
                     title: 'Send Bug Report',
                     subtitle: 'Report app issues on GitHub',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl(
+                        'https://github.com/IsmailHosenIsmailJames/al_hadith/issues',
+                      );
+                    },
                   ),
                   _buildDrawerItem(
                     icon: Icons.feedback_outlined,
                     title: 'Hadith Dataset Feedback',
                     subtitle: 'Submit database edits to API owner',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl('https://github.com/fawazahmed0/hadith-api');
+                    },
                   ),
                   _buildDrawerItem(
                     icon: Icons.star_rate_outlined,
                     title: 'Rate App',
                     subtitle: 'Give us 5 stars on Play Store',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl(
+                        'https://play.google.com/store/apps/details?id=com.ismail.al_hadith',
+                      );
+                    },
                   ),
                   _buildDrawerItem(
                     icon: Icons.star_border,
                     title: 'Star on GitHub',
                     subtitle: 'Show support to open-source repository',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl(
+                        'https://github.com/IsmailHosenIsmailJames/al_hadith',
+                      );
+                    },
                   ),
                   const Divider(color: Color(0xFF1E293B), thickness: 1),
                   _buildDrawerItem(
                     icon: Icons.info_outline,
                     title: 'About App',
                     subtitle: 'Details about API and compilers',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showAboutDialog();
+                    },
                   ),
                 ],
               ),
@@ -220,8 +368,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return ListTile(
       leading: Icon(icon, color: AppTheme.primaryMint, size: 24),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-      subtitle: Text(subtitle, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+      ),
       onTap: onTap,
     );
   }

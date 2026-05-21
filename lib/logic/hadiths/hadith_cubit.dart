@@ -229,4 +229,80 @@ class HadithCubit extends Cubit<HadithState> {
     await _historyService.deleteNote(bookKey, hadithNumber);
     await loadCollections();
   }
+
+  /// Toggles target book selection for search scope
+  void toggleSearchBookSelection(String bookKey) {
+    final updated = Set<String>.from(state.selectedSearchBooks);
+    if (updated.contains(bookKey)) {
+      updated.remove(bookKey);
+    } else {
+      updated.add(bookKey);
+    }
+    emit(state.copyWith(selectedSearchBooks: updated));
+  }
+
+  /// Bulk select all books for search scope
+  void selectAllSearchBooks(List<String> bookKeys) {
+    emit(state.copyWith(selectedSearchBooks: bookKeys.toSet()));
+  }
+
+  /// Bulk clear all selected search books
+  void deselectAllSearchBooks() {
+    emit(state.copyWith(selectedSearchBooks: const {}));
+  }
+
+  /// Global FTS Search across selected databases
+  Future<void> searchHadiths(String query) async {
+    final cleanedQuery = query.trim();
+    if (cleanedQuery.isEmpty) {
+      emit(state.copyWith(
+        searchQuery: '',
+        isSearching: false,
+        searchResultsGrouped: const {},
+      ));
+      return;
+    }
+
+    emit(state.copyWith(
+      isSearching: true,
+      searchQuery: cleanedQuery,
+      searchResultsGrouped: const {}, // Clear prior results
+    ));
+
+    try {
+      final targetBooks = state.selectedSearchBooks.isNotEmpty
+          ? state.selectedSearchBooks
+          : state.downloadedBooks.map((b) => b.book).toSet();
+
+      final Map<String, List<HadithItem>> results = {};
+
+      await Future.wait(targetBooks.map((bookKey) async {
+        try {
+          final matches = await _hadithRepository.searchHadiths(bookKey, cleanedQuery);
+          if (matches.isNotEmpty) {
+            results[bookKey] = matches;
+          }
+        } catch (_) {}
+      }));
+
+      emit(state.copyWith(
+        searchResultsGrouped: results,
+        isSearching: false,
+      ));
+    } catch (_) {
+      emit(state.copyWith(
+        isSearching: false,
+        searchResultsGrouped: const {},
+      ));
+    }
+  }
+
+  /// Clears the global search results and query
+  void clearSearch() {
+    emit(state.copyWith(
+      searchQuery: '',
+      isSearching: false,
+      searchResultsGrouped: const {},
+    ));
+  }
 }

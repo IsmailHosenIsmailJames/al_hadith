@@ -47,6 +47,9 @@ dependencies:
   google_fonts: ^8.0.2
   scrollable_positioned_list: ^0.3.8
   share_plus: ^10.1.4
+  wakelock_plus: ^1.5.2
+  url_launcher: ^6.3.1
+  firebase_core: ^4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -83,19 +86,14 @@ flutter:
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  # list giving the asset and other descriptors for the font.
+  fonts:
+    - family: Indopak Nastaleeq
+      fonts:
+        - asset: assets/fonts/Indopak Nastaleeq font.ttf
+    - family: Me Quran
+      fonts:
+        - asset: assets/fonts/me_quran_volt_newmet.ttf
+    - family: QPC Hafs
+      fonts:
+        - asset: assets/fonts/QPC Hafs font.ttf

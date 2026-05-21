@@ -11,6 +11,7 @@ import 'package:al_hadith/data/services/preferences_service.dart';
 import 'package:al_hadith/data/services/history_service.dart';
 import 'package:al_hadith/logic/setup/setup_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 
 void main() async {
   // Ensure Flutter engine is fully bootstrapped
@@ -53,6 +54,9 @@ void main() async {
               historyService: historyService,
             ),
           ),
+          BlocProvider<SettingsCubit>(
+            create: (context) => SettingsCubit(prefsService),
+          ),
         ],
         child: MyApp(appRouter: appRouter),
       ),
@@ -63,10 +67,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final AppRouter appRouter;
 
-  const MyApp({
-    super.key,
-    required this.appRouter,
-  });
+  const MyApp({super.key, required this.appRouter});
 
   @override
   Widget build(BuildContext context) {

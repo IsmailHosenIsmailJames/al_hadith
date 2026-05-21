@@ -4,6 +4,9 @@ import 'package:al_hadith/presentation/screens/setup_wizard_screen.dart';
 import 'package:al_hadith/presentation/screens/home_screen.dart';
 import 'package:al_hadith/presentation/screens/book_sections_screen.dart';
 import 'package:al_hadith/presentation/screens/hadith_read_placeholder_screen.dart';
+import 'package:al_hadith/presentation/screens/hadith_search_screen.dart';
+import 'package:al_hadith/presentation/screens/settings_screen.dart';
+import 'package:al_hadith/presentation/screens/manage_resources_screen.dart';
 
 class AppRouter {
   final PreferencesService _prefs;
@@ -22,6 +25,21 @@ class AppRouter {
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/search',
+        name: 'search',
+        builder: (context, state) => const HadithSearchScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/resources',
+        name: 'resources',
+        builder: (context, state) => const ManageResourcesScreen(),
       ),
       GoRoute(
         path: '/book/:bookKey',

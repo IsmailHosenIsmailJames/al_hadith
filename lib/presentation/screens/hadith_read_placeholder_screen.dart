@@ -7,11 +7,14 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/data/repositories/hadith_repository.dart';
 import 'package:al_hadith/data/services/history_service.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/logic/settings/settings_state.dart';
 
 enum _ViewMode { page, list }
 
@@ -170,13 +173,13 @@ class _HadithReadPlaceholderScreenState
     );
   }
 
-  /// Starts (or resets) the 5-second dwell timer for [index].
-  /// When it fires and the user is still on the same hadith, it is
-  /// automatically marked as read.
   void _startDwellTimer(int index) {
+    final settings = context.read<SettingsCubit>().state;
+    if (!settings.autoMarkRead) return;
+
     _dwellTimer?.cancel();
     _dwellIndex = index;
-    _dwellTimer = Timer(const Duration(seconds: 5), () {
+    _dwellTimer = Timer(Duration(seconds: settings.dwellTimerSeconds), () {
       // Ensure we are still mounted and still on the same hadith
       if (!mounted) return;
       if (_currentIndex != _dwellIndex) return;
@@ -639,10 +642,10 @@ class _HadithReadPlaceholderScreenState
                   child: TextButton.icon(
                     onPressed: canPrev
                         ? () => _pageController.animateToPage(
-                              _currentIndex - 1,
-                              duration: 300.ms,
-                              curve: Curves.easeInOut,
-                            )
+                            _currentIndex - 1,
+                            duration: 300.ms,
+                            curve: Curves.easeInOut,
+                          )
                         : null,
                     icon: const Icon(
                       Icons.arrow_back_ios_rounded,
@@ -663,7 +666,10 @@ class _HadithReadPlaceholderScreenState
 
               // Centre progress pill
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.darkSurfaceCard,
                   borderRadius: BorderRadius.circular(20),
@@ -687,10 +693,10 @@ class _HadithReadPlaceholderScreenState
                   child: TextButton.icon(
                     onPressed: canNext
                         ? () => _pageController.animateToPage(
-                              _currentIndex + 1,
-                              duration: 300.ms,
-                              curve: Curves.easeInOut,
-                            )
+                            _currentIndex + 1,
+                            duration: 300.ms,
+                            curve: Curves.easeInOut,
+                          )
                         : null,
                     iconAlignment: IconAlignment.end,
                     icon: const Icon(
@@ -820,7 +826,9 @@ class _HadithCard extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
@@ -846,7 +854,10 @@ class _HadithCard extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppTheme.textSecondary,
+                      ),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
@@ -862,10 +873,17 @@ class _HadithCard extends StatelessWidget {
                     controller: textController,
                     maxLines: 5,
                     autofocus: true,
-                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14,
+                    ),
                     decoration: const InputDecoration(
-                      hintText: 'Write your notes, reflection or study guide here...',
-                      hintStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                      hintText:
+                          'Write your notes, reflection or study guide here...',
+                      hintStyle: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 13,
+                      ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(16),
                     ),
@@ -879,13 +897,19 @@ class _HadithCard extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.redAccent,
                           side: const BorderSide(color: Colors.redAccent),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                         onPressed: () {
-                          context.read<HadithCubit>().deleteHadithNote(bookKey, hadithNumber);
+                          context.read<HadithCubit>().deleteHadithNote(
+                            bookKey,
+                            hadithNumber,
+                          );
                           Navigator.pop(ctx);
                         },
                         icon: const Icon(Icons.delete_outline, size: 18),
@@ -1074,14 +1098,49 @@ class _HadithCard extends StatelessWidget {
                 ),
                 const Gap(16),
                 // Hadith text
-                Text(
-                  hadith.text,
-                  style: const TextStyle(
-                    fontSize: 15.5,
-                    color: AppTheme.textPrimary,
-                    height: 1.7,
-                    letterSpacing: 0.1,
-                  ),
+                BlocBuilder<SettingsCubit, SettingsState>(
+                  builder: (context, settingsState) {
+                    final isArabic = bookKey.toLowerCase().startsWith('ara');
+                    final isLocalFont =
+                        settingsState.arabicFontFamily == 'Me Quran' ||
+                        settingsState.arabicFontFamily == 'QPC Hafs' ||
+                        settingsState.arabicFontFamily == 'Indopak Nastaleeq';
+
+                    final textStyle = isArabic
+                        ? (isLocalFont
+                              ? TextStyle(
+                                  fontFamily: settingsState.arabicFontFamily,
+                                  fontSize: settingsState.arabicFontSize,
+                                  color: AppTheme.textPrimary,
+                                  height: 1.8,
+                                  fontFamilyFallback: [
+                                    isLocalFont ? 'Me Quran' : 'Arial',
+                                  ],
+                                )
+                              : GoogleFonts.getFont(
+                                  settingsState.arabicFontFamily,
+                                  fontSize: settingsState.arabicFontSize,
+                                  color: AppTheme.textPrimary,
+                                  height: 1.8,
+                                ))
+                        : TextStyle(
+                            fontSize: settingsState.translationFontSize,
+                            color: AppTheme.textPrimary,
+                            height: 1.6,
+                            letterSpacing: 0.1,
+                            fontFamilyFallback: [
+                              settingsState.arabicFontFamily,
+                            ],
+                          );
+                    return Text(
+                      hadith.text,
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                      textDirection: isArabic
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
+                      style: textStyle,
+                    );
+                  },
                 ),
                 // Custom Note Display Speech Bubble
                 if (hasNote) ...[
@@ -1102,7 +1161,11 @@ class _HadithCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.edit_note_rounded, color: AppTheme.primaryMint, size: 18),
+                            const Icon(
+                              Icons.edit_note_rounded,
+                              color: AppTheme.primaryMint,
+                              size: 18,
+                            ),
                             const Gap(6),
                             const Text(
                               'My Notes',
@@ -1114,7 +1177,12 @@ class _HadithCard extends StatelessWidget {
                             ),
                             const Spacer(),
                             GestureDetector(
-                              onTap: () => _showNoteDialog(context, bookKey, hadith.hadithNumber, noteText),
+                              onTap: () => _showNoteDialog(
+                                context,
+                                bookKey,
+                                hadith.hadithNumber,
+                                noteText,
+                              ),
                               child: const Text(
                                 'Edit',
                                 style: TextStyle(
@@ -1200,29 +1268,53 @@ class _HadithCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildCardAction(
-                      icon: isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                      color: isBookmarked ? AppTheme.primaryMint : AppTheme.textSecondary,
+                      icon: isBookmarked
+                          ? Icons.bookmark_rounded
+                          : Icons.bookmark_outline_rounded,
+                      color: isBookmarked
+                          ? AppTheme.primaryMint
+                          : AppTheme.textSecondary,
                       label: 'Bookmark',
-                      onTap: () => context.read<HadithCubit>().toggleBookmark(bookKey, hadith.hadithNumber),
+                      onTap: () => context.read<HadithCubit>().toggleBookmark(
+                        bookKey,
+                        hadith.hadithNumber,
+                      ),
                     ),
                     _buildCardAction(
-                      icon: isPinned ? Icons.push_pin_rounded : Icons.push_pin_outlined,
-                      color: isPinned ? Colors.orangeAccent : AppTheme.textSecondary,
+                      icon: isPinned
+                          ? Icons.push_pin_rounded
+                          : Icons.push_pin_outlined,
+                      color: isPinned
+                          ? Colors.orangeAccent
+                          : AppTheme.textSecondary,
                       label: 'Pin',
-                      onTap: () => context.read<HadithCubit>().togglePin(bookKey, hadith.hadithNumber),
+                      onTap: () => context.read<HadithCubit>().togglePin(
+                        bookKey,
+                        hadith.hadithNumber,
+                      ),
                     ),
                     _buildCardAction(
-                      icon: hasNote ? Icons.note_alt_rounded : Icons.note_alt_outlined,
-                      color: hasNote ? Colors.tealAccent : AppTheme.textSecondary,
+                      icon: hasNote
+                          ? Icons.note_alt_rounded
+                          : Icons.note_alt_outlined,
+                      color: hasNote
+                          ? Colors.tealAccent
+                          : AppTheme.textSecondary,
                       label: 'Note',
-                      onTap: () => _showNoteDialog(context, bookKey, hadith.hadithNumber, noteText ?? ''),
+                      onTap: () => _showNoteDialog(
+                        context,
+                        bookKey,
+                        hadith.hadithNumber,
+                        noteText ?? '',
+                      ),
                     ),
                     _buildCardAction(
                       icon: Icons.content_copy_rounded,
                       color: AppTheme.textSecondary,
                       label: 'Copy',
                       onTap: () {
-                        final copyText = 'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\nShared via Al Hadith App';
+                        final copyText =
+                            'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\nShared via Al Hadith App';
                         Clipboard.setData(ClipboardData(text: copyText));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

@@ -24,6 +24,12 @@ class HadithState {
   final Map<String, String> hadithNotes;
   final Map<String, HadithItem> collectionsHadiths; // reference -> loaded detail
 
+  // Global FTS Search State
+  final Map<String, List<HadithItem>> searchResultsGrouped; // bookKey -> results
+  final Set<String> selectedSearchBooks; // books selected for search scope
+  final bool isSearching;
+  final String searchQuery;
+
   HadithState({
     this.isLoading = false,
     this.downloadedBooks = const [],
@@ -39,6 +45,10 @@ class HadithState {
     this.pinnedRefs = const {},
     this.hadithNotes = const {},
     this.collectionsHadiths = const {},
+    this.searchResultsGrouped = const {},
+    this.selectedSearchBooks = const {},
+    this.isSearching = false,
+    this.searchQuery = '',
   });
 
   HadithState copyWith({
@@ -56,6 +66,10 @@ class HadithState {
     Set<String>? pinnedRefs,
     Map<String, String>? hadithNotes,
     Map<String, HadithItem>? collectionsHadiths,
+    Map<String, List<HadithItem>>? searchResultsGrouped,
+    Set<String>? selectedSearchBooks,
+    bool? isSearching,
+    String? searchQuery,
   }) {
     return HadithState(
       isLoading: isLoading ?? this.isLoading,
@@ -72,6 +86,10 @@ class HadithState {
       pinnedRefs: pinnedRefs ?? this.pinnedRefs,
       hadithNotes: hadithNotes ?? this.hadithNotes,
       collectionsHadiths: collectionsHadiths ?? this.collectionsHadiths,
+      searchResultsGrouped: searchResultsGrouped ?? this.searchResultsGrouped,
+      selectedSearchBooks: selectedSearchBooks ?? this.selectedSearchBooks,
+      isSearching: isSearching ?? this.isSearching,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
