@@ -254,7 +254,7 @@ class BackupService {
     await _historyService.saveLastReadSession(
       bookKey: session['bookKey'] as String,
       bookName: session['bookName'] as String,
-      hadithNumber: session['hadithNumber'] as int,
+      hadithNumber: (session['hadithNumber'] as num?)?.toInt() ?? 0,
       sectionTitle: session['sectionTitle'] as String,
     );
   }

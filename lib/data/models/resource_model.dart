@@ -46,12 +46,12 @@ class HadithResource {
     return HadithResource(
       book: json['book'] as String,
       name: json['name'] as String,
-      hadithCount: json['hadith_count'] as int,
-      sectionCount: json['section_count'] as int,
+      hadithCount: (json['hadith_count'] as num?)?.toInt() ?? 0,
+      sectionCount: (json['section_count'] as num?)?.toInt() ?? 0,
       checksum: json['checksum'] as String,
       zipPath: json['zip_path'] as String,
-      fileSize: json['file_size'] as int,
-      zipSize: json['zip_size'] as int,
+      fileSize: (json['file_size'] as num?)?.toInt() ?? 0,
+      zipSize: (json['zip_size'] as num?)?.toInt() ?? 0,
       languageCode: languageCode,
     );
   }

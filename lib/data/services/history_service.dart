@@ -29,9 +29,9 @@ class ReadSession {
     return ReadSession(
       bookKey: json['bookKey'] as String,
       bookName: json['bookName'] as String,
-      hadithNumber: json['hadithNumber'] as int,
+      hadithNumber: (json['hadithNumber'] as num?)?.toInt() ?? 0,
       sectionTitle: json['sectionTitle'] as String,
-      timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
+      timestamp: DateTime.fromMillisecondsSinceEpoch((json['timestamp'] as num?)?.toInt() ?? 0),
     );
   }
 }

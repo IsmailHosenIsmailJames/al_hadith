@@ -57,13 +57,13 @@ class HadithRepository {
     // Group grades by hadith_id in memory
     final Map<int, List<HadithGrade>> groupedGrades = {};
     for (final map in gradeMaps) {
-      final hId = map['hadith_id'] as int;
+      final hId = parseInt(map['hadith_id']);
       groupedGrades.putIfAbsent(hId, () => []).add(HadithGrade.fromMap(map));
     }
 
     // Map into HadithItem objects
     return hadithMaps.map((map) {
-      final hadithId = map['id'] as int;
+      final hadithId = parseInt(map['id']);
       final grades = groupedGrades[hadithId] ?? const [];
       return HadithItem.fromMap(map, grades: grades);
     }).toList();
@@ -82,7 +82,7 @@ class HadithRepository {
 
     if (hadithMaps.isEmpty) return null;
     final hadithMap = hadithMaps.first;
-    final hadithId = hadithMap['id'] as int;
+    final hadithId = parseInt(hadithMap['id']);
 
     // Fetch grades for this single hadith
     final List<Map<String, dynamic>> gradeMaps = await db.query(
@@ -110,7 +110,7 @@ class HadithRepository {
     if (searchResults.isEmpty) return [];
 
     // Fetch grades for these search results
-    final List<int> hadithIds = searchResults.map((map) => map['id'] as int).toList();
+    final List<int> hadithIds = searchResults.map((map) => parseInt(map['id'])).toList();
     final String idPlaceholders = List.filled(hadithIds.length, '?').join(',');
 
     final List<Map<String, dynamic>> gradeMaps = await db.rawQuery('''
@@ -120,12 +120,12 @@ class HadithRepository {
 
     final Map<int, List<HadithGrade>> groupedGrades = {};
     for (final map in gradeMaps) {
-      final hId = map['hadith_id'] as int;
+      final hId = parseInt(map['hadith_id']);
       groupedGrades.putIfAbsent(hId, () => []).add(HadithGrade.fromMap(map));
     }
 
     return searchResults.map((map) {
-      final hadithId = map['id'] as int;
+      final hadithId = parseInt(map['id']);
       final grades = groupedGrades[hadithId] ?? const [];
       return HadithItem.fromMap(map, grades: grades);
     }).toList();
