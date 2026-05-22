@@ -29,78 +29,253 @@ class _HomeScreenState extends State<HomeScreen> {
       const ProfileScreen(),
     ];
 
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isWideScreen = screenWidth >= AppTheme.wideWidth;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Al Hadith',
-        ).animate().fadeIn(duration: 600.ms).scale(delay: 100.ms),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: AppTheme.primaryMint),
-            onPressed: () {
-              context.push('/search');
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.settings_outlined,
-              color: AppTheme.textSecondary,
+      appBar: isWideScreen
+          ? null
+          : AppBar(
+              leading: Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu, color: AppTheme.primaryMint),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  );
+                },
+              ),
+              title: const Text(
+                'Al Hadith',
+              ).animate().fadeIn(duration: 600.ms).scale(delay: 100.ms),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.search, color: AppTheme.primaryMint),
+                  onPressed: () {
+                    context.push('/search');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                    color: AppTheme.textSecondary,
+                  ),
+                  onPressed: () {
+                    context.push('/settings');
+                  },
+                ),
+                const Gap(8),
+              ],
             ),
-            onPressed: () {
-              context.push('/settings');
-            },
+      drawer: _buildDrawer(context),
+      body: Row(
+        children: [
+          if (isWideScreen)
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  right: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                ),
+              ),
+              child: NavigationRail(
+                indicatorColor: AppTheme.darkSurfaceCard,
+                selectedIndex: _currentIndex,
+                onDestinationSelected: (index) =>
+                    setState(() => _currentIndex = index),
+                backgroundColor: AppTheme.darkSurface,
+                extended: screenWidth >= 1100,
+                minExtendedWidth: 300,
+                selectedIconTheme: const IconThemeData(
+                  color: AppTheme.primaryMint,
+                  size: 28,
+                ),
+                unselectedIconTheme: const IconThemeData(
+                  color: AppTheme.textSecondary,
+                  size: 24,
+                ),
+                selectedLabelTextStyle: const TextStyle(
+                  color: AppTheme.primaryMint,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                unselectedLabelTextStyle: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12,
+                ),
+                labelType: screenWidth >= 1100
+                    ? NavigationRailLabelType.none
+                    : NavigationRailLabelType.all,
+                leading: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: screenWidth >= 1100 ? 260 : 72,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Gap(16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Builder(
+                              builder: (context) {
+                                return IconButton(
+                                  onPressed: () =>
+                                      Scaffold.of(context).openDrawer(),
+                                  icon: Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primaryMint.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.menu_open_rounded,
+                                      color: AppTheme.primaryMint,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            if (screenWidth >= 1100)
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.search,
+                                      color: AppTheme.primaryMint,
+                                    ),
+                                    onPressed: () {
+                                      context.push('/search');
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.settings_outlined,
+                                      color: AppTheme.textSecondary,
+                                    ),
+                                    onPressed: () {
+                                      context.push('/settings');
+                                    },
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
+                      if (screenWidth >= 1100) ...[
+                        const Gap(24),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child:
+                              const Text(
+                                    'Al Hadith',
+                                    style: TextStyle(
+                                      color: AppTheme.textPrimary,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  )
+                                  .animate()
+                                  .fadeIn(duration: 600.ms)
+                                  .scale(delay: 100.ms),
+                        ),
+                        const Gap(32),
+                      ] else
+                        const Gap(24),
+                    ],
+                  ),
+                ),
+                destinations: const [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.book_outlined),
+                    selectedIcon: Icon(Icons.book),
+                    label: Text('Hadiths'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.grid_view_outlined),
+                    selectedIcon: Icon(Icons.grid_view),
+                    label: Text('Chapters'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.bookmark_outline),
+                    selectedIcon: Icon(Icons.bookmark),
+                    label: Text('Collections'),
+                  ),
+                  NavigationRailDestination(
+                    icon: Icon(Icons.person_outline),
+                    selectedIcon: Icon(Icons.person),
+                    label: Text('Profile'),
+                  ),
+                ],
+              ),
+            ),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: 300.ms,
+              child: views[_currentIndex],
+            ),
           ),
-          const Gap(8),
         ],
       ),
-      drawer: _buildDrawer(context),
-      body: AnimatedSwitcher(duration: 300.ms, child: views[_currentIndex]),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: const Border(
-            top: BorderSide(color: Color(0xFF1E293B), width: 1.5),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
+      bottomNavigationBar: isWideScreen
+          ? null
+          : Container(
+              decoration: BoxDecoration(
+                border: const Border(
+                  top: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: BottomNavigationBar(
+                currentIndex: _currentIndex,
+                onTap: (index) => setState(() => _currentIndex = index),
+                backgroundColor: AppTheme.darkSurface,
+                selectedItemColor: AppTheme.primaryMint,
+                unselectedItemColor: AppTheme.textSecondary,
+                type: BottomNavigationBarType.fixed,
+                selectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                elevation: 0,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.book_outlined),
+                    activeIcon: Icon(Icons.book, color: AppTheme.primaryMint),
+                    label: 'Hadiths',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.grid_view_outlined),
+                    activeIcon: Icon(
+                      Icons.grid_view,
+                      color: AppTheme.primaryMint,
+                    ),
+                    label: 'Chapters',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.bookmark_outline),
+                    activeIcon: Icon(
+                      Icons.bookmark,
+                      color: AppTheme.primaryMint,
+                    ),
+                    label: 'Collections',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person_outline),
+                    activeIcon: Icon(Icons.person, color: AppTheme.primaryMint),
+                    label: 'Profile',
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
-          backgroundColor: AppTheme.darkSurface,
-          selectedItemColor: AppTheme.primaryMint,
-          unselectedItemColor: AppTheme.textSecondary,
-          type: BottomNavigationBarType.fixed,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          elevation: 0,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.book_outlined),
-              activeIcon: Icon(Icons.book, color: AppTheme.primaryMint),
-              label: 'Hadiths',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.grid_view_outlined),
-              activeIcon: Icon(Icons.grid_view, color: AppTheme.primaryMint),
-              label: 'Chapters',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_outline),
-              activeIcon: Icon(Icons.bookmark, color: AppTheme.primaryMint),
-              label: 'Collections',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person, color: AppTheme.primaryMint),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
     );
   }
 
