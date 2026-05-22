@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  static const double wideWidth = 800;
   // Brand color scheme based on HSL tailoring
   static const Color darkCanvas = Color(
     0xFF0A0C10,

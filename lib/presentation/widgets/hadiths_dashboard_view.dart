@@ -1,4 +1,3 @@
-import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -109,7 +108,6 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                   final book = state.downloadedBooks[index];
                   final readCount = state.readCounts[book.book] ?? 0;
                   final totalHadiths = book.hadithCount;
-                  final languageCode = book.languageCode;
 
                   // Calculate dynamic reading ratio
                   final double ratio = totalHadiths > 0

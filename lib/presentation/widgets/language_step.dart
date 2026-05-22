@@ -23,6 +23,8 @@ class LanguageStep extends StatelessWidget {
       );
     }
 
+    bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,9 +49,9 @@ class LanguageStep extends StatelessWidget {
         const Gap(24),
         Expanded(
           child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.15,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isWideWindow ? 4 : 2,
+              childAspectRatio: 1.5,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
             ),
