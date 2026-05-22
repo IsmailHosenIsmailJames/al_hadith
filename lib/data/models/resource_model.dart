@@ -1,6 +1,7 @@
 class HadithResource {
   final String book;
   final String name;
+  final String nameNative;
   final int hadithCount;
   final int sectionCount;
   final String checksum;
@@ -18,6 +19,7 @@ class HadithResource {
   HadithResource({
     required this.book,
     required this.name,
+    required this.nameNative,
     required this.hadithCount,
     required this.sectionCount,
     required this.checksum,
@@ -37,15 +39,24 @@ class HadithResource {
     return meta?['display'] ?? languageCode.toUpperCase();
   }
 
+  String get langNativeName {
+    final meta = HadithLanguage.languageMetadata[languageCode];
+    return meta?['native'] ?? languageCode.toUpperCase();
+  }
+
   String get langFlag {
     final meta = HadithLanguage.languageMetadata[languageCode];
     return meta?['flag'] ?? '🏳️';
   }
 
-  factory HadithResource.fromJson(Map<String, dynamic> json, {String languageCode = ''}) {
+  factory HadithResource.fromJson(
+    Map<String, dynamic> json, {
+    String languageCode = '',
+  }) {
     return HadithResource(
       book: json['book'] as String,
       name: json['name'] as String,
+      nameNative: json['name_native'] as String? ?? '',
       hadithCount: (json['hadith_count'] as num?)?.toInt() ?? 0,
       sectionCount: (json['section_count'] as num?)?.toInt() ?? 0,
       checksum: json['checksum'] as String,
@@ -60,6 +71,7 @@ class HadithResource {
     return {
       'book': book,
       'name': name,
+      'name_native': nameNative,
       'hadith_count': hadithCount,
       'section_count': sectionCount,
       'checksum': checksum,
@@ -72,13 +84,15 @@ class HadithResource {
   // Helper properties
   String get formattedZipSize {
     if (zipSize < 1024) return '$zipSize B';
-    if (zipSize < 1024 * 1024) return '${(zipSize / 1024).toStringAsFixed(1)} KB';
+    if (zipSize < 1024 * 1024)
+      return '${(zipSize / 1024).toStringAsFixed(1)} KB';
     return '${(zipSize / (1024 * 1024)).toStringAsFixed(2)} MB';
   }
 
   String get formattedFileSize {
     if (fileSize < 1024) return '$fileSize B';
-    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    if (fileSize < 1024 * 1024)
+      return '${(fileSize / 1024).toStringAsFixed(1)} KB';
     return '${(fileSize / (1024 * 1024)).toStringAsFixed(2)} MB';
   }
 
@@ -92,6 +106,7 @@ class HadithResource {
     return HadithResource(
       book: book,
       name: name,
+      nameNative: nameNative,
       hadithCount: hadithCount,
       sectionCount: sectionCount,
       checksum: checksum,
@@ -127,7 +142,11 @@ class HadithLanguage {
     'ben': {'display': 'Bengali', 'native': 'বাংলা', 'flag': '🇧🇩'},
     'eng': {'display': 'English', 'native': 'English', 'flag': '🇬🇧'},
     'fra': {'display': 'French', 'native': 'Français', 'flag': '🇫🇷'},
-    'ind': {'display': 'Indonesian', 'native': 'Bahasa Indonesia', 'flag': '🇮🇩'},
+    'ind': {
+      'display': 'Indonesian',
+      'native': 'Bahasa Indonesia',
+      'flag': '🇮🇩',
+    },
     'rus': {'display': 'Russian', 'native': 'Русский', 'flag': '🇷🇺'},
     'tam': {'display': 'Tamil', 'native': 'தமிழ்', 'flag': '🇮🇳'},
     'tur': {'display': 'Turkish', 'native': 'Türkçe', 'flag': '🇹🇷'},
@@ -135,11 +154,9 @@ class HadithLanguage {
   };
 
   factory HadithLanguage.fromCode(String code, List<HadithResource> resources) {
-    final meta = languageMetadata[code] ?? {
-      'display': 'Language ($code)',
-      'native': code,
-      'flag': '🏳️',
-    };
+    final meta =
+        languageMetadata[code] ??
+        {'display': 'Language ($code)', 'native': code, 'flag': '🏳️'};
     return HadithLanguage(
       code: code,
       displayName: meta['display']!,

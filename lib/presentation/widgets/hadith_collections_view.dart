@@ -8,6 +8,8 @@ import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
 
+import '../../data/models/resource_model.dart';
+
 class HadithCollectionsView extends StatefulWidget {
   const HadithCollectionsView({super.key});
 
@@ -33,12 +35,12 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     super.dispose();
   }
 
-  String _getBookName(HadithState state, String bookKey) {
+  HadithResource? _getBookName(HadithState state, String bookKey) {
     final books = state.downloadedBooks;
     if (books.any((b) => b.book == bookKey)) {
-      return books.firstWhere((b) => b.book == bookKey).name;
+      return books.firstWhere((b) => b.book == bookKey);
     }
-    return bookKey.toUpperCase();
+    return null;
   }
 
   String _getFlag(HadithState state, String bookKey) {
@@ -63,7 +65,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
@@ -89,7 +93,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppTheme.textSecondary,
+                      ),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
@@ -105,10 +112,16 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     controller: textController,
                     maxLines: 5,
                     autofocus: true,
-                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14,
+                    ),
                     decoration: const InputDecoration(
                       hintText: 'Enter note reflection details...',
-                      hintStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                      hintStyle: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 13,
+                      ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(16),
                     ),
@@ -155,49 +168,53 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     required String subtitle,
   }) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMint.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppTheme.primaryMint.withValues(alpha: 0.15),
-                  width: 1.5,
+      child:
+          Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryMint.withValues(alpha: 0.05),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppTheme.primaryMint.withValues(alpha: 0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: AppTheme.primaryMint.withValues(alpha: 0.6),
+                        size: 40,
+                      ),
+                    ),
+                    const Gap(20),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const Gap(8),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppTheme.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              child: Icon(
-                icon,
-                color: AppTheme.primaryMint.withValues(alpha: 0.6),
-                size: 40,
-              ),
-            ),
-            const Gap(20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
-              ),
-            ),
-            const Gap(8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12.5,
-                color: AppTheme.textSecondary,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.95, 0.95)),
+              )
+              .animate()
+              .fadeIn(duration: 400.ms)
+              .scale(begin: const Offset(0.95, 0.95)),
     );
   }
 
@@ -209,7 +226,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
   }) {
     final parts = ref.split('_');
     final bookKey = parts[0];
-    final bookName = _getBookName(state, bookKey);
+    final hadithResources = _getBookName(state, bookKey);
     final flag = _getFlag(state, bookKey);
 
     return Container(
@@ -234,11 +251,16 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.primaryMint.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.2)),
+                        border: Border.all(
+                          color: AppTheme.primaryMint.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -246,7 +268,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                           Text(flag, style: const TextStyle(fontSize: 11)),
                           const Gap(6),
                           Text(
-                            bookName,
+                            hadithResources?.nameNative ?? bookKey,
                             style: const TextStyle(
                               color: AppTheme.primaryMint,
                               fontSize: 10.5,
@@ -270,9 +292,15 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     GestureDetector(
                       onTap: () {
                         if (isBookmark) {
-                          context.read<HadithCubit>().toggleBookmark(bookKey, hadith.hadithNumber);
+                          context.read<HadithCubit>().toggleBookmark(
+                            bookKey,
+                            hadith.hadithNumber,
+                          );
                         } else {
-                          context.read<HadithCubit>().togglePin(bookKey, hadith.hadithNumber);
+                          context.read<HadithCubit>().togglePin(
+                            bookKey,
+                            hadith.hadithNumber,
+                          );
                         }
                       },
                       child: Container(
@@ -283,8 +311,12 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                           border: Border.all(color: const Color(0xFF1E293B)),
                         ),
                         child: Icon(
-                          isBookmark ? Icons.bookmark_rounded : Icons.push_pin_rounded,
-                          color: isBookmark ? AppTheme.primaryMint : Colors.orangeAccent,
+                          isBookmark
+                              ? Icons.bookmark_rounded
+                              : Icons.push_pin_rounded,
+                          color: isBookmark
+                              ? AppTheme.primaryMint
+                              : Colors.orangeAccent,
                           size: 13,
                         ),
                       ),
@@ -320,7 +352,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                         c = Colors.redAccent;
                       }
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: c.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(6),
@@ -354,7 +389,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
   }) {
     final parts = ref.split('_');
     final bookKey = parts[0];
-    final bookName = _getBookName(state, bookKey);
+    final hadithResources = _getBookName(state, bookKey);
     final flag = _getFlag(state, bookKey);
 
     return Container(
@@ -373,7 +408,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppTheme.primaryMint.withValues(alpha: 0.06),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               border: const Border(
                 bottom: BorderSide(color: Color(0xFF1E293B)),
               ),
@@ -383,7 +420,11 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.edit_note_rounded, color: AppTheme.primaryMint, size: 18),
+                    const Icon(
+                      Icons.edit_note_rounded,
+                      color: AppTheme.primaryMint,
+                      size: 18,
+                    ),
                     const Gap(6),
                     const Text(
                       'Study Notes',
@@ -396,7 +437,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     const Spacer(),
                     // Delete Note icon
                     GestureDetector(
-                      onTap: () => context.read<HadithCubit>().deleteHadithNote(bookKey, hadith.hadithNumber),
+                      onTap: () => context.read<HadithCubit>().deleteHadithNote(
+                        bookKey,
+                        hadith.hadithNumber,
+                      ),
                       child: const Icon(
                         Icons.delete_outline_rounded,
                         color: Colors.redAccent,
@@ -406,7 +450,12 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     const Gap(10),
                     // Edit Note icon
                     GestureDetector(
-                      onTap: () => _showEditNoteDialog(context, bookKey, hadith.hadithNumber, noteText),
+                      onTap: () => _showEditNoteDialog(
+                        context,
+                        bookKey,
+                        hadith.hadithNumber,
+                        noteText,
+                      ),
                       child: const Icon(
                         Icons.edit_rounded,
                         color: AppTheme.textSecondary,
@@ -430,7 +479,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
           ),
           // Related Hadith Info
           InkWell(
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(16),
+            ),
             onTap: () {
               context.push('/book/$bookKey/hadith/${hadith.hadithNumber}');
             },
@@ -442,7 +493,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(20),
@@ -453,7 +507,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                             Text(flag, style: const TextStyle(fontSize: 10)),
                             const Gap(4),
                             Text(
-                              bookName,
+                              hadithResources?.nameNative ?? bookKey,
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 9.5,
@@ -520,11 +574,14 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
         if (hadith == null) return const SizedBox();
 
         return _buildCollectionCard(
-          ref: ref,
-          hadith: hadith,
-          state: state,
-          isBookmark: true,
-        ).animate().fadeIn(duration: 350.ms, delay: (index * 40).ms).slideY(begin: 0.08, end: 0);
+              ref: ref,
+              hadith: hadith,
+              state: state,
+              isBookmark: true,
+            )
+            .animate()
+            .fadeIn(duration: 350.ms, delay: (index * 40).ms)
+            .slideY(begin: 0.08, end: 0);
       },
     );
   }
@@ -549,11 +606,14 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
         if (hadith == null) return const SizedBox();
 
         return _buildCollectionCard(
-          ref: ref,
-          hadith: hadith,
-          state: state,
-          isBookmark: false,
-        ).animate().fadeIn(duration: 350.ms, delay: (index * 40).ms).slideY(begin: 0.08, end: 0);
+              ref: ref,
+              hadith: hadith,
+              state: state,
+              isBookmark: false,
+            )
+            .animate()
+            .fadeIn(duration: 350.ms, delay: (index * 40).ms)
+            .slideY(begin: 0.08, end: 0);
       },
     );
   }
@@ -580,11 +640,14 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
         if (hadith == null) return const SizedBox();
 
         return _buildNoteCollectionCard(
-          ref: ref,
-          hadith: hadith,
-          noteText: noteText,
-          state: state,
-        ).animate().fadeIn(duration: 350.ms, delay: (index * 40).ms).slideY(begin: 0.08, end: 0);
+              ref: ref,
+              hadith: hadith,
+              noteText: noteText,
+              state: state,
+            )
+            .animate()
+            .fadeIn(duration: 350.ms, delay: (index * 40).ms)
+            .slideY(begin: 0.08, end: 0);
       },
     );
   }
@@ -618,8 +681,14 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                   indicatorSize: TabBarIndicatorSize.label,
                   dividerColor: Colors.transparent,
                   indicatorWeight: 2.5,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13),
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 13,
+                  ),
                   tabs: const [
                     Tab(
                       iconMargin: EdgeInsets.only(bottom: 2),

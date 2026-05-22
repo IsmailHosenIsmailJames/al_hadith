@@ -7,10 +7,7 @@ import 'package:al_hadith/logic/setup/setup_state.dart';
 class DownloadStep extends StatelessWidget {
   final SetupState state;
 
-  const DownloadStep({
-    super.key,
-    required this.state,
-  });
+  const DownloadStep({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +71,7 @@ class DownloadStep extends StatelessWidget {
             ),
           ],
         ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
-        
+
         const Gap(24),
         const Text(
           'Downloading Library',
@@ -95,7 +92,7 @@ class DownloadStep extends StatelessWidget {
           ),
         ),
         const Gap(28),
-        
+
         // Progress List
         Expanded(
           child: Container(
@@ -111,17 +108,26 @@ class DownloadStep extends StatelessWidget {
                 final res = targetResources[index];
                 final progress = state.downloadProgress[res.book] ?? 0.0;
                 final status = state.downloadStatus[res.book] ?? 'Pending';
-                
+
                 final isCompleted = status.contains('Completed');
-                final isDownloading = status == 'Downloading...' || status == 'Extracting...';
+                final isDownloading =
+                    status == 'Downloading...' || status == 'Extracting...';
                 final isError = status == 'Error';
 
                 Color statusColor = AppTheme.textSecondary;
-                Widget statusIcon = const Icon(Icons.circle_outlined, color: Color(0xFF334155), size: 20);
+                Widget statusIcon = const Icon(
+                  Icons.circle_outlined,
+                  color: Color(0xFF334155),
+                  size: 20,
+                );
 
                 if (isCompleted) {
                   statusColor = AppTheme.primaryMint;
-                  statusIcon = const Icon(Icons.check_circle, color: AppTheme.primaryMint, size: 22);
+                  statusIcon = const Icon(
+                    Icons.check_circle,
+                    color: AppTheme.primaryMint,
+                    size: 22,
+                  );
                 } else if (isDownloading) {
                   statusColor = AppTheme.secondaryIndigo;
                   statusIcon = const SizedBox(
@@ -134,7 +140,11 @@ class DownloadStep extends StatelessWidget {
                   );
                 } else if (isError) {
                   statusColor = Colors.redAccent;
-                  statusIcon = const Icon(Icons.error, color: Colors.redAccent, size: 22);
+                  statusIcon = const Icon(
+                    Icons.error,
+                    color: Colors.redAccent,
+                    size: 22,
+                  );
                 }
 
                 return Padding(
@@ -151,14 +161,30 @@ class DownloadStep extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Text(
-                                    res.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: AppTheme.textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        res.nameNative,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Gap(2),
+                                      Text(
+                                        res.name,
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 Text(

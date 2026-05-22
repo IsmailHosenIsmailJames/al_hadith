@@ -22,10 +22,12 @@ class HadithState {
   final Set<String> bookmarkedRefs;
   final Set<String> pinnedRefs;
   final Map<String, String> hadithNotes;
-  final Map<String, HadithItem> collectionsHadiths; // reference -> loaded detail
+  final Map<String, HadithItem>
+  collectionsHadiths; // reference -> loaded detail
 
   // Global FTS Search State
-  final Map<String, List<HadithItem>> searchResultsGrouped; // bookKey -> results
+  final Map<String, List<HadithItem>>
+  searchResultsGrouped; // bookKey -> results
   final Set<String> selectedSearchBooks; // books selected for search scope
   final bool isSearching;
   final String searchQuery;
@@ -97,9 +99,10 @@ class HadithState {
   List<HadithSection> get filteredSections {
     if (sectionsSearchQuery.isEmpty) return activeSections;
     final normalized = sectionsSearchQuery.toLowerCase();
-    return activeSections
-        .where((s) => s.sectionName.toLowerCase().contains(normalized))
-        .toList();
+    return activeSections.where((s) {
+      return s.sectionName.toLowerCase().contains(normalized) ||
+          s.sectionNameNative.toLowerCase().contains(normalized);
+    }).toList();
   }
 
   /// Helper to check if a specific book is downloaded

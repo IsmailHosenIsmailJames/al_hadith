@@ -15,7 +15,11 @@ class HadithRepository {
   Future<Map<String, dynamic>?> getBookInfo(String bookKey) async {
     try {
       final db = await _dbHelper.getDatabase(bookKey);
-      final List<Map<String, dynamic>> results = await db.query('book_info', limit: 1);
+      // book_name_native is available in newer database versions
+      final List<Map<String, dynamic>> results = await db.query(
+        'book_info',
+        limit: 1,
+      );
       if (results.isNotEmpty) {
         return results.first;
       }
@@ -28,13 +32,20 @@ class HadithRepository {
   /// Fetches all sections/chapters inside a specific offline database
   Future<List<HadithSection>> getSections(String bookKey) async {
     final db = await _dbHelper.getDatabase(bookKey);
-    final List<Map<String, dynamic>> results = await db.query('sections', orderBy: 'id ASC');
+    // section_name_native is available in newer database versions
+    final List<Map<String, dynamic>> results = await db.query(
+      'sections',
+      orderBy: 'id ASC',
+    );
     return results.map((map) => HadithSection.fromMap(map)).toList();
   }
 
   /// Fetches all Hadith items for a specific section, including their scholarly gradings.
   /// Uses a highly optimized two-query approach to avoid N+1 query loops.
-  Future<List<HadithItem>> getHadithsForSection(String bookKey, int sectionId) async {
+  Future<List<HadithItem>> getHadithsForSection(
+    String bookKey,
+    int sectionId,
+  ) async {
     final db = await _dbHelper.getDatabase(bookKey);
 
     // Query 1: Fetch all hadiths in this section
@@ -48,11 +59,14 @@ class HadithRepository {
     if (hadithMaps.isEmpty) return [];
 
     // Query 2: Fetch all scholarly grades for these hadiths at once
-    final List<Map<String, dynamic>> gradeMaps = await db.rawQuery('''
+    final List<Map<String, dynamic>> gradeMaps = await db.rawQuery(
+      '''
       SELECT g.* FROM grades g
       JOIN hadiths h ON g.hadith_id = h.id
       WHERE h.section_id = ?
-    ''', [sectionId]);
+    ''',
+      [sectionId],
+    );
 
     // Group grades by hadith_id in memory
     final Map<int, List<HadithGrade>> groupedGrades = {};
@@ -70,9 +84,12 @@ class HadithRepository {
   }
 
   /// Fetches a single Hadith by its reference number
-  Future<HadithItem?> getHadithByNumber(String bookKey, int hadithNumber) async {
+  Future<HadithItem?> getHadithByNumber(
+    String bookKey,
+    int hadithNumber,
+  ) async {
     final db = await _dbHelper.getDatabase(bookKey);
-    
+
     final List<Map<String, dynamic>> hadithMaps = await db.query(
       'hadiths',
       where: 'hadith_number = ?',
@@ -96,21 +113,30 @@ class HadithRepository {
   }
 
   /// Offline text search across the database using SQL LIKE
-  Future<List<HadithItem>> searchHadiths(String bookKey, String query, {int limit = 30}) async {
+  Future<List<HadithItem>> searchHadiths(
+    String bookKey,
+    String query, {
+    int limit = 30,
+  }) async {
     final db = await _dbHelper.getDatabase(bookKey);
 
     // Use LIKE for broad text matching (works on all SQLite builds)
     final searchPattern = '%$query%';
-    final List<Map<String, dynamic>> searchResults = await db.rawQuery('''
+    final List<Map<String, dynamic>> searchResults = await db.rawQuery(
+      '''
       SELECT * FROM hadiths
       WHERE text LIKE ?
       LIMIT ?
-    ''', [searchPattern, limit]);
+    ''',
+      [searchPattern, limit],
+    );
 
     if (searchResults.isEmpty) return [];
 
     // Fetch grades for these search results
-    final List<int> hadithIds = searchResults.map((map) => parseInt(map['id'])).toList();
+    final List<int> hadithIds = searchResults
+        .map((map) => parseInt(map['id']))
+        .toList();
     final String idPlaceholders = List.filled(hadithIds.length, '?').join(',');
 
     final List<Map<String, dynamic>> gradeMaps = await db.rawQuery('''

@@ -1,3 +1,4 @@
+import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -39,7 +40,11 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.redAccent,
+                    size: 48,
+                  ),
                   const Gap(16),
                   Text(
                     state.errorMessage!,
@@ -51,9 +56,12 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryMint,
                       foregroundColor: AppTheme.darkCanvas,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    onPressed: () => context.read<HadithCubit>().loadDashboard(),
+                    onPressed: () =>
+                        context.read<HadithCubit>().loadDashboard(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -76,9 +84,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             children: [
               // 1. History or Daily Inspiration Panel
               _buildHistoryHeader(context, state),
-              
+
               const Gap(28),
-              
+
               // 2. Downloaded Book Categories
               const Padding(
                 padding: EdgeInsets.only(left: 4.0, bottom: 12.0),
@@ -92,7 +100,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                   ),
                 ),
               ),
-              
+
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -101,153 +109,191 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                   final book = state.downloadedBooks[index];
                   final readCount = state.readCounts[book.book] ?? 0;
                   final totalHadiths = book.hadithCount;
-                  
+                  final languageCode = book.languageCode;
+
                   // Calculate dynamic reading ratio
-                  final double ratio = totalHadiths > 0 ? readCount / totalHadiths : 0.0;
+                  final double ratio = totalHadiths > 0
+                      ? readCount / totalHadiths
+                      : 0.0;
                   final percentageText = (ratio * 100).toStringAsFixed(2);
 
                   return GestureDetector(
-                    onTap: () {
-                      context.push('/book/${book.book}');
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF1E293B)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          )
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              // Unique book visual card logo
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryMint.withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.3)),
-                                ),
-                                child: const Icon(
-                                  Icons.menu_book_rounded,
-                                  color: AppTheme.primaryMint,
-                                  size: 20,
-                                ),
+                        onTap: () {
+                          context.push('/book/${book.book}');
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppTheme.darkSurfaceCard.withValues(
+                              alpha: 0.2,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFF1E293B)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
-                              const Gap(14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      book.name,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppTheme.textPrimary,
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  // Unique book visual card logo
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primaryMint.withValues(
+                                        alpha: 0.08,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: AppTheme.primaryMint.withValues(
+                                          alpha: 0.3,
+                                        ),
                                       ),
                                     ),
-                                    const Gap(4),
-                                    Text(
-                                      '${book.hadithCount} Hadiths • ${book.sectionCount} Chapters',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppTheme.textSecondary,
-                                      ),
+                                    child: const Icon(
+                                      Icons.menu_book_rounded,
+                                      color: AppTheme.primaryMint,
+                                      size: 20,
                                     ),
-                                    if (book.languageCode.isNotEmpty) ...[
-                                      const Gap(6),
-                                      // Language pill badge
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                        decoration: BoxDecoration(
-                                          color: AppTheme.secondaryIndigo.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(
-                                            color: AppTheme.secondaryIndigo.withValues(alpha: 0.3),
-                                            width: 1,
+                                  ),
+                                  const Gap(14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          book.nameNative.isNotEmpty
+                                              ? book.nameNative
+                                              : book.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppTheme.textPrimary,
                                           ),
                                         ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(book.langFlag, style: const TextStyle(fontSize: 11)),
-                                            const Gap(4),
-                                            Text(
-                                              book.langDisplayName,
-                                              style: const TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w600,
-                                                color: AppTheme.secondaryIndigo,
-                                                letterSpacing: 0.2,
+                                        if (book.nameNative.isNotEmpty &&
+                                            book.languageCode != "eng")
+                                          Text(
+                                            book.name,
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              color: AppTheme.textSecondary,
+                                            ),
+                                          ),
+                                        const Gap(4),
+                                        Text(
+                                          '${book.hadithCount} Hadiths • ${book.sectionCount} Chapters',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppTheme.textSecondary,
+                                          ),
+                                        ),
+                                        if (book.languageCode.isNotEmpty) ...[
+                                          const Gap(6),
+                                          // Language pill badge
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 3,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppTheme.secondaryIndigo
+                                                  .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: AppTheme.secondaryIndigo
+                                                    .withValues(alpha: 0.3),
+                                                width: 1,
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  book.langFlag,
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                  ),
+                                                ),
+                                                const Gap(4),
+                                                Text(
+                                                  book.languageCode == "eng"
+                                                      ? book.langDisplayName
+                                                      : "${book.langNativeName} (${book.langDisplayName})",
+                                                  style: const TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppTheme
+                                                        .secondaryIndigo,
+                                                    letterSpacing: 0.2,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: AppTheme.textSecondary,
+                                    size: 24,
+                                  ),
+                                ],
                               ),
-                              const Icon(
-                                Icons.chevron_right_rounded,
-                                color: AppTheme.textSecondary,
-                                size: 24,
-                              ),
-                            ],
-                          ),
-                          const Gap(16),
-                          
-                          // Custom Linear Progress bar
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: LinearProgressIndicator(
-                              value: ratio,
-                              minHeight: 5,
-                              backgroundColor: const Color(0xFF1E293B),
-                              color: AppTheme.primaryMint,
-                            ),
-                          ),
-                          const Gap(8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '$readCount / $totalHadiths read',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppTheme.textSecondary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '$percentageText%',
-                                style: const TextStyle(
-                                  fontSize: 11,
+                              const Gap(16),
+
+                              // Custom Linear Progress bar
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: LinearProgressIndicator(
+                                  value: ratio,
+                                  minHeight: 5,
+                                  backgroundColor: const Color(0xFF1E293B),
                                   color: AppTheme.primaryMint,
-                                  fontWeight: FontWeight.bold,
                                 ),
+                              ),
+                              const Gap(8),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '$readCount / $totalHadiths read',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppTheme.textSecondary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    '$percentageText%',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppTheme.primaryMint,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ).animate().fadeIn(
-                    duration: 350.ms,
-                    delay: (index * 40).ms,
-                  ).slideY(begin: 0.05, end: 0);
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 350.ms, delay: (index * 40).ms)
+                      .slideY(begin: 0.05, end: 0);
                 },
               ),
             ],
@@ -274,7 +320,10 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.3), width: 1.5),
+          border: Border.all(
+            color: AppTheme.primaryMint.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
               color: AppTheme.primaryMint.withValues(alpha: 0.05),
@@ -290,14 +339,17 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               children: [
                 // Pulsing read dot
                 Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppTheme.primaryMint,
-                    shape: BoxShape.circle,
-                  ),
-                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                 .scale(end: const Offset(1.5, 1.5), duration: 1000.ms),
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.primaryMint,
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                    .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true),
+                    )
+                    .scale(end: const Offset(1.5, 1.5), duration: 1000.ms),
                 const Gap(8),
                 const Text(
                   'RESUME READING',
@@ -328,12 +380,15 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            if (history.sectionTitle.isNotEmpty) ...[  
+            if (history.sectionTitle.isNotEmpty) ...[
               const Gap(4),
               Row(
                 children: [
-                  const Icon(Icons.bookmark_outline,
-                      color: AppTheme.textSecondary, size: 13),
+                  const Icon(
+                    Icons.bookmark_outline,
+                    color: AppTheme.textSecondary,
+                    size: 13,
+                  ),
                   const Gap(5),
                   Expanded(
                     child: Text(
@@ -353,12 +408,19 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
                 foregroundColor: AppTheme.darkCanvas,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 elevation: 0,
               ),
               onPressed: () {
-                final encodedSection = Uri.encodeComponent(history.sectionTitle);
+                final encodedSection = Uri.encodeComponent(
+                  history.sectionTitle,
+                );
                 context.push(
                   '/book/${history.bookKey}/hadith/${history.hadithNumber}?sectionName=$encodedSection',
                 );
@@ -465,8 +527,13 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
                 foregroundColor: AppTheme.darkCanvas,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
               ),
               onPressed: () {
                 // Navigate to the Setup wizard screen to choose and download databases!

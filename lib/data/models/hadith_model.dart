@@ -10,6 +10,7 @@ int parseInt(dynamic value) {
 class HadithSection {
   final int id;
   final String sectionName;
+  final String sectionNameNative;
   final int startHadithNumber;
   final int endHadithNumber;
   final int hadithCount;
@@ -17,6 +18,7 @@ class HadithSection {
   HadithSection({
     required this.id,
     required this.sectionName,
+    required this.sectionNameNative,
     required this.startHadithNumber,
     required this.endHadithNumber,
     required this.hadithCount,
@@ -26,6 +28,7 @@ class HadithSection {
     return HadithSection(
       id: parseInt(map['id']),
       sectionName: (map['section_name'] ?? '') as String,
+      sectionNameNative: (map['section_name_native'] ?? '') as String,
       startHadithNumber: parseInt(map['start_hadith_number']),
       endHadithNumber: parseInt(map['end_hadith_number']),
       hadithCount: parseInt(map['hadith_count']),
@@ -73,7 +76,10 @@ class HadithItem {
     required this.grades,
   });
 
-  factory HadithItem.fromMap(Map<String, dynamic> map, {List<HadithGrade> grades = const []}) {
+  factory HadithItem.fromMap(
+    Map<String, dynamic> map, {
+    List<HadithGrade> grades = const [],
+  }) {
     return HadithItem(
       id: parseInt(map['id']),
       hadithNumber: parseInt(map['hadith_number']),

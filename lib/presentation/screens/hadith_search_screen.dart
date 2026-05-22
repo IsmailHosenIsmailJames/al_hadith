@@ -44,7 +44,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
   String _getBookName(HadithState state, String bookKey) {
     final books = state.downloadedBooks;
     if (books.any((b) => b.book == bookKey)) {
-      return books.firstWhere((b) => b.book == bookKey).name;
+      final book = books.firstWhere((b) => b.book == bookKey);
+      return book.nameNative.isNotEmpty ? book.nameNative : book.name;
     }
     return bookKey.toUpperCase();
   }
@@ -63,49 +64,53 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     required String subtitle,
   }) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMint.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppTheme.primaryMint.withValues(alpha: 0.15),
-                  width: 1.5,
+      child:
+          Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryMint.withValues(alpha: 0.05),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppTheme.primaryMint.withValues(alpha: 0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: AppTheme.primaryMint.withValues(alpha: 0.6),
+                        size: 40,
+                      ),
+                    ),
+                    const Gap(20),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const Gap(8),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppTheme.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              child: Icon(
-                icon,
-                color: AppTheme.primaryMint.withValues(alpha: 0.6),
-                size: 40,
-              ),
-            ),
-            const Gap(20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
-              ),
-            ),
-            const Gap(8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12.5,
-                color: AppTheme.textSecondary,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.95, 0.95)),
+              )
+              .animate()
+              .fadeIn(duration: 400.ms)
+              .scale(begin: const Offset(0.95, 0.95)),
     );
   }
 
@@ -132,16 +137,23 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
               GestureDetector(
                 onTap: () {
                   final cubit = context.read<HadithCubit>();
-                  final allSelected = state.selectedSearchBooks.length == state.downloadedBooks.length;
+                  final allSelected =
+                      state.selectedSearchBooks.length ==
+                      state.downloadedBooks.length;
                   if (allSelected) {
                     cubit.deselectAllSearchBooks();
                   } else {
-                    final allKeys = state.downloadedBooks.map((b) => b.book).toList();
+                    final allKeys = state.downloadedBooks
+                        .map((b) => b.book)
+                        .toList();
                     cubit.selectAllSearchBooks(allKeys);
                   }
                 },
                 child: Text(
-                  state.selectedSearchBooks.length == state.downloadedBooks.length ? 'Deselect All' : 'Select All',
+                  state.selectedSearchBooks.length ==
+                          state.downloadedBooks.length
+                      ? 'Deselect All'
+                      : 'Select All',
                   style: const TextStyle(
                     color: AppTheme.primaryMint,
                     fontSize: 11,
@@ -172,9 +184,13 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                       Text(book.langFlag, style: const TextStyle(fontSize: 11)),
                       const Gap(6),
                       Text(
-                        book.name,
+                        book.nameNative.isNotEmpty
+                            ? book.nameNative
+                            : book.name,
                         style: TextStyle(
-                          color: isSelected ? AppTheme.darkCanvas : AppTheme.textPrimary,
+                          color: isSelected
+                              ? AppTheme.darkCanvas
+                              : AppTheme.textPrimary,
                           fontSize: 11.5,
                           fontWeight: FontWeight.bold,
                         ),
@@ -188,11 +204,15 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                     side: BorderSide(
-                      color: isSelected ? AppTheme.primaryMint : const Color(0xFF1E293B),
+                      color: isSelected
+                          ? AppTheme.primaryMint
+                          : const Color(0xFF1E293B),
                     ),
                   ),
                   onSelected: (_) {
-                    context.read<HadithCubit>().toggleSearchBookSelection(book.book);
+                    context.read<HadithCubit>().toggleSearchBookSelection(
+                      book.book,
+                    );
                   },
                 ),
               );
@@ -205,7 +225,15 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
   }
 
   Widget _buildSuggestionsView() {
-    final trending = ['Intention', 'Charity', 'Prayer', 'Fasting', 'Parents', 'Greetings', 'Patience'];
+    final trending = [
+      'Intention',
+      'Charity',
+      'Prayer',
+      'Fasting',
+      'Parents',
+      'Greetings',
+      'Patience',
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +257,9 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             runSpacing: 8,
             children: trending.map((topic) {
               return ActionChip(
-                backgroundColor: AppTheme.darkSurfaceCard.withValues(alpha: 0.4),
+                backgroundColor: AppTheme.darkSurfaceCard.withValues(
+                  alpha: 0.4,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: const BorderSide(color: Color(0xFF1E293B)),
@@ -237,7 +267,11 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.trending_up, color: AppTheme.primaryMint, size: 12),
+                    const Icon(
+                      Icons.trending_up,
+                      color: AppTheme.primaryMint,
+                      size: 12,
+                    ),
                     const Gap(6),
                     Text(
                       topic,
@@ -260,7 +294,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
         _buildEmptyState(
           icon: Icons.search_rounded,
           title: 'Search Offline Hadiths',
-          subtitle: 'Search terms across matching grading authorities or text schemas instantly.',
+          subtitle:
+              'Search terms across matching grading authorities or text schemas instantly.',
         ),
         const Spacer(),
       ],
@@ -297,11 +332,16 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.primaryMint.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppTheme.primaryMint.withValues(alpha: 0.2)),
+                        border: Border.all(
+                          color: AppTheme.primaryMint.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -365,7 +405,10 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                         c = Colors.redAccent;
                       }
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: c.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(6),
@@ -418,11 +461,22 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
               onSubmitted: _triggerSearch,
               decoration: InputDecoration(
                 hintText: 'Search Hadith text offline...',
-                hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-                prefixIcon: const Icon(Icons.search, color: AppTheme.primaryMint, size: 18),
+                hintStyle: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppTheme.primaryMint,
+                  size: 18,
+                ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close, color: AppTheme.textSecondary, size: 18),
+                        icon: const Icon(
+                          Icons.close,
+                          color: AppTheme.textSecondary,
+                          size: 18,
+                        ),
                         onPressed: () {
                           _searchController.clear();
                           context.read<HadithCubit>().clearSearch();
@@ -443,7 +497,9 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                   builder: (context) {
                     if (state.isSearching) {
                       return const Center(
-                        child: CircularProgressIndicator(color: AppTheme.primaryMint),
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primaryMint,
+                        ),
                       );
                     }
 
@@ -455,7 +511,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                       return _buildEmptyState(
                         icon: Icons.search_off_rounded,
                         title: 'No Matches Found',
-                        subtitle: 'No results found for "${state.searchQuery}". Try related terms.',
+                        subtitle:
+                            'No results found for "${state.searchQuery}". Try related terms.',
                       );
                     }
 
@@ -502,10 +559,16 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                                   itemBuilder: (context, index) {
                                     final hadith = bookHadiths[index];
                                     return _buildResultCard(
-                                      hadith: hadith,
-                                      bookKey: key,
-                                      state: state,
-                                    ).animate().fadeIn(duration: 300.ms, delay: (index * 30).ms).slideY(begin: 0.05, end: 0);
+                                          hadith: hadith,
+                                          bookKey: key,
+                                          state: state,
+                                        )
+                                        .animate()
+                                        .fadeIn(
+                                          duration: 300.ms,
+                                          delay: (index * 30).ms,
+                                        )
+                                        .slideY(begin: 0.05, end: 0);
                                   },
                                 );
                               }).toList(),

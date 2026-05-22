@@ -54,7 +54,11 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.redAccent,
+                    size: 48,
+                  ),
                   const Gap(16),
                   Text(
                     state.errorMessage!,
@@ -66,9 +70,12 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryMint,
                       foregroundColor: AppTheme.darkCanvas,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    onPressed: () => context.read<HadithCubit>().loadDashboard(),
+                    onPressed: () =>
+                        context.read<HadithCubit>().loadDashboard(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -81,7 +88,8 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
           return _buildEmptyState();
         }
 
-        final selectedKey = state.selectedBookKey ?? state.downloadedBooks.first.book;
+        final selectedKey =
+            state.selectedBookKey ?? state.downloadedBooks.first.book;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,9 +107,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                 ),
               ),
             ),
-            
+
             SizedBox(
-              height: 125,
+              height: 130,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -112,7 +120,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                   final isSelected = book.book == selectedKey;
                   final readCount = state.readCounts[book.book] ?? 0;
                   final totalHadiths = book.hadithCount;
-                  final ratio = totalHadiths > 0 ? readCount / totalHadiths : 0.0;
+                  final ratio = totalHadiths > 0
+                      ? readCount / totalHadiths
+                      : 0.0;
 
                   return GestureDetector(
                     onTap: () {
@@ -121,115 +131,164 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                         context.read<HadithCubit>().loadBookSections(book.book);
                       }
                     },
-                    child: AnimatedContainer(
-                      duration: 250.ms,
-                      curve: Curves.easeInOut,
-                      width: 175,
-                      margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                      padding: const EdgeInsets.all(12.0),
-                      decoration: BoxDecoration(
-                        gradient: isSelected
-                            ? LinearGradient(
-                                colors: [
-                                  AppTheme.primaryMint.withValues(alpha: 0.15),
-                                  AppTheme.secondaryIndigo.withValues(alpha: 0.06),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : null,
-                        color: isSelected ? null : AppTheme.darkSurfaceCard.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppTheme.primaryMint
-                              : const Color(0xFF1E293B),
-                          width: isSelected ? 1.5 : 1.0,
-                        ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: AppTheme.primaryMint.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]
-                            : null,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Text(book.langFlag, style: const TextStyle(fontSize: 14)),
-                              const Gap(6),
-                              Expanded(
-                                child: Text(
-                                  book.langDisplayName,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppTheme.textSecondary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                    child:
+                        AnimatedContainer(
+                              duration: 250.ms,
+                              curve: Curves.easeInOut,
+                              width: 175,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 4.0,
+                                vertical: 8.0,
                               ),
-                            ],
-                          ),
-                          const Gap(4),
-                          Text(
-                            book.name,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const Gap(6),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              padding: const EdgeInsets.all(12.0),
+                              decoration: BoxDecoration(
+                                gradient: isSelected
+                                    ? LinearGradient(
+                                        colors: [
+                                          AppTheme.primaryMint.withValues(
+                                            alpha: 0.15,
+                                          ),
+                                          AppTheme.secondaryIndigo.withValues(
+                                            alpha: 0.06,
+                                          ),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      )
+                                    : null,
+                                color: isSelected
+                                    ? null
+                                    : AppTheme.darkSurfaceCard.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppTheme.primaryMint
+                                      : const Color(0xFF1E293B),
+                                  width: isSelected ? 1.5 : 1.0,
+                                ),
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: AppTheme.primaryMint
+                                              .withValues(alpha: 0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    '${book.sectionCount} Ch.',
-                                    style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        book.langFlag,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const Gap(6),
+                                      Expanded(
+                                        child: Text(
+                                          book.languageCode == "eng"
+                                              ? book.langDisplayName
+                                              : "${book.langNativeName} (${book.langDisplayName})",
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: AppTheme.textSecondary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  const Gap(4),
                                   Text(
-                                    '${(ratio * 100).toStringAsFixed(0)}% Read',
-                                    style: TextStyle(
-                                      fontSize: 10,
+                                    book.nameNative.isNotEmpty
+                                        ? book.nameNative
+                                        : book.name,
+                                    style: const TextStyle(
+                                      fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: isSelected ? AppTheme.primaryMint : AppTheme.textSecondary,
+                                      color: AppTheme.textPrimary,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (book.nameNative.isNotEmpty &&
+                                      book.languageCode != "eng")
+                                    Text(
+                                      book.name,
+                                      style: const TextStyle(
+                                        fontSize: 9,
+                                        color: AppTheme.textSecondary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  const Gap(6),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            '${book.sectionCount} Ch.',
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              color: AppTheme.textSecondary,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${(ratio * 100).toStringAsFixed(0)}% Read',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: isSelected
+                                                  ? AppTheme.primaryMint
+                                                  : AppTheme.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const Gap(4),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(2),
+                                        child: LinearProgressIndicator(
+                                          value: ratio,
+                                          minHeight: 3,
+                                          backgroundColor: const Color(
+                                            0xFF1E293B,
+                                          ),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                isSelected
+                                                    ? AppTheme.primaryMint
+                                                    : AppTheme.textSecondary
+                                                          .withValues(
+                                                            alpha: 0.6,
+                                                          ),
+                                              ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              const Gap(4),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(2),
-                                child: LinearProgressIndicator(
-                                  value: ratio,
-                                  minHeight: 3,
-                                  backgroundColor: const Color(0xFF1E293B),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    isSelected ? AppTheme.primaryMint : AppTheme.textSecondary.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ).animate(target: isSelected ? 1.0 : 0.0).scale(
-                          begin: const Offset(0.98, 0.98),
-                          end: const Offset(1.02, 1.02),
-                          duration: 200.ms,
-                        ),
+                            )
+                            .animate(target: isSelected ? 1.0 : 0.0)
+                            .scale(
+                              begin: const Offset(0.98, 0.98),
+                              end: const Offset(1.02, 1.02),
+                              duration: 200.ms,
+                            ),
                   );
                 },
               ),
@@ -237,7 +296,10 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
 
             // 2. Glassmorphic Chapter Search Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: AppTheme.darkSurface,
@@ -246,18 +308,35 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (val) => context.read<HadithCubit>().updateSectionsSearch(val),
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                  onChanged: (val) =>
+                      context.read<HadithCubit>().updateSectionsSearch(val),
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Search chapters by name...',
-                    hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
-                    prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary, size: 20),
+                    hintStyle: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 14,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppTheme.textSecondary,
+                      size: 20,
+                    ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: AppTheme.textSecondary, size: 18),
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppTheme.textSecondary,
+                              size: 18,
+                            ),
                             onPressed: () {
                               _searchController.clear();
-                              context.read<HadithCubit>().updateSectionsSearch('');
+                              context.read<HadithCubit>().updateSectionsSearch(
+                                '',
+                              );
                             },
                           )
                         : null,
@@ -274,7 +353,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                 child: Center(
                   child: CircularProgressIndicator(color: AppTheme.primaryMint),
                 ),
-              )
+              ),
             ] else if (state.sectionsErrorMessage != null) ...[
               Expanded(
                 child: Center(
@@ -283,7 +362,11 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, color: Colors.redAccent, size: 40),
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.redAccent,
+                          size: 40,
+                        ),
                         const Gap(12),
                         Text(
                           state.sectionsErrorMessage!,
@@ -291,17 +374,22 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                         ),
                         const Gap(12),
                         ElevatedButton(
-                          onPressed: () => context.read<HadithCubit>().loadBookSections(selectedKey),
+                          onPressed: () => context
+                              .read<HadithCubit>()
+                              .loadBookSections(selectedKey),
                           child: const Text('Retry'),
                         ),
                       ],
                     ),
                   ),
                 ),
-              )
+              ),
             ] else ...[
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 6.0,
+                ),
                 child: Text(
                   '${state.filteredSections.length} Chapters Available',
                   style: const TextStyle(
@@ -318,113 +406,154 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                     ? _buildNoResultsState()
                     : ListView.builder(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         itemCount: state.filteredSections.length,
                         itemBuilder: (context, index) {
                           final section = state.filteredSections[index];
 
                           return GestureDetector(
-                            onTap: () {
-                              final encodedName = Uri.encodeComponent(section.sectionName);
-                              context.push(
-                                '/book/$selectedKey/hadith/${section.startHadithNumber}?sectionId=${section.id}&sectionName=$encodedName',
-                              );
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppTheme.darkSurfaceCard.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: const Color(0xFF1E293B)),
-                              ),
-                              child: Row(
-                                children: [
-                                  // Unique visual tag index
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppTheme.primaryMint.withValues(alpha: 0.1),
-                                      border: Border.all(
-                                        color: AppTheme.primaryMint.withValues(alpha: 0.35),
-                                        width: 1.0,
-                                      ),
+                                onTap: () {
+                                  final displayName =
+                                      section.sectionNameNative.isNotEmpty
+                                      ? section.sectionNameNative
+                                      : section.sectionName;
+                                  final encodedName = Uri.encodeComponent(
+                                    displayName,
+                                  );
+                                  context.push(
+                                    '/book/$selectedKey/hadith/${section.startHadithNumber}?sectionId=${section.id}&sectionName=$encodedName',
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.darkSurfaceCard.withValues(
+                                      alpha: 0.2,
                                     ),
-                                    child: Center(
-                                      child: Text(
-                                        '${section.id}',
-                                        style: const TextStyle(
-                                          color: AppTheme.primaryMint,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: const Color(0xFF1E293B),
                                     ),
                                   ),
-                                  const Gap(14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          section.sectionName,
-                                          style: const TextStyle(
-                                            fontSize: 14.5,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppTheme.textPrimary,
-                                            height: 1.3,
+                                  child: Row(
+                                    children: [
+                                      // Unique visual tag index
+                                      Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppTheme.primaryMint
+                                              .withValues(alpha: 0.1),
+                                          border: Border.all(
+                                            color: AppTheme.primaryMint
+                                                .withValues(alpha: 0.35),
+                                            width: 1.0,
                                           ),
                                         ),
-                                        const Gap(6),
-                                        Row(
+                                        child: Center(
+                                          child: Text(
+                                            '${section.id}',
+                                            style: const TextStyle(
+                                              color: AppTheme.primaryMint,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const Gap(14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Icon(Icons.bookmark_outline, color: AppTheme.textSecondary, size: 12),
-                                            const Gap(4),
                                             Text(
-                                              'Hadith: ${section.startHadithNumber} - ${section.endHadithNumber}',
+                                              section
+                                                      .sectionNameNative
+                                                      .isNotEmpty
+                                                  ? section.sectionNameNative
+                                                  : section.sectionName,
                                               style: const TextStyle(
-                                                fontSize: 11.5,
-                                                color: AppTheme.textSecondary,
-                                              ),
-                                            ),
-                                            const Gap(8),
-                                            const Text(
-                                              '•',
-                                              style: TextStyle(color: AppTheme.textSecondary, fontSize: 11.5),
-                                            ),
-                                            const Gap(8),
-                                            Text(
-                                              '${section.hadithCount} items',
-                                              style: const TextStyle(
-                                                fontSize: 11.5,
-                                                color: AppTheme.textSecondary,
+                                                fontSize: 14.5,
                                                 fontWeight: FontWeight.bold,
+                                                color: AppTheme.textPrimary,
+                                                height: 1.3,
                                               ),
+                                            ),
+                                            if (section
+                                                .sectionNameNative
+                                                .isNotEmpty)
+                                              Text(
+                                                section.sectionName,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: AppTheme.textSecondary,
+                                                  height: 1.2,
+                                                ),
+                                              ),
+                                            const Gap(6),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.bookmark_outline,
+                                                  color: AppTheme.textSecondary,
+                                                  size: 12,
+                                                ),
+                                                const Gap(4),
+                                                Text(
+                                                  'Hadith: ${section.startHadithNumber} - ${section.endHadithNumber}',
+                                                  style: const TextStyle(
+                                                    fontSize: 11.5,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                  ),
+                                                ),
+                                                const Gap(8),
+                                                const Text(
+                                                  '•',
+                                                  style: TextStyle(
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                    fontSize: 11.5,
+                                                  ),
+                                                ),
+                                                const Gap(8),
+                                                Text(
+                                                  '${section.hadithCount} items',
+                                                  style: const TextStyle(
+                                                    fontSize: 11.5,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const Gap(8),
+                                      const Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: AppTheme.textSecondary,
+                                        size: 13,
+                                      ),
+                                    ],
                                   ),
-                                  const Gap(8),
-                                  const Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    color: AppTheme.textSecondary,
-                                    size: 13,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ).animate().fadeIn(
-                                duration: 250.ms,
-                                delay: (index * 15).ms,
-                              ).slideX(begin: 0.03, end: 0);
+                                ),
+                              )
+                              .animate()
+                              .fadeIn(duration: 250.ms, delay: (index * 15).ms)
+                              .slideX(begin: 0.03, end: 0);
                         },
                       ),
               ),
-            ]
+            ],
           ],
         );
       },
@@ -444,12 +573,20 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                 shape: BoxShape.circle,
                 color: AppTheme.primaryMint.withValues(alpha: 0.1),
               ),
-              child: const Icon(Icons.grid_view_rounded, size: 48, color: AppTheme.primaryMint),
+              child: const Icon(
+                Icons.grid_view_rounded,
+                size: 48,
+                color: AppTheme.primaryMint,
+              ),
             ),
             const Gap(24),
             const Text(
               'No Offline Books',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
+              ),
             ),
             const Gap(8),
             const Text(
@@ -470,7 +607,11 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off_rounded, color: AppTheme.textSecondary.withValues(alpha: 0.2), size: 48),
+            Icon(
+              Icons.search_off_rounded,
+              color: AppTheme.textSecondary.withValues(alpha: 0.2),
+              size: 48,
+            ),
             const Gap(16),
             const Text(
               'No chapters match your query.',

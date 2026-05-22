@@ -57,8 +57,10 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       final resourceRepo = RepositoryProvider.of<ResourceRepository>(context);
       final downloadService = RepositoryProvider.of<DownloadService>(context);
 
-      final languages = await resourceRepo.getLanguagesAndResources(forceRemote: true);
-      
+      final languages = await resourceRepo.getLanguagesAndResources(
+        forceRemote: true,
+      );
+
       // Cache current download statuses
       for (final lang in languages) {
         for (final res in lang.resources) {
@@ -132,7 +134,10 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
             backgroundColor: AppTheme.primaryMint,
             content: Text(
               'Successfully downloaded ${resource.name}!',
-              style: const TextStyle(color: AppTheme.darkCanvas, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: AppTheme.darkCanvas,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         );
@@ -150,7 +155,10 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
             backgroundColor: Colors.redAccent,
             content: Text(
               'Download failed: ${e.toString()}',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         );
@@ -167,13 +175,24 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.darkSurface,
-        title: const Text('Delete Book', style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to delete ${resource.name}? This will remove the offline database file from your device.',
-            style: const TextStyle(color: AppTheme.textSecondary)),
+        title: const Text(
+          'Delete Book',
+          style: TextStyle(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete ${resource.name}? This will remove the offline database file from your device.',
+          style: const TextStyle(color: AppTheme.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
@@ -205,7 +224,9 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: AppTheme.primaryMint,
-            content: Text('Successfully deleted ${resource.name} offline files.'),
+            content: Text(
+              'Successfully deleted ${resource.name} offline files.',
+            ),
           ),
         );
       }
@@ -235,9 +256,12 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
 
         // Apply search filter
         final query = _searchQuery.toLowerCase();
-        final matchesQuery = res.name.toLowerCase().contains(query) ||
+        final matchesQuery =
+            res.name.toLowerCase().contains(query) ||
             res.book.toLowerCase().contains(query) ||
-            lang.displayName.toLowerCase().contains(query);
+            res.book.toLowerCase().contains(query) ||
+            lang.displayName.toLowerCase().contains(query) ||
+            lang.nativeName.toLowerCase().contains(query);
 
         if (matchesQuery) {
           list.add(res);
@@ -245,14 +269,6 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       }
     }
     return list;
-  }
-
-  String _getLanguageName(String code) {
-    if (code == 'ara') return 'Arabic';
-    if (code == 'ben') return 'Bengali';
-    if (code == 'eng') return 'English';
-    if (code == 'urd') return 'Urdu';
-    return code.toUpperCase();
   }
 
   @override
@@ -267,11 +283,18 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         elevation: 0,
         title: const Text(
           'Manage Resources',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppTheme.primaryMint),
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: AppTheme.primaryMint,
+            ),
             onPressed: _loadMetadata,
           ),
           const Gap(8),
@@ -288,126 +311,173 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryMint))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.primaryMint),
+            )
           : _errorMessage != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
-                        const Gap(16),
-                        Text(_errorMessage!, style: const TextStyle(color: AppTheme.textSecondary), textAlign: TextAlign.center),
-                        const Gap(16),
-                        ElevatedButton(
-                          onPressed: _loadMetadata,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Column(
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Search & Language filter row
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: AppTheme.darkSurface,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFF1E293B)),
-                              ),
-                              child: TextField(
-                                controller: _searchController,
-                                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
-                                onChanged: (val) {
-                                  setState(() {
-                                    _searchQuery = val;
-                                  });
-                                },
-                                decoration: const InputDecoration(
-                                  hintText: 'Search books...',
-                                  hintStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-                                  prefixIcon: Icon(Icons.search, color: AppTheme.textSecondary, size: 18),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(vertical: 14),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const Gap(12),
-                          // Language selector pill
-                          Container(
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: AppTheme.darkSurface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFF1E293B)),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _selectedLangFilter,
-                                dropdownColor: AppTheme.darkSurface,
-                                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
-                                icon: const Icon(Icons.keyboard_arrow_down, color: AppTheme.primaryMint, size: 18),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedLangFilter = value;
-                                    });
-                                  }
-                                },
-                                items: [
-                                  const DropdownMenuItem(value: 'All', child: Text('All Languages')),
-                                  ..._languages.map(
-                                    (lang) => DropdownMenuItem(
-                                      value: lang.code,
-                                      child: Text(_getLanguageName(lang.code)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      color: Colors.redAccent,
+                      size: 48,
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildBookList(downloadedList, downloadedOnly: true),
-                          _buildBookList(allList, downloadedOnly: false),
-                        ],
-                      ),
+                    const Gap(16),
+                    Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: AppTheme.textSecondary),
+                      textAlign: TextAlign.center,
+                    ),
+                    const Gap(16),
+                    ElevatedButton(
+                      onPressed: _loadMetadata,
+                      child: const Text('Retry'),
                     ),
                   ],
                 ),
+              ),
+            )
+          : Column(
+              children: [
+                // Search & Language filter row
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppTheme.darkSurface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF1E293B)),
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 14,
+                            ),
+                            onChanged: (val) {
+                              setState(() {
+                                _searchQuery = val;
+                              });
+                            },
+                            decoration: const InputDecoration(
+                              hintText: 'Search books...',
+                              hintStyle: TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: 13,
+                              ),
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: AppTheme.textSecondary,
+                                size: 18,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Gap(12),
+                      // Language selector pill
+                      Container(
+                        height: 48,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.darkSurface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF1E293B)),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedLangFilter,
+                            dropdownColor: AppTheme.darkSurface,
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: AppTheme.primaryMint,
+                              size: 18,
+                            ),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _selectedLangFilter = value;
+                                });
+                              }
+                            },
+                            items: [
+                              const DropdownMenuItem(
+                                value: 'All',
+                                child: Text('All Languages'),
+                              ),
+                              ..._languages.map(
+                                (lang) => DropdownMenuItem(
+                                  value: lang.code,
+                                  child: Text(
+                                    lang.code == "eng"
+                                        ? lang.displayName
+                                        : "${lang.nativeName} (${lang.displayName})",
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildBookList(downloadedList, downloadedOnly: true),
+                      _buildBookList(allList, downloadedOnly: false),
+                    ],
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
-  Widget _buildBookList(List<HadithResource> books, {required bool downloadedOnly}) {
+  Widget _buildBookList(
+    List<HadithResource> books, {
+    required bool downloadedOnly,
+  }) {
     if (books.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              downloadedOnly ? Icons.cloud_off_rounded : Icons.find_in_page_rounded,
+              downloadedOnly
+                  ? Icons.cloud_off_rounded
+                  : Icons.find_in_page_rounded,
               color: AppTheme.textSecondary.withValues(alpha: 0.4),
               size: 48,
             ),
             const Gap(14),
             Text(
-              downloadedOnly ? 'No downloaded books found' : 'No books match search query',
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+              downloadedOnly
+                  ? 'No downloaded books found'
+                  : 'No books match search query',
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -466,7 +536,9 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                 child: Center(
                   child: Icon(
                     Icons.menu_book_rounded,
-                    color: isCompleted ? AppTheme.primaryMint : AppTheme.textSecondary,
+                    color: isCompleted
+                        ? AppTheme.primaryMint
+                        : AppTheme.textSecondary,
                     size: 20,
                   ),
                 ),
@@ -478,24 +550,38 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      resource.name,
+                      resource.nameNative,
                       style: const TextStyle(
                         color: AppTheme.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const Gap(2),
+                    if (resource.languageCode != "eng")
+                      Text(
+                        resource.name,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
                     const Gap(4),
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E293B),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            _getLanguageName(resource.languageCode),
+                            resource.languageCode == "eng"
+                                ? resource.langDisplayName
+                                : "${resource.langNativeName} (${resource.langDisplayName})",
                             style: const TextStyle(
                               color: AppTheme.primaryMint,
                               fontSize: 10,
@@ -531,12 +617,20 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                   children: [
                     // Update / Refresh action
                     IconButton(
-                      icon: const Icon(Icons.cloud_download_outlined, color: AppTheme.textSecondary, size: 20),
+                      icon: const Icon(
+                        Icons.cloud_download_outlined,
+                        color: AppTheme.textSecondary,
+                        size: 20,
+                      ),
                       tooltip: 'Re-download / Update',
                       onPressed: () => _startDownload(resource),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.redAccent,
+                        size: 20,
+                      ),
                       tooltip: 'Delete offline file',
                       onPressed: () => _deleteResource(resource),
                     ),
@@ -544,7 +638,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                 )
               else
                 IconButton(
-                  icon: const Icon(Icons.download_for_offline_rounded, color: AppTheme.primaryMint, size: 26),
+                  icon: const Icon(
+                    Icons.download_for_offline_rounded,
+                    color: AppTheme.primaryMint,
+                    size: 26,
+                  ),
                   tooltip: 'Download now',
                   onPressed: () => _startDownload(resource),
                 ),
@@ -557,11 +655,18 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               children: [
                 Text(
                   status,
-                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 11,
+                  ),
                 ),
                 Text(
                   '${(progress * 100).toInt()}%',
-                  style: const TextStyle(color: AppTheme.primaryMint, fontSize: 11, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: AppTheme.primaryMint,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

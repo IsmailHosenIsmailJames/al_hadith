@@ -81,9 +81,12 @@ class _HadithReadPlaceholderScreenState
 
       // Resolve book name
       final books = cubit.state.downloadedBooks;
-      _bookName = books.any((b) => b.book == widget.bookKey)
-          ? books.firstWhere((b) => b.book == widget.bookKey).name
-          : widget.bookKey;
+      if (books.any((b) => b.book == widget.bookKey)) {
+        final book = books.firstWhere((b) => b.book == widget.bookKey);
+        _bookName = book.nameNative.isNotEmpty ? book.nameNative : book.name;
+      } else {
+        _bookName = widget.bookKey;
+      }
 
       List<HadithItem> loaded;
       if (widget.initialSectionId != null) {
