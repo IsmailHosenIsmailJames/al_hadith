@@ -46,12 +46,12 @@ class LanguageStep extends StatelessWidget {
             .animate()
             .fadeIn(duration: 450.ms, delay: 100.ms)
             .slideY(begin: 0.1, end: 0),
-        const Gap(24),
+        Gap(isWideWindow ? 12 : 24),
         Expanded(
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: isWideWindow ? 4 : 2,
-              childAspectRatio: 1.5,
+              childAspectRatio: 1.15,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
             ),

@@ -149,7 +149,7 @@ class ResourceStep extends StatelessWidget {
                   GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: isWideWindow ? 2 : 1,
-                      childAspectRatio: 4,
+                      childAspectRatio: isWideWindow ? 3 : 2.5,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
@@ -173,145 +173,155 @@ class ResourceStep extends StatelessWidget {
 
                       return GestureDetector(
                             onTap: () => onToggle(res.book),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: isChecked
-                                    ? AppTheme.darkSurfaceCard.withValues(
-                                        alpha: 0.4,
-                                      )
-                                    : AppTheme.darkSurface.withValues(
-                                        alpha: 0.5,
-                                      ),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: isChecked
-                                      ? AppTheme.primaryMint.withValues(
-                                          alpha: 0.3,
-                                        )
-                                      : const Color(0xFF1E293B),
-                                  width: isChecked ? 1.5 : 1.0,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Checkbox(
-                                    value: isChecked,
-                                    onChanged: (_) => onToggle(res.book),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: isChecked
+                                        ? AppTheme.darkSurfaceCard.withValues(
+                                            alpha: 0.4,
+                                          )
+                                        : AppTheme.darkSurface.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isChecked
+                                          ? AppTheme.primaryMint.withValues(
+                                              alpha: 0.3,
+                                            )
+                                          : const Color(0xFF1E293B),
+                                      width: isChecked ? 1.5 : 1.0,
+                                    ),
                                   ),
-                                  const Gap(12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          res.nameNative,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: AppTheme.textPrimary,
-                                          ),
-                                        ),
-                                        Gap(2),
-                                        Text(
-                                          res.name,
-
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            color: AppTheme.textSecondary,
-                                          ),
-                                        ),
-                                        const Gap(6),
-                                        Row(
+                                  child: Row(
+                                    children: [
+                                      Checkbox(
+                                        value: isChecked,
+                                        onChanged: (_) => onToggle(res.book),
+                                      ),
+                                      const Gap(12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
-                                            // Sleek language tag
                                             Text(
-                                              bookItem.language.flagEmoji,
+                                              res.nameNative,
                                               style: const TextStyle(
-                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: AppTheme.textPrimary,
                                               ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Gap(2),
+                                            if (res.languageCode != "eng")
+                                              Text(
+                                                res.name,
+
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: AppTheme.textSecondary,
+                                                ),
+                                              ),
+                                            const Gap(6),
+                                            Row(
+                                              children: [
+                                                // Sleek language tag
+                                                Text(
+                                                  bookItem.language.flagEmoji,
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                                const Gap(4),
+                                                Text(
+                                                  bookItem.language.code ==
+                                                          "eng"
+                                                      ? bookItem
+                                                            .language
+                                                            .displayName
+                                                      : "${bookItem.language.nativeName} (${bookItem.language.displayName})",
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppTheme.primaryMint,
+                                                  ),
+                                                ),
+                                                const Gap(8),
+                                                const Text(
+                                                  '•',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                  ),
+                                                ),
+                                                const Gap(8),
+                                                Text(
+                                                  '${res.hadithCount} Hadiths',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                  ),
+                                                ),
+                                                const Gap(6),
+                                                const Text(
+                                                  '•',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                  ),
+                                                ),
+                                                const Gap(6),
+                                                Text(
+                                                  '${res.sectionCount} Ch',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             const Gap(4),
                                             Text(
-                                              bookItem.language.code == "eng"
-                                                  ? bookItem
-                                                        .language
-                                                        .displayName
-                                                  : "${bookItem.language.nativeName} (${bookItem.language.displayName})",
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppTheme.primaryMint,
-                                              ),
-                                            ),
-                                            const Gap(8),
-                                            const Text(
-                                              '•',
+                                              'Download Size: ${res.formattedZipSize}',
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                color: AppTheme.textSecondary,
-                                              ),
-                                            ),
-                                            const Gap(8),
-                                            Text(
-                                              '${res.hadithCount} Hadiths',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: AppTheme.textSecondary,
-                                              ),
-                                            ),
-                                            const Gap(6),
-                                            const Text(
-                                              '•',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: AppTheme.textSecondary,
-                                              ),
-                                            ),
-                                            const Gap(6),
-                                            Text(
-                                              '${res.sectionCount} Ch',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: AppTheme.textSecondary,
+                                                color: isChecked
+                                                    ? AppTheme.primaryMint
+                                                    : AppTheme.textSecondary,
+                                                fontWeight: isChecked
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal,
                                               ),
                                             ),
                                           ],
                                         ),
-                                        const Gap(4),
-                                        Text(
-                                          'Download Size: ${res.formattedZipSize}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: isChecked
-                                                ? AppTheme.primaryMint
-                                                : AppTheme.textSecondary,
-                                            fontWeight: isChecked
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                  if (isAlreadyDownloaded)
-                                    Container(
+                                ),
+                                if (isAlreadyDownloaded)
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 8),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 10,
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: AppTheme.primaryMint.withValues(
-                                          alpha: 0.12,
-                                        ),
+                                        color: AppTheme.darkSurfaceCard,
                                         borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: AppTheme.primaryMint
-                                              .withValues(alpha: 0.5),
-                                          width: 1.0,
-                                        ),
                                       ),
                                       child: const Row(
                                         mainAxisSize: MainAxisSize.min,
@@ -333,8 +343,8 @@ class ResourceStep extends StatelessWidget {
                                         ],
                                       ),
                                     ).animate().fadeIn(duration: 300.ms),
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
                           )
                           .animate()

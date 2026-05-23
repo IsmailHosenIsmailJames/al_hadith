@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Gap(8),
               ],
             ),
-      drawer: _buildDrawer(context),
+      drawer: _buildDrawer(context, isWideScreen),
       body: Row(
         children: [
           if (isWideScreen)
@@ -79,6 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: NavigationRail(
                 indicatorColor: AppTheme.darkSurfaceCard,
                 selectedIndex: _currentIndex,
+                scrollable: true,
+
+                minWidth: 120,
                 onDestinationSelected: (index) =>
                     setState(() => _currentIndex = index),
                 backgroundColor: AppTheme.darkSurface,
@@ -123,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   onPressed: () =>
                                       Scaffold.of(context).openDrawer(),
                                   icon: Container(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: AppTheme.primaryMint.withValues(
                                         alpha: 0.1,
@@ -395,7 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Drawer builder
-  Widget _buildDrawer(BuildContext context) {
+  Widget _buildDrawer(BuildContext context, bool isWideScreen) {
     return Drawer(
       backgroundColor: AppTheme.darkCanvas,
       child: Container(
@@ -406,37 +409,93 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
-                color: AppTheme.darkSurface,
-                border: Border(
-                  bottom: BorderSide(color: Color(0xFF1E293B), width: 1.5),
-                ),
-              ),
-              currentAccountPicture: Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: AppTheme.primaryGradient,
-                ),
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: Image.asset(
-                      'assets/img/logo.png',
-                      height: 100,
-                      width: 100,
+            Stack(
+              children: [
+                UserAccountsDrawerHeader(
+                  decoration: const BoxDecoration(
+                    color: AppTheme.darkSurface,
+                    border: Border(
+                      bottom: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                    ),
+                  ),
+                  currentAccountPicture: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: AppTheme.primaryGradient,
+                    ),
+                    child: Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.asset(
+                          'assets/img/logo.png',
+                          height: 100,
+                          width: 100,
+                        ),
+                      ),
+                    ),
+                  ),
+                  accountName: Text(
+                    'Al Hadith',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  accountEmail: const Text(
+                    'Read, search & study authentic Hadith offline with multilingual support & sync',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 13,
                     ),
                   ),
                 ),
-              ),
-              accountName: const Text(
-                'Al Hadith',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              accountEmail: const Text(
-                'Read, search & study authentic Hadith offline with multilingual support & sync',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-              ),
+                Container(
+                  alignment: Alignment(1, 1),
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      FutureBuilder(
+                        future: PackageInfo.fromPlatform(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              'Version ${snapshot.data!.version}',
+                              style: const TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: 12,
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                      if (isWideScreen) Gap(16),
+                      if (isWideScreen)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.search,
+                            color: AppTheme.primaryMint,
+                          ),
+                          onPressed: () {
+                            context.push('/search');
+                          },
+                        ),
+                      if (isWideScreen)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.settings_outlined,
+                            color: AppTheme.textSecondary,
+                          ),
+                          onPressed: () {
+                            context.push('/settings');
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             Expanded(
               child: ListView(
@@ -515,24 +574,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: FutureBuilder(
-                future: PackageInfo.fromPlatform(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(
-                      'Version ${snapshot.data!.version}',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: 12,
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
               ),
             ),
           ],

@@ -29,6 +29,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
     return Scaffold(
       backgroundColor: AppTheme.darkCanvas,
       body: SafeArea(
@@ -40,11 +41,16 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 SnackBar(
                   content: Text(
                     state.errorMessage!,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   backgroundColor: Colors.redAccent,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               );
             }
@@ -62,18 +68,33 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             }
 
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-              child: Column(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
+              child: Stack(
                 children: [
-                  _buildHeaderProgress(state),
-                  const Gap(24),
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: 300.ms,
-                      child: _buildCurrentStep(state),
+                  Padding(
+                    padding: EdgeInsets.only(right: isWideWindow ? 80.0 : 0.0),
+                    child: Column(
+                      children: [
+                        if (!isWideWindow) _buildHeaderProgress(state, false),
+                        if (!isWideWindow) Gap(24),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: 300.ms,
+                            child: _buildCurrentStep(state),
+                          ),
+                        ),
+                        _buildBottomNavBar(context, state),
+                      ],
                     ),
                   ),
-                  _buildBottomNavBar(context, state),
+                  if (isWideWindow)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: _buildHeaderProgress(state, true),
+                    ),
                 ],
               ),
             );
@@ -84,20 +105,31 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   }
 
   // Header progress/stepper widget
-  Widget _buildHeaderProgress(SetupState state) {
+  Widget _buildHeaderProgress(SetupState state, bool isWideWindow) {
     int activeIndex = 0;
     if (state.isSecondStep) activeIndex = 1;
     if (state.isDownloadingStep) activeIndex = 2;
-
-    return Row(
-      children: [
-        _buildStepIndicator(0, 'Language', activeIndex >= 0),
-        _buildLineConnector(activeIndex >= 1),
-        _buildStepIndicator(1, 'Resources', activeIndex >= 1),
-        _buildLineConnector(activeIndex >= 2),
-        _buildStepIndicator(2, 'Install', activeIndex >= 2),
-      ],
-    ).animate().fadeIn(duration: 400.ms);
+    if (isWideWindow) {
+      return Column(
+        children: [
+          _buildStepIndicator(0, 'Language', activeIndex >= 0),
+          _buildLineConnector(activeIndex >= 1, isWideWindow),
+          _buildStepIndicator(1, 'Resources', activeIndex >= 1),
+          _buildLineConnector(activeIndex >= 2, isWideWindow),
+          _buildStepIndicator(2, 'Install', activeIndex >= 2),
+        ],
+      ).animate().fadeIn(duration: 400.ms);
+    } else {
+      return Row(
+        children: [
+          _buildStepIndicator(0, 'Language', activeIndex >= 0),
+          _buildLineConnector(activeIndex >= 1, isWideWindow),
+          _buildStepIndicator(1, 'Resources', activeIndex >= 1),
+          _buildLineConnector(activeIndex >= 2, isWideWindow),
+          _buildStepIndicator(2, 'Install', activeIndex >= 2),
+        ],
+      ).animate().fadeIn(duration: 400.ms);
+    }
   }
 
   Widget _buildStepIndicator(int index, String label, bool isCompleted) {
@@ -112,7 +144,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             shape: BoxShape.circle,
             color: isCompleted ? AppTheme.primaryMint : const Color(0xFF1E293B),
             border: Border.all(
-              color: isCompleted ? AppTheme.primaryMint : const Color(0xFF334155),
+              color: isCompleted
+                  ? AppTheme.primaryMint
+                  : const Color(0xFF334155),
               width: 1.5,
             ),
           ),
@@ -121,7 +155,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 ? const Icon(Icons.check, color: AppTheme.darkCanvas, size: 18)
                 : Text(
                     '${index + 1}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
           ),
         ),
@@ -138,17 +175,27 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  Widget _buildLineConnector(bool isDone) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
+  Widget _buildLineConnector(bool isDone, bool isWideWindow) {
+    if (isWideWindow) {
+      return Expanded(
         child: AnimatedContainer(
           duration: 300.ms,
-          height: 2,
+          width: 2,
           color: isDone ? AppTheme.primaryMint : const Color(0xFF1E293B),
         ),
-      ),
-    );
+      );
+    } else {
+      return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: AnimatedContainer(
+            duration: 300.ms,
+            height: 2,
+            color: isDone ? AppTheme.primaryMint : const Color(0xFF1E293B),
+          ),
+        ),
+      );
+    }
   }
 
   // Current active step view selector
@@ -164,13 +211,11 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
         return ResourceStep(
           key: const ValueKey('resource_step'),
           state: state,
-          onToggle: (bookKey) => context.read<SetupCubit>().toggleResourceSelection(bookKey),
+          onToggle: (bookKey) =>
+              context.read<SetupCubit>().toggleResourceSelection(bookKey),
         );
       case SetupStep.downloading:
-        return DownloadStep(
-          key: const ValueKey('download_step'),
-          state: state,
-        );
+        return DownloadStep(key: const ValueKey('download_step'), state: state);
       case SetupStep.completed:
         return const SizedBox.shrink();
     }
@@ -180,7 +225,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   Widget _buildBottomNavBar(BuildContext context, SetupState state) {
     if (state.isDownloadingStep) {
       // In downloading step: if we hit an error, let the user retry
-      final hasError = state.downloadStatus.values.any((status) => status == 'Error');
+      final hasError = state.downloadStatus.values.any(
+        (status) => status == 'Error',
+      );
       if (hasError) {
         return Padding(
           padding: const EdgeInsets.only(top: 16.0),
@@ -218,7 +265,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                   foregroundColor: AppTheme.textPrimary,
                   side: const BorderSide(color: Color(0xFF1E293B), width: 1.5),
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 child: const Text('Back'),
               ),
@@ -230,7 +279,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
             child: ElevatedButton(
               onPressed: () => context.read<SetupCubit>().nextStep(),
               child: Text(
-                isFirst ? 'Continue to Resources' : 'Download Offline Library (${state.formattedTotalSize})',
+                isFirst
+                    ? 'Continue to Resources'
+                    : 'Download Offline Library (${state.formattedTotalSize})',
               ),
             ),
           ),
@@ -259,15 +310,19 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 BoxShadow(
                   color: AppTheme.primaryMint.withValues(alpha: 0.2),
                   blurRadius: 32,
-                )
+                ),
               ],
             ),
             child: Center(
-              child: Icon(Icons.done_all, color: AppTheme.primaryMint, size: 48),
+              child: Icon(
+                Icons.done_all,
+                color: AppTheme.primaryMint,
+                size: 48,
+              ),
             ),
           ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
           const Gap(32),
-          
+
           const Text(
             'Library Ready!',
             style: TextStyle(
@@ -276,7 +331,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               color: AppTheme.textPrimary,
             ),
           ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
-          
+
           const Gap(12),
           const Text(
             'Congratulations! Your offline Hadith resources have been successfully compiled and extracted. The application is now fully offline first ready.',
@@ -287,35 +342,40 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               height: 1.5,
             ),
           ).animate().fadeIn(duration: 450.ms, delay: 200.ms),
-          
+
           const Gap(48),
-          
+
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to main home view
-                context.go('/home');
-              },
-              child: const Text('Enter Hadith Library'),
-            ).animate(
-              onPlay: (controller) => controller.repeat(reverse: true),
-            ).custom(
-              duration: 1.5.seconds,
-              builder: (context, value, child) => Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryMint.withValues(alpha: 0.15 + (value * 0.15)),
-                      blurRadius: 10 + (value * 12),
-                      spreadRadius: value * 3,
+            child:
+                ElevatedButton(
+                      onPressed: () {
+                        // Navigate to main home view
+                        context.go('/home');
+                      },
+                      child: const Text('Enter Hadith Library'),
+                    )
+                    .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true),
+                    )
+                    .custom(
+                      duration: 1.5.seconds,
+                      builder: (context, value, child) => Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryMint.withValues(
+                                alpha: 0.15 + (value * 0.15),
+                              ),
+                              blurRadius: 10 + (value * 12),
+                              spreadRadius: value * 3,
+                            ),
+                          ],
+                        ),
+                        child: child,
+                      ),
                     ),
-                  ],
-                ),
-                child: child,
-              ),
-            ),
           ).animate().fadeIn(duration: 400.ms, delay: 350.ms),
         ],
       ),
