@@ -71,7 +71,7 @@ class PreferencesService {
 
   // Theme settings
   String getThemeMode() {
-    return _prefs.getString(_keyThemeMode) ?? 'dark';
+    return _prefs.getString(_keyThemeMode) ?? 'system';
   }
 
   Future<bool> setThemeMode(String mode) {

@@ -169,29 +169,33 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
   Future<void> _deleteResource(HadithResource resource) async {
     final downloadService = RepositoryProvider.of<DownloadService>(context);
     final prefs = RepositoryProvider.of<PreferencesService>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final dialogBg = isDark ? AppTheme.darkSurface : Colors.white;
 
     // Confirm dialog
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.darkSurface,
-        title: const Text(
+        backgroundColor: dialogBg,
+        title: Text(
           'Delete Book',
           style: TextStyle(
-            color: AppTheme.textPrimary,
+            color: textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           'Are you sure you want to delete ${resource.name}? This will remove the offline database file from your device.',
-          style: const TextStyle(color: AppTheme.textSecondary),
+          style: TextStyle(color: textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppTheme.textSecondary),
+              style: TextStyle(color: textSecondary),
             ),
           ),
           ElevatedButton(
@@ -275,15 +279,25 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
   Widget build(BuildContext context) {
     final downloadedList = _getFilteredResources(downloadedOnly: true);
     final allList = _getFilteredResources(downloadedOnly: false);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final inputBgColor = isDark ? AppTheme.darkSurface : const Color(0xFFF3F4F6);
+    final dropdownBgColor = isDark ? AppTheme.darkSurface : Colors.white;
 
     return Scaffold(
-      backgroundColor: AppTheme.darkCanvas,
+      backgroundColor: canvasColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.darkSurface,
+        backgroundColor: surfaceColor,
         elevation: 0,
-        title: const Text(
+        iconTheme: IconThemeData(color: textPrimary),
+        title: Text(
           'Manage Resources',
           style: TextStyle(
+            color: textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
@@ -303,7 +317,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           controller: _tabController,
           indicatorColor: AppTheme.primaryMint,
           labelColor: AppTheme.primaryMint,
-          unselectedLabelColor: AppTheme.textSecondary,
+          unselectedLabelColor: textSecondary,
           tabs: [
             Tab(text: 'Downloaded (${downloadedList.length})'),
             Tab(text: 'All Books (${allList.length})'),
@@ -329,7 +343,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                     const Gap(16),
                     Text(
                       _errorMessage!,
-                      style: const TextStyle(color: AppTheme.textSecondary),
+                      style: TextStyle(color: textSecondary),
                       textAlign: TextAlign.center,
                     ),
                     const Gap(16),
@@ -352,14 +366,14 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         child: Container(
                           height: 48,
                           decoration: BoxDecoration(
-                            color: AppTheme.darkSurface,
+                            color: inputBgColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFF1E293B)),
+                            border: Border.all(color: borderDividerColor),
                           ),
                           child: TextField(
                             controller: _searchController,
-                            style: const TextStyle(
-                              color: AppTheme.textPrimary,
+                            style: TextStyle(
+                              color: textPrimary,
                               fontSize: 14,
                             ),
                             onChanged: (val) {
@@ -367,19 +381,19 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                                 _searchQuery = val;
                               });
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: 'Search books...',
                               hintStyle: TextStyle(
-                                color: AppTheme.textSecondary,
+                                color: textSecondary,
                                 fontSize: 13,
                               ),
                               prefixIcon: Icon(
                                 Icons.search,
-                                color: AppTheme.textSecondary,
+                                color: textSecondary,
                                 size: 18,
                               ),
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 vertical: 14,
                               ),
                             ),
@@ -392,16 +406,16 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         height: 48,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: AppTheme.darkSurface,
+                          color: inputBgColor,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF1E293B)),
+                          border: Border.all(color: borderDividerColor),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: _selectedLangFilter,
-                            dropdownColor: AppTheme.darkSurface,
-                            style: const TextStyle(
-                              color: AppTheme.textPrimary,
+                            dropdownColor: dropdownBgColor,
+                            style: TextStyle(
+                              color: textPrimary,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
@@ -418,9 +432,9 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                               }
                             },
                             items: [
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: 'All',
-                                child: Text('All Languages'),
+                                child: Text('All Languages', style: TextStyle(color: textPrimary)),
                               ),
                               ..._languages.map(
                                 (lang) => DropdownMenuItem(
@@ -429,6 +443,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                                     lang.code == "eng"
                                         ? lang.displayName
                                         : "${lang.nativeName} (${lang.displayName})",
+                                    style: TextStyle(color: textPrimary),
                                   ),
                                 ),
                               ),
@@ -457,6 +472,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     List<HadithResource> books, {
     required bool downloadedOnly,
   }) {
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     if (books.isEmpty) {
       return Center(
         child: Column(
@@ -466,7 +483,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               downloadedOnly
                   ? Icons.cloud_off_rounded
                   : Icons.find_in_page_rounded,
-              color: AppTheme.textSecondary.withValues(alpha: 0.4),
+              color: textSecondary.withValues(alpha: 0.4),
               size: 48,
             ),
             const Gap(14),
@@ -474,8 +491,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               downloadedOnly
                   ? 'No downloaded books found'
                   : 'No books match search query',
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
+              style: TextStyle(
+                color: textSecondary,
                 fontSize: 14,
               ),
             ),
@@ -504,16 +521,26 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     final isDownloading = _isDownloading[resource.book] ?? false;
     final isCompleted = status == 'Completed';
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final badgeBgColor = isCompleted
+        ? AppTheme.primaryMint.withValues(alpha: 0.1)
+        : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB));
+    final pillBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFF3F4F6);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDownloading
               ? AppTheme.primaryMint.withValues(alpha: 0.4)
-              : const Color(0xFF1E293B),
+              : borderDividerColor,
           width: isDownloading ? 1.5 : 1,
         ),
       ),
@@ -528,9 +555,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: isCompleted
-                      ? AppTheme.primaryMint.withValues(alpha: 0.1)
-                      : const Color(0xFF1E293B),
+                  color: badgeBgColor,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
@@ -538,7 +563,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                     Icons.menu_book_rounded,
                     color: isCompleted
                         ? AppTheme.primaryMint
-                        : AppTheme.textSecondary,
+                        : textSecondary,
                     size: 20,
                   ),
                 ),
@@ -551,8 +576,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                   children: [
                     Text(
                       resource.nameNative,
-                      style: const TextStyle(
-                        color: AppTheme.textPrimary,
+                      style: TextStyle(
+                        color: textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -561,9 +586,9 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                     if (resource.languageCode != "eng")
                       Text(
                         resource.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
-                          color: AppTheme.textSecondary,
+                          color: textSecondary,
                         ),
                       ),
                     const Gap(4),
@@ -575,7 +600,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B),
+                            color: pillBgColor,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -592,8 +617,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         const Gap(8),
                         Text(
                           resource.formattedZipSize,
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
+                          style: TextStyle(
+                            color: textSecondary,
                             fontSize: 11,
                           ),
                         ),
@@ -617,9 +642,9 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                   children: [
                     // Update / Refresh action
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.cloud_download_outlined,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         size: 20,
                       ),
                       tooltip: 'Re-download / Update',
@@ -655,8 +680,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               children: [
                 Text(
                   status,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
+                  style: TextStyle(
+                    color: textSecondary,
                     fontSize: 11,
                   ),
                 ),
@@ -675,7 +700,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: const Color(0xFF1E293B),
+                backgroundColor: pillBgColor,
                 color: AppTheme.primaryMint,
                 minHeight: 4,
               ),

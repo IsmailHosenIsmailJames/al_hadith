@@ -34,15 +34,23 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2) : Colors.white;
+    final searchBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+
     return Scaffold(
-      backgroundColor: AppTheme.darkCanvas,
+      backgroundColor: canvasColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new,
-            color: AppTheme.textPrimary,
+            color: textPrimary,
             size: 20,
           ),
           onPressed: () => context.pop(),
@@ -54,12 +62,12 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
           builder: (context, state) {
             // Find book name in metadata
             if (!state.downloadedBooks.any((b) => b.book == widget.bookKey)) {
-              return const Text(
+              return Text(
                 'Hadith Book',
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                 ),
               );
             }
@@ -76,18 +84,18 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
               children: [
                 Text(
                   displayName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: textPrimary,
                   ),
                 ),
                 if (book.nameNative.isNotEmpty)
                   Text(
                     book.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                     ),
                   ),
               ],
@@ -120,7 +128,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                     Text(
                       state.sectionsErrorMessage!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppTheme.textSecondary),
+                      style: TextStyle(color: textSecondary),
                     ),
                     const Gap(16),
                     ElevatedButton(
@@ -155,33 +163,33 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.darkSurface,
+                    color: searchBgColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF1E293B)),
+                    border: Border.all(color: borderDividerColor),
                   ),
                   child: TextField(
                     controller: _searchController,
                     onChanged: (val) =>
                         context.read<HadithCubit>().updateSectionsSearch(val),
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                    style: TextStyle(
+                      color: textPrimary,
                       fontSize: 14,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Search chapters by name...',
-                      hintStyle: const TextStyle(
-                        color: AppTheme.textSecondary,
+                      hintStyle: TextStyle(
+                        color: textSecondary,
                         fontSize: 14,
                       ),
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                       ),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                color: AppTheme.textSecondary,
+                                color: textSecondary,
                                 size: 18,
                               ),
                               onPressed: () {
@@ -210,9 +218,9 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                 ),
                 child: Text(
                   '${sections.length} Chapters Available',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppTheme.textSecondary,
+                    color: textSecondary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -227,16 +235,16 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                           children: [
                             Icon(
                               Icons.search_off_rounded,
-                              color: AppTheme.textSecondary.withValues(
+                              color: textSecondary.withValues(
                                 alpha: 0.3,
                               ),
                               size: 48,
                             ),
                             const Gap(16),
-                            const Text(
+                            Text(
                               'No chapters found matching your query.',
                               style: TextStyle(
-                                color: AppTheme.textSecondary,
+                                color: textSecondary,
                                 fontSize: 14,
                               ),
                             ),
@@ -271,12 +279,10 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.darkSurfaceCard.withValues(
-                                      alpha: 0.2,
-                                    ),
+                                    color: cardBgColor,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: const Color(0xFF1E293B),
+                                      color: borderDividerColor,
                                     ),
                                   ),
                                   child: Row(
@@ -318,10 +324,10 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                                                       .isNotEmpty
                                                   ? section.sectionNameNative
                                                   : section.sectionName,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold,
-                                                color: AppTheme.textPrimary,
+                                                color: textPrimary,
                                                 height: 1.3,
                                               ),
                                             ),
@@ -330,45 +336,42 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                                                 .isNotEmpty)
                                               Text(
                                                 section.sectionName,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 12,
-                                                  color: AppTheme.textSecondary,
+                                                  color: textSecondary,
                                                   height: 1.2,
                                                 ),
                                               ),
                                             const Gap(6),
                                             Row(
                                               children: [
-                                                const Icon(
+                                                Icon(
                                                   Icons.menu_book,
-                                                  color: AppTheme.textSecondary,
+                                                  color: textSecondary,
                                                   size: 12,
                                                 ),
                                                 const Gap(4),
                                                 Text(
                                                   'Hadith: ${section.startHadithNumber} - ${section.endHadithNumber}',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                   ),
                                                 ),
                                                 const Gap(8),
-                                                const Text(
+                                                Text(
                                                   '•',
                                                   style: TextStyle(
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                     fontSize: 12,
                                                   ),
                                                 ),
                                                 const Gap(8),
                                                 Text(
                                                   '${section.hadithCount} items',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
@@ -378,9 +381,9 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                                         ),
                                       ),
                                       const Gap(8),
-                                      const Icon(
+                                      Icon(
                                         Icons.arrow_forward_ios_rounded,
-                                        color: AppTheme.textSecondary,
+                                        color: textSecondary,
                                         size: 14,
                                       ),
                                     ],

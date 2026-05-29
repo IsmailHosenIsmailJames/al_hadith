@@ -23,6 +23,13 @@ class LanguageStep extends StatelessWidget {
       );
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final inactiveBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
 
     return Column(
@@ -33,13 +40,14 @@ class LanguageStep extends StatelessWidget {
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.bold,
+            color: textPrimary,
           ),
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
         const Gap(6),
         Text(
               'Choose your preferred translation language. You can download and manage resources for other languages later.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 height: 1.4,
               ),
             )
@@ -68,12 +76,12 @@ class LanguageStep extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppTheme.primaryMint.withValues(alpha: 0.08)
-                            : AppTheme.darkSurface,
+                            : cardBgColor,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
                               ? AppTheme.primaryMint
-                              : const Color(0xFF1E293B),
+                              : inactiveBorderColor,
                           width: isSelected ? 2.0 : 1.5,
                         ),
                         boxShadow: isSelected
@@ -103,10 +111,10 @@ class LanguageStep extends StatelessWidget {
                                 const Gap(10),
                                 Text(
                                   lang.displayName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: AppTheme.textPrimary,
+                                    color: textPrimary,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -115,9 +123,9 @@ class LanguageStep extends StatelessWidget {
                                 if (lang.code != "eng")
                                   Text(
                                     lang.nativeName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
-                                      color: AppTheme.textSecondary,
+                                      color: textSecondary,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -135,9 +143,9 @@ class LanguageStep extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   color: AppTheme.primaryMint,
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.check,
-                                  color: AppTheme.darkCanvas,
+                                  color: tickColor,
                                   size: 14,
                                 ),
                               ).animate().scale(duration: 200.ms),

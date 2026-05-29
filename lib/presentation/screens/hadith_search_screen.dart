@@ -63,6 +63,9 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     required String title,
     required String subtitle,
   }) {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Center(
       child:
           Padding(
@@ -89,19 +92,19 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     const Gap(20),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                       ),
                     ),
                     const Gap(8),
                     Text(
                       subtitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -117,6 +120,13 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
   Widget _buildScopeSelectionBar(HadithState state) {
     if (state.downloadedBooks.isEmpty) return const SizedBox();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final chipBgColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+    final tickColor = AppTheme.darkCanvas;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -125,10 +135,10 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Target Search Scope',
                 style: TextStyle(
-                  color: AppTheme.textSecondary,
+                  color: textSecondary,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -189,8 +199,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                             : book.name,
                         style: TextStyle(
                           color: isSelected
-                              ? AppTheme.darkCanvas
-                              : AppTheme.textPrimary,
+                              ? tickColor
+                              : textPrimary,
                           fontSize: 11.5,
                           fontWeight: FontWeight.bold,
                         ),
@@ -198,7 +208,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     ],
                   ),
                   selected: isSelected,
-                  backgroundColor: AppTheme.darkSurfaceCard,
+                  backgroundColor: chipBgColor,
                   selectedColor: AppTheme.primaryMint,
                   showCheckmark: false,
                   shape: RoundedRectangleBorder(
@@ -206,7 +216,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     side: BorderSide(
                       color: isSelected
                           ? AppTheme.primaryMint
-                          : const Color(0xFF1E293B),
+                          : borderDividerColor,
                     ),
                   ),
                   onSelected: (_) {
@@ -225,6 +235,12 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
   }
 
   Widget _buildSuggestionsView() {
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.4) : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     final trending = [
       'Intention',
       'Charity',
@@ -238,12 +254,12 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Text(
             'Trending Search Suggestions',
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: textSecondary,
               fontSize: 11.5,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -257,12 +273,10 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             runSpacing: 8,
             children: trending.map((topic) {
               return ActionChip(
-                backgroundColor: AppTheme.darkSurfaceCard.withValues(
-                  alpha: 0.4,
-                ),
+                backgroundColor: chipBgColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFF1E293B)),
+                  side: BorderSide(color: borderDividerColor),
                 ),
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -275,8 +289,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     const Gap(6),
                     Text(
                       topic,
-                      style: const TextStyle(
-                        color: AppTheme.textPrimary,
+                      style: TextStyle(
+                        color: textPrimary,
                         fontSize: 12,
                       ),
                     ),
@@ -310,12 +324,18 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     final flag = _getFlag(state, bookKey);
     final bookName = _getBookName(state, bookKey);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderDividerColor),
       ),
       child: Material(
         color: Colors.transparent,
@@ -362,16 +382,16 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     const Gap(8),
                     Text(
                       'Hadith #${hadith.hadithNumber}',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
+                      style: TextStyle(
+                        color: textSecondary,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const Spacer(),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right_rounded,
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                       size: 18,
                     ),
                   ],
@@ -381,15 +401,15 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                   hadith.text,
                   maxLines: 4,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 13.5,
                     height: 1.5,
                   ),
                 ),
                 if (hadith.grades.isNotEmpty) ...[
                   const Gap(12),
-                  const Divider(color: Color(0xFF1E293B), height: 1),
+                  Divider(color: borderDividerColor, height: 1),
                   const Gap(8),
                   Wrap(
                     spacing: 4,
@@ -436,18 +456,25 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
         final results = state.searchResultsGrouped;
         final resultsKeys = results.keys.toList();
 
         return Scaffold(
-          backgroundColor: AppTheme.darkCanvas,
+          backgroundColor: canvasColor,
           appBar: AppBar(
-            backgroundColor: AppTheme.darkSurface,
+            backgroundColor: surfaceColor,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+              icon: Icon(Icons.arrow_back, color: textPrimary),
               onPressed: () {
                 context.read<HadithCubit>().clearSearch();
                 Navigator.pop(context);
@@ -456,13 +483,13 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             title: TextField(
               controller: _searchController,
               autofocus: true,
-              style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+              style: TextStyle(color: textPrimary, fontSize: 14),
               textInputAction: TextInputAction.search,
               onSubmitted: _triggerSearch,
               decoration: InputDecoration(
                 hintText: 'Search Hadith text offline...',
-                hintStyle: const TextStyle(
-                  color: AppTheme.textSecondary,
+                hintStyle: TextStyle(
+                  color: textSecondary,
                   fontSize: 13,
                 ),
                 prefixIcon: const Icon(
@@ -472,9 +499,9 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close,
-                          color: AppTheme.textSecondary,
+                          color: textSecondary,
                           size: 18,
                         ),
                         onPressed: () {
@@ -491,7 +518,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             children: [
               const Gap(8),
               _buildScopeSelectionBar(state),
-              const Divider(color: Color(0xFF1E293B), height: 1),
+              Divider(color: borderDividerColor, height: 1),
               Expanded(
                 child: Builder(
                   builder: (context) {
@@ -522,12 +549,12 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                       child: Column(
                         children: [
                           Container(
-                            color: AppTheme.darkSurface,
+                            color: surfaceColor,
                             child: TabBar(
                               isScrollable: true,
                               indicatorColor: AppTheme.primaryMint,
                               labelColor: AppTheme.primaryMint,
-                              unselectedLabelColor: AppTheme.textSecondary,
+                              unselectedLabelColor: textSecondary,
                               indicatorSize: TabBarIndicatorSize.tab,
                               dividerColor: Colors.transparent,
                               tabs: resultsKeys.map((key) {

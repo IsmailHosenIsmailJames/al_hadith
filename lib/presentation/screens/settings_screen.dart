@@ -22,17 +22,23 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
+        final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+        final surfaceColor = Theme.of(context).colorScheme.surface;
+        final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
         return Scaffold(
-          backgroundColor: AppTheme.darkCanvas,
+          backgroundColor: canvasColor,
           appBar: AppBar(
-            backgroundColor: AppTheme.darkSurface,
+            backgroundColor: surfaceColor,
             elevation: 0,
-            title: const Text(
+            iconTheme: IconThemeData(color: textPrimary),
+            title: Text(
               'Settings',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
+                color: textPrimary,
               ),
             ),
           ),
@@ -41,12 +47,12 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             children: [
               // ── Appearance ──
-              // _buildSectionHeader('Appearance'),
-              // _buildThemeSelector(context, state),
-              // const Gap(8),
+              _buildSectionHeader(context, 'Appearance'),
+              _buildThemeSelector(context, state),
+              const Gap(8),
 
               // ── Font Settings ──
-              _buildSectionHeader('Font Settings'),
+              _buildSectionHeader(context, 'Font Settings'),
               _buildArabicFontPicker(context, state),
               const Gap(8),
               _buildSliderTile(
@@ -57,7 +63,7 @@ class SettingsScreen extends StatelessWidget {
                 value: state.arabicFontSize,
                 min: 16,
                 max: 42,
-                preview: _buildArabicPreview(state),
+                preview: _buildArabicPreview(context, state),
                 onChanged: (v) =>
                     context.read<SettingsCubit>().setArabicFontSize(v.roundToDouble()),
               ),
@@ -70,14 +76,14 @@ class SettingsScreen extends StatelessWidget {
                 value: state.translationFontSize,
                 min: 12,
                 max: 30,
-                preview: _buildTranslationPreview(state),
+                preview: _buildTranslationPreview(context, state),
                 onChanged: (v) =>
                     context.read<SettingsCubit>().setTranslationFontSize(v.roundToDouble()),
               ),
               const Gap(8),
 
               // ── Reading Behavior ──
-              _buildSectionHeader('Reading Behavior'),
+              _buildSectionHeader(context, 'Reading Behavior'),
               _buildToggleTile(
                 context,
                 icon: Icons.screen_lock_portrait_rounded,
@@ -109,13 +115,15 @@ class SettingsScreen extends StatelessWidget {
               const Gap(8),
 
               // ── About ──
-              _buildSectionHeader('About'),
+              _buildSectionHeader(context, 'About'),
               _buildInfoTile(
+                context,
                 icon: Icons.info_outline_rounded,
                 title: 'Version',
                 trailing: '1.0.0',
               ),
               _buildInfoTile(
+                context,
                 icon: Icons.code_rounded,
                 title: 'Developed by',
                 trailing: 'Ismail Hosen',
@@ -128,7 +136,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
@@ -143,132 +151,147 @@ class SettingsScreen extends StatelessWidget {
     ).animate().fadeIn(duration: 300.ms);
   }
 
-  // Widget _buildThemeSelector(BuildContext context, SettingsState state) {
-  //   return Container(
-  //     margin: const EdgeInsets.symmetric(horizontal: 16),
-  //     padding: const EdgeInsets.all(16),
-  //     decoration: BoxDecoration(
-  //       color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
-  //       borderRadius: BorderRadius.circular(16),
-  //       border: Border.all(color: const Color(0xFF1E293B)),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         const Row(
-  //           children: [
-  //             Icon(Icons.palette_rounded, color: AppTheme.primaryMint, size: 18),
-  //             Gap(10),
-  //             Text(
-  //               'Theme',
-  //               style: TextStyle(
-  //                 color: AppTheme.textPrimary,
-  //                 fontSize: 14,
-  //                 fontWeight: FontWeight.bold,
-  //                 // color: AppTheme.textPrimary,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         const Gap(14),
-  //         Row(
-  //           children: [
-  //             _buildThemeOption(
-  //               context,
-  //               icon: Icons.dark_mode_rounded,
-  //               label: 'Dark',
-  //               isSelected: state.themeMode == 'dark',
-  //               onTap: () => context.read<SettingsCubit>().setThemeMode('dark'),
-  //             ),
-  //             const Gap(12),
-  //             _buildThemeOption(
-  //               context,
-  //               icon: Icons.light_mode_rounded,
-  //               label: 'Light',
-  //               isSelected: state.themeMode == 'light',
-  //               onTap: () => context.read<SettingsCubit>().setThemeMode('light'),
-  //             ),
-  //             const Gap(12),
-  //             _buildThemeOption(
-  //               context,
-  //               icon: Icons.brightness_auto_rounded,
-  //               label: 'System',
-  //               isSelected: state.themeMode == 'system',
-  //               onTap: () => context.read<SettingsCubit>().setThemeMode('system'),
-  //             ),
-  //           ],
-  //         ),
-  //       ],
-  //     ),
-  //   ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
-  // }
-  // 
-  // Widget _buildThemeOption(
-  //   BuildContext context, {
-  //   required IconData icon,
-  //   required String label,
-  //   required bool isSelected,
-  //   required VoidCallback onTap,
-  // }) {
-  //   return Expanded(
-  //     child: GestureDetector(
-  //       onTap: onTap,
-  //       child: AnimatedContainer(
-  //         duration: const Duration(milliseconds: 250),
-  //         padding: const EdgeInsets.symmetric(vertical: 14),
-  //         decoration: BoxDecoration(
-  //           color: isSelected
-  //               ? AppTheme.primaryMint.withValues(alpha: 0.12)
-  //               : AppTheme.darkSurface,
-  //           borderRadius: BorderRadius.circular(12),
-  //           border: Border.all(
-  //             color: isSelected ? AppTheme.primaryMint : const Color(0xFF1E293B),
-  //             width: isSelected ? 1.5 : 1,
-  //           ),
-  //         ),
-  //         child: Column(
-  //           children: [
-  //             Icon(
-  //               icon,
-  //               color: isSelected ? AppTheme.primaryMint : AppTheme.textSecondary,
-  //               size: 22,
-  //             ),
-  //             const Gap(6),
-  //             Text(
-  //               label,
-  //               style: TextStyle(
-  //                 color: isSelected ? AppTheme.primaryMint : AppTheme.textSecondary,
-  //                 fontSize: 11,
-  //                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildThemeSelector(BuildContext context, SettingsState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
 
-  Widget _buildArabicFontPicker(BuildContext context, SettingsState state) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.font_download_rounded, color: AppTheme.primaryMint, size: 18),
-              Gap(10),
+              const Icon(Icons.palette_rounded, color: AppTheme.primaryMint, size: 18),
+              const Gap(10),
+              Text(
+                'Theme',
+                style: TextStyle(
+                  color: textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const Gap(14),
+          Row(
+            children: [
+              _buildThemeOption(
+                context,
+                icon: Icons.dark_mode_rounded,
+                label: 'Dark',
+                isSelected: state.themeMode == 'dark',
+                onTap: () => context.read<SettingsCubit>().setThemeMode('dark'),
+              ),
+              const Gap(12),
+              _buildThemeOption(
+                context,
+                icon: Icons.light_mode_rounded,
+                label: 'Light',
+                isSelected: state.themeMode == 'light',
+                onTap: () => context.read<SettingsCubit>().setThemeMode('light'),
+              ),
+              const Gap(12),
+              _buildThemeOption(
+                context,
+                icon: Icons.brightness_auto_rounded,
+                label: 'System',
+                isSelected: state.themeMode == 'system',
+                onTap: () => context.read<SettingsCubit>().setThemeMode('system'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  }
+
+  Widget _buildThemeOption(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final unselectedBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final optionBgColor = isSelected
+        ? AppTheme.primaryMint.withValues(alpha: 0.12)
+        : (isDark ? AppTheme.darkSurface : Colors.white);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            color: optionBgColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? AppTheme.primaryMint : unselectedBorderColor,
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? AppTheme.primaryMint : textSecondary,
+                size: 22,
+              ),
+              const Gap(6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppTheme.primaryMint : textSecondary,
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArabicFontPicker(BuildContext context, SettingsState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final chipBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.font_download_rounded, color: AppTheme.primaryMint, size: 18),
+              const Gap(10),
               Text(
                 'Arabic Font Family',
                 style: TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -285,19 +308,19 @@ class SettingsScreen extends StatelessWidget {
                 label: Text(
                   font['display']!,
                   style: TextStyle(
-                    color: isSelected ? AppTheme.darkCanvas : AppTheme.textPrimary,
+                    color: isSelected ? Colors.white : textPrimary,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 selected: isSelected,
-                backgroundColor: AppTheme.darkSurface,
+                backgroundColor: chipBgColor,
                 selectedColor: AppTheme.primaryMint,
                 showCheckmark: false,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(
-                    color: isSelected ? AppTheme.primaryMint : const Color(0xFF1E293B),
+                    color: isSelected ? AppTheme.primaryMint : borderColor,
                   ),
                 ),
                 onSelected: (_) {
@@ -311,7 +334,12 @@ class SettingsScreen extends StatelessWidget {
     ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
   }
 
-  Widget _buildArabicPreview(SettingsState state) {
+  Widget _buildArabicPreview(BuildContext context, SettingsState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final previewBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
     final isLocalFont = state.arabicFontFamily == 'Me Quran' ||
         state.arabicFontFamily == 'QPC Hafs' ||
         state.arabicFontFamily == 'Indopak Nastaleeq';
@@ -320,13 +348,13 @@ class SettingsScreen extends StatelessWidget {
         ? TextStyle(
             fontFamily: state.arabicFontFamily,
             fontSize: state.arabicFontSize,
-            color: AppTheme.textPrimary,
+            color: textPrimary,
             height: 1.8,
           )
         : GoogleFonts.getFont(
             state.arabicFontFamily,
             fontSize: state.arabicFontSize,
-            color: AppTheme.textPrimary,
+            color: textPrimary,
             height: 1.8,
           );
 
@@ -334,9 +362,9 @@ class SettingsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
+        color: previewBgColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderColor),
       ),
       child: Text(
         'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
@@ -347,20 +375,25 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTranslationPreview(SettingsState state) {
+  Widget _buildTranslationPreview(BuildContext context, SettingsState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final previewBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
+        color: previewBgColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderColor),
       ),
       child: Text(
         'The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended.',
         style: TextStyle(
           fontSize: state.translationFontSize,
-          color: AppTheme.textPrimary,
+          color: textPrimary,
           height: 1.5,
         ),
       ),
@@ -378,13 +411,18 @@ class SettingsScreen extends StatelessWidget {
     required ValueChanged<double> onChanged,
     Widget? preview,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,8 +434,8 @@ class SettingsScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -423,7 +461,7 @@ class SettingsScreen extends StatelessWidget {
           SliderTheme(
             data: SliderThemeData(
               activeTrackColor: AppTheme.primaryMint,
-              inactiveTrackColor: const Color(0xFF1E293B),
+              inactiveTrackColor: borderColor,
               thumbColor: AppTheme.primaryMint,
               overlayColor: AppTheme.primaryMint.withValues(alpha: 0.15),
               trackHeight: 3,
@@ -454,13 +492,19 @@ class SettingsScreen extends StatelessWidget {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
@@ -472,8 +516,8 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -481,8 +525,8 @@ class SettingsScreen extends StatelessWidget {
                 const Gap(2),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
+                  style: TextStyle(
+                    color: textSecondary,
                     fontSize: 11.5,
                   ),
                 ),
@@ -493,8 +537,8 @@ class SettingsScreen extends StatelessWidget {
             value: value,
             activeThumbColor: AppTheme.primaryMint,
             activeTrackColor: AppTheme.primaryMint.withValues(alpha: 0.3),
-            inactiveThumbColor: AppTheme.textSecondary,
-            inactiveTrackColor: const Color(0xFF1E293B),
+            inactiveThumbColor: textSecondary,
+            inactiveTrackColor: borderColor,
             onChanged: onChanged,
           ),
         ],
@@ -502,18 +546,25 @@ class SettingsScreen extends StatelessWidget {
     ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
   }
 
-  Widget _buildInfoTile({
+  Widget _buildInfoTile(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required String trailing,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
@@ -522,8 +573,8 @@ class SettingsScreen extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
+              style: TextStyle(
+                color: textPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
@@ -531,8 +582,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           Text(
             trailing,
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
+            style: TextStyle(
+              color: textSecondary,
               fontSize: 12,
             ),
           ),

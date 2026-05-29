@@ -39,6 +39,12 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final searchBgColor = Theme.of(context).colorScheme.surface;
+
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
         if (state.isLoading) {
@@ -63,13 +69,13 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                   Text(
                     state.errorMessage!,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppTheme.textSecondary),
+                    style: TextStyle(color: textSecondary),
                   ),
                   const Gap(16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryMint,
-                      foregroundColor: AppTheme.darkCanvas,
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -95,14 +101,14 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. Horizontal Book Selector Carousel
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
               child: Text(
                 'Select Resource',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                   letterSpacing: 0.2,
                 ),
               ),
@@ -123,6 +129,10 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                   final ratio = totalHadiths > 0
                       ? readCount / totalHadiths
                       : 0.0;
+
+                  final inactiveBookBgColor = isDark
+                      ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2)
+                      : const Color(0xFFF3F4F6);
 
                   return GestureDetector(
                     onTap: () {
@@ -158,14 +168,12 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                     : null,
                                 color: isSelected
                                     ? null
-                                    : AppTheme.darkSurfaceCard.withValues(
-                                        alpha: 0.2,
-                                      ),
+                                    : inactiveBookBgColor,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isSelected
                                       ? AppTheme.primaryMint
-                                      : const Color(0xFF1E293B),
+                                      : borderDividerColor,
                                   width: isSelected ? 1.5 : 1.0,
                                 ),
                                 boxShadow: isSelected
@@ -196,9 +204,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                           book.languageCode == "eng"
                                               ? book.langDisplayName
                                               : "${book.langNativeName} (${book.langDisplayName})",
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 10,
-                                            color: AppTheme.textSecondary,
+                                            color: textSecondary,
                                             fontWeight: FontWeight.bold,
                                           ),
                                           overflow: TextOverflow.ellipsis,
@@ -211,10 +219,10 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                     book.nameNative.isNotEmpty
                                         ? book.nameNative
                                         : book.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: AppTheme.textPrimary,
+                                      color: textPrimary,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -223,9 +231,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                       book.languageCode != "eng")
                                     Text(
                                       book.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 9,
-                                        color: AppTheme.textSecondary,
+                                        color: textSecondary,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -241,9 +249,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                         children: [
                                           Text(
                                             '${book.sectionCount} Ch.',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 10,
-                                              color: AppTheme.textSecondary,
+                                              color: textSecondary,
                                             ),
                                           ),
                                           Text(
@@ -253,7 +261,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                               fontWeight: FontWeight.bold,
                                               color: isSelected
                                                   ? AppTheme.primaryMint
-                                                  : AppTheme.textSecondary,
+                                                  : textSecondary,
                                             ),
                                           ),
                                         ],
@@ -264,17 +272,14 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                         child: LinearProgressIndicator(
                                           value: ratio,
                                           minHeight: 3,
-                                          backgroundColor: const Color(
-                                            0xFF1E293B,
-                                          ),
+                                          backgroundColor: borderDividerColor,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
                                                 isSelected
                                                     ? AppTheme.primaryMint
-                                                    : AppTheme.textSecondary
-                                                          .withValues(
-                                                            alpha: 0.6,
-                                                          ),
+                                                    : textSecondary.withValues(
+                                                        alpha: 0.6,
+                                                      ),
                                               ),
                                         ),
                                       ),
@@ -302,34 +307,34 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.darkSurface,
+                  color: searchBgColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF1E293B)),
+                  border: Border.all(color: borderDividerColor),
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (val) =>
                       context.read<HadithCubit>().updateSectionsSearch(val),
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 14,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search chapters by name...',
-                    hintStyle: const TextStyle(
-                      color: AppTheme.textSecondary,
+                    hintStyle: TextStyle(
+                      color: textSecondary,
                       fontSize: 14,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                       size: 20,
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.clear,
-                              color: AppTheme.textSecondary,
+                              color: textSecondary,
                               size: 18,
                             ),
                             onPressed: () {
@@ -370,7 +375,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                         const Gap(12),
                         Text(
                           state.sectionsErrorMessage!,
-                          style: const TextStyle(color: AppTheme.textSecondary),
+                          style: TextStyle(color: textSecondary),
                         ),
                         const Gap(12),
                         ElevatedButton(
@@ -392,9 +397,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                 ),
                 child: Text(
                   '${state.filteredSections.length} Chapters Available',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppTheme.textSecondary,
+                    color: textSecondary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -413,6 +418,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                         itemCount: state.filteredSections.length,
                         itemBuilder: (context, index) {
                           final section = state.filteredSections[index];
+                          final cardBgColor = isDark
+                              ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2)
+                              : const Color(0xFFF3F4F6);
 
                           return GestureDetector(
                                 onTap: () {
@@ -431,12 +439,10 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.darkSurfaceCard.withValues(
-                                      alpha: 0.2,
-                                    ),
+                                    color: cardBgColor,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: const Color(0xFF1E293B),
+                                      color: borderDividerColor,
                                     ),
                                   ),
                                   child: Row(
@@ -478,10 +484,10 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                                       .isNotEmpty
                                                   ? section.sectionNameNative
                                                   : section.sectionName,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 14.5,
                                                 fontWeight: FontWeight.bold,
-                                                color: AppTheme.textPrimary,
+                                                color: textPrimary,
                                                 height: 1.3,
                                               ),
                                             ),
@@ -490,45 +496,42 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                                 .isNotEmpty)
                                               Text(
                                                 section.sectionName,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 12,
-                                                  color: AppTheme.textSecondary,
+                                                  color: textSecondary,
                                                   height: 1.2,
                                                 ),
                                               ),
                                             const Gap(6),
                                             Row(
                                               children: [
-                                                const Icon(
+                                                Icon(
                                                   Icons.bookmark_outline,
-                                                  color: AppTheme.textSecondary,
+                                                  color: textSecondary,
                                                   size: 12,
                                                 ),
                                                 const Gap(4),
                                                 Text(
                                                   'Hadith: ${section.startHadithNumber} - ${section.endHadithNumber}',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 11.5,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                   ),
                                                 ),
                                                 const Gap(8),
-                                                const Text(
+                                                Text(
                                                   '•',
                                                   style: TextStyle(
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                     fontSize: 11.5,
                                                   ),
                                                 ),
                                                 const Gap(8),
                                                 Text(
                                                   '${section.hadithCount} items',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 11.5,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -538,9 +541,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                         ),
                                       ),
                                       const Gap(8),
-                                      const Icon(
+                                      Icon(
                                         Icons.arrow_forward_ios_rounded,
-                                        color: AppTheme.textSecondary,
+                                        color: textSecondary,
                                         size: 13,
                                       ),
                                     ],
@@ -561,6 +564,9 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
   }
 
   Widget _buildEmptyState() {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -580,19 +586,19 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
               ),
             ),
             const Gap(24),
-            const Text(
+            Text(
               'No Offline Books',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: textPrimary,
               ),
             ),
             const Gap(8),
-            const Text(
+            Text(
               'Chapters will appear here once you download resources from the setup wizard or download center.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, height: 1.4),
+              style: TextStyle(color: textSecondary, height: 1.4),
             ),
           ],
         ).animate().fadeIn(duration: 400.ms),
@@ -601,6 +607,8 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
   }
 
   Widget _buildNoResultsState() {
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -609,13 +617,13 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
           children: [
             Icon(
               Icons.search_off_rounded,
-              color: AppTheme.textSecondary.withValues(alpha: 0.2),
+              color: textSecondary.withValues(alpha: 0.2),
               size: 48,
             ),
             const Gap(16),
-            const Text(
+            Text(
               'No chapters match your query.',
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+              style: TextStyle(color: textSecondary, fontSize: 14),
             ),
           ],
         ),

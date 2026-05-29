@@ -24,6 +24,12 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
         if (state.isLoading) {
@@ -48,13 +54,13 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                   Text(
                     state.errorMessage!,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppTheme.textSecondary),
+                    style: TextStyle(color: textSecondary),
                   ),
                   const Gap(16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryMint,
-                      foregroundColor: AppTheme.darkCanvas,
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -75,7 +81,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
 
         return RefreshIndicator(
           color: AppTheme.primaryMint,
-          backgroundColor: AppTheme.darkSurface,
+          backgroundColor: surfaceColor,
           onRefresh: () => context.read<HadithCubit>().loadDashboard(),
           child: ListView(
             physics: const BouncingScrollPhysics(),
@@ -87,14 +93,14 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               const Gap(28),
 
               // 2. Downloaded Book Categories
-              const Padding(
-                padding: EdgeInsets.only(left: 4.0, bottom: 12.0),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
                 child: Text(
                   'Your Offline Library',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
+                    color: textPrimary,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -114,6 +120,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                       ? readCount / totalHadiths
                       : 0.0;
                   final percentageText = (ratio * 100).toStringAsFixed(2);
+                  final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2) : const Color(0xFFF3F4F6);
 
                   return GestureDetector(
                         onTap: () {
@@ -123,14 +130,12 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: AppTheme.darkSurfaceCard.withValues(
-                              alpha: 0.2,
-                            ),
+                            color: cardBgColor,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFF1E293B)),
+                            border: Border.all(color: borderDividerColor),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
+                                color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.02),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -172,27 +177,27 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                           book.nameNative.isNotEmpty
                                               ? book.nameNative
                                               : book.name,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
-                                            color: AppTheme.textPrimary,
+                                            color: textPrimary,
                                           ),
                                         ),
                                         if (book.nameNative.isNotEmpty &&
                                             book.languageCode != "eng")
                                           Text(
                                             book.name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 10,
-                                              color: AppTheme.textSecondary,
+                                              color: textSecondary,
                                             ),
                                           ),
                                         const Gap(4),
                                         Text(
                                           '${book.hadithCount} Hadiths • ${book.sectionCount} Chapters',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
-                                            color: AppTheme.textSecondary,
+                                            color: textSecondary,
                                           ),
                                         ),
                                         if (book.languageCode.isNotEmpty) ...[
@@ -243,9 +248,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                       ],
                                     ),
                                   ),
-                                  const Icon(
+                                  Icon(
                                     Icons.chevron_right_rounded,
-                                    color: AppTheme.textSecondary,
+                                    color: textSecondary,
                                     size: 24,
                                   ),
                                 ],
@@ -258,7 +263,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                 child: LinearProgressIndicator(
                                   value: ratio,
                                   minHeight: 5,
-                                  backgroundColor: const Color(0xFF1E293B),
+                                  backgroundColor: borderDividerColor,
                                   color: AppTheme.primaryMint,
                                 ),
                               ),
@@ -269,9 +274,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                 children: [
                                   Text(
                                     '$readCount / $totalHadiths read',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: AppTheme.textSecondary,
+                                      color: textSecondary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -303,6 +308,11 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
 
   Widget _buildHistoryHeader(BuildContext context, HadithState state) {
     final history = state.history;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
     if (history != null) {
       // Premium interactive resume card
@@ -363,18 +373,18 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             const Gap(14),
             Text(
               history.bookName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: textPrimary,
               ),
             ),
             const Gap(4),
             Text(
               'Hadith Reference: #${history.hadithNumber}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -382,18 +392,18 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               const Gap(4),
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.bookmark_outline,
-                    color: AppTheme.textSecondary,
+                    color: textSecondary,
                     size: 13,
                   ),
                   const Gap(5),
                   Expanded(
                     child: Text(
                       history.sectionTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -405,7 +415,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
-                foregroundColor: AppTheme.darkCanvas,
+                foregroundColor: tickColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -440,40 +450,42 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
       ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.98, 0.98));
     }
 
+    final quoteBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.12) : const Color(0xFFF3F4F6);
+
     // Curated Empty Quote Panel
     return Container(
       padding: const EdgeInsets.all(22.0),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.12),
+        color: quoteBgColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderDividerColor),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
+          const Icon(
             Icons.format_quote_rounded,
             color: AppTheme.primaryMint,
             size: 32,
           ),
-          Gap(12),
+          const Gap(12),
           Text(
             '"Verily, actions are judged by intentions, and every person will have only what they intended."',
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w500,
               fontStyle: FontStyle.italic,
-              color: AppTheme.textPrimary,
+              color: textPrimary,
               height: 1.5,
             ),
           ),
-          Gap(12),
+          const Gap(12),
           Text(
             '— Sahih al-Bukhari, Hadith 1',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textSecondary,
+              color: textSecondary,
             ),
           ),
         ],
@@ -482,6 +494,11 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -502,21 +519,21 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               ),
             ),
             const Gap(24),
-            const Text(
+            Text(
               'Your Library is Empty',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: textPrimary,
               ),
             ),
             const Gap(8),
-            const Text(
+            Text(
               'No downloaded hadith books detected on this device. Click the button below to download static resources.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5,
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 height: 1.4,
               ),
             ),
@@ -524,7 +541,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
-                foregroundColor: AppTheme.darkCanvas,
+                foregroundColor: tickColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

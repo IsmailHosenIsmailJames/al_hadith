@@ -17,6 +17,7 @@ import 'package:al_hadith/data/services/backup_service.dart';
 import 'package:al_hadith/logic/setup/setup_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/logic/settings/settings_state.dart';
 import 'package:al_hadith/logic/auth/auth_cubit.dart';
 
 void main() async {
@@ -98,11 +99,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Al Hadith',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      routerConfig: appRouter.router,
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        ThemeMode themeMode;
+        switch (state.themeMode) {
+          case 'light':
+            themeMode = ThemeMode.light;
+            break;
+          case 'dark':
+            themeMode = ThemeMode.dark;
+            break;
+          case 'system':
+          default:
+            themeMode = ThemeMode.system;
+            break;
+        }
+
+        return MaterialApp.router(
+          title: 'Al Hadith',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
+          routerConfig: appRouter.router,
+        );
+      },
     );
   }
 }

@@ -221,9 +221,15 @@ class _HadithReadPlaceholderScreenState
   void _showJumpDialog() {
     if (_hadiths.isEmpty) return;
     int selected = _currentIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.darkSurface,
+      backgroundColor: navBgColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -239,26 +245,26 @@ class _HadithReadPlaceholderScreenState
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                    color: textSecondary.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               const Gap(20),
-              const Text(
+              Text(
                 'Jump to Hadith',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                 ),
               ),
               const Gap(6),
               Text(
                 '${selected + 1} of ${_hadiths.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppTheme.textSecondary,
+                  color: textSecondary,
                 ),
               ),
               const Gap(20),
@@ -266,7 +272,7 @@ class _HadithReadPlaceholderScreenState
                 data: SliderTheme.of(ctx).copyWith(
                   activeTrackColor: AppTheme.primaryMint,
                   thumbColor: AppTheme.primaryMint,
-                  inactiveTrackColor: const Color(0xFF1E293B),
+                  inactiveTrackColor: borderDividerColor,
                   overlayColor: AppTheme.primaryMint.withValues(alpha: 0.15),
                 ),
                 child: Slider(
@@ -282,15 +288,15 @@ class _HadithReadPlaceholderScreenState
                 children: [
                   Text(
                     'Hadith #${_hadiths.first.hadithNumber}',
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
+                    style: TextStyle(
+                      color: textSecondary,
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     'Hadith #${_hadiths.last.hadithNumber}',
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
+                    style: TextStyle(
+                      color: textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -314,17 +320,9 @@ class _HadithReadPlaceholderScreenState
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (_viewMode == _ViewMode.page &&
                           _pageController.hasClients) {
-                        _pageController.animateToPage(
-                          selected,
-                          duration: 300.ms,
-                          curve: Curves.easeInOut,
-                        );
+                        _pageController.jumpToPage(selected);
                       } else if (_listScrollController.isAttached) {
-                        _listScrollController.scrollTo(
-                          index: selected,
-                          duration: 400.ms,
-                          curve: Curves.easeInOut,
-                        );
+                        _listScrollController.jumpTo(index: selected);
                       }
                     });
                   },
@@ -345,9 +343,15 @@ class _HadithReadPlaceholderScreenState
   }
 
   void _shareHadith(HadithItem hadith) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.darkSurface,
+      backgroundColor: navBgColor,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -361,7 +365,7 @@ class _HadithReadPlaceholderScreenState
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                color: textSecondary.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -418,23 +422,23 @@ class _HadithReadPlaceholderScreenState
                   const Gap(14),
                   Text(
                     hadith.text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14.5,
-                      color: AppTheme.textPrimary,
+                      color: textPrimary,
                       height: 1.6,
                     ),
                     maxLines: 8,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Gap(16),
-                  const Divider(color: Color(0xFF1E293B), height: 1),
+                  Divider(color: borderDividerColor, height: 1),
                   const Gap(12),
                   Row(
                     children: [
                       Text(
                         _bookName,
-                        style: const TextStyle(
-                          color: AppTheme.textSecondary,
+                        style: TextStyle(
+                          color: textSecondary,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -459,8 +463,8 @@ class _HadithReadPlaceholderScreenState
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.textPrimary,
-                      side: const BorderSide(color: Color(0xFF1E293B)),
+                      foregroundColor: textPrimary,
+                      side: BorderSide(color: borderDividerColor),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -476,284 +480,294 @@ class _HadithReadPlaceholderScreenState
                           content: const Row(
                             children: [
                               Icon(
-                                Icons.copy_all,
-                                color: AppTheme.darkCanvas,
-                                size: 16,
-                              ),
-                              Gap(8),
-                              Text('Copied to clipboard!'),
-                            ],
+                                  Icons.copy_all,
+                                  color: AppTheme.darkCanvas,
+                                  size: 16,
+                                ),
+                                Gap(8),
+                                Text('Copied to clipboard!'),
+                              ],
+                            ),
+                            backgroundColor: AppTheme.primaryMint,
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          backgroundColor: AppTheme.primaryMint,
-                          behavior: SnackBarBehavior.floating,
-                          duration: const Duration(seconds: 2),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.copy_outlined, size: 16),
+                      label: const Text('Copy'),
+                    ),
+                  ),
+                  const Gap(12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryMint,
+                        foregroundColor: AppTheme.darkCanvas,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.copy_outlined, size: 16),
-                    label: const Text('Copy'),
-                  ),
-                ),
-                const Gap(12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryMint,
-                      foregroundColor: AppTheme.darkCanvas,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
                       ),
-                    ),
-                    onPressed: () {
-                      final text =
-                          'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\n— $_bookName\n\nShared via Al Hadith App';
-                      Share.share(
-                        text,
-                        subject: 'Hadith #${hadith.hadithNumber}',
-                      );
-                      Navigator.pop(ctx);
-                    },
-                    icon: const Icon(Icons.share_rounded, size: 16),
-                    label: const Text('Share'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final title = widget.sectionName.isNotEmpty
-        ? widget.sectionName
-        : _bookName.isNotEmpty
-        ? _bookName
-        : 'Reading';
-
-    return Scaffold(
-      backgroundColor: AppTheme.darkCanvas,
-      appBar: AppBar(
-        backgroundColor: AppTheme.darkSurface,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: AppTheme.textPrimary,
-            size: 20,
-          ),
-          onPressed: () => context.pop(),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: AppTheme.textPrimary,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (_hadiths.isNotEmpty)
-              Text(
-                'Hadith ${_hadiths[_currentIndex].hadithNumber} · ${_currentIndex + 1} / ${_hadiths.length}',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-          ],
-        ),
-        centerTitle: true,
-        actions: [
-          if (_hadiths.isNotEmpty) ...[
-            IconButton(
-              tooltip: 'Jump to hadith',
-              icon: const Icon(
-                Icons.subdirectory_arrow_left,
-                color: AppTheme.textSecondary,
-                size: 22,
-              ),
-              onPressed: _showJumpDialog,
-            ),
-            IconButton(
-              tooltip: _viewMode == _ViewMode.page
-                  ? 'Switch to List View'
-                  : 'Switch to Page View',
-              icon: Icon(
-                _viewMode == _ViewMode.page
-                    ? Icons.view_list_rounded
-                    : Icons.auto_stories_rounded,
-                color: AppTheme.primaryMint,
-                size: 22,
-              ),
-              onPressed: _switchView,
-            ),
-          ],
-        ],
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primaryMint),
-            )
-          : _error != null
-          ? _buildError()
-          : _hadiths.isEmpty
-          ? const Center(
-              child: Text(
-                'No hadiths available.',
-                style: TextStyle(color: AppTheme.textSecondary),
-              ),
-            )
-          : _viewMode == _ViewMode.page
-          ? _buildPageView()
-          : _buildListView(),
-      bottomNavigationBar: (_viewMode == _ViewMode.page && _hadiths.isNotEmpty)
-          ? _buildPageNavBar()
-          : null,
-    );
-  }
-
-  Widget _buildPageNavBar() {
-    final canPrev = _currentIndex > 0;
-    final canNext = _currentIndex < _hadiths.length - 1;
-
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.darkSurface,
-        border: Border(top: BorderSide(color: Color(0xFF1E293B), width: 1)),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
-            children: [
-              // Previous button
-              Expanded(
-                child: AnimatedOpacity(
-                  opacity: canPrev ? 1.0 : 0.35,
-                  duration: 200.ms,
-                  child: TextButton.icon(
-                    onPressed: canPrev
-                        ? () => _pageController.animateToPage(
-                            _currentIndex - 1,
-                            duration: 300.ms,
-                            curve: Curves.easeInOut,
-                          )
-                        : null,
-                    icon: const Icon(
-                      Icons.arrow_back_ios_rounded,
-                      size: 14,
-                      color: AppTheme.primaryMint,
-                    ),
-                    label: const Text(
-                      'Previous',
-                      style: TextStyle(
-                        color: AppTheme.primaryMint,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
+                      onPressed: () {
+                        final text =
+                            'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\n— $_bookName\n\nShared via Al Hadith App';
+                        Share.share(
+                          text,
+                          subject: 'Hadith #${hadith.hadithNumber}',
+                        );
+                        Navigator.pop(ctx);
+                      },
+                      icon: const Icon(Icons.share_rounded, size: 16),
+                      label: const Text('Share'),
                     ),
                   ),
-                ),
-              ),
-
-              // Centre progress pill
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.darkSurfaceCard,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFF1E293B)),
-                ),
-                child: Text(
-                  '${_currentIndex + 1} / ${_hadiths.length}',
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
-              // Next button
-              Expanded(
-                child: AnimatedOpacity(
-                  opacity: canNext ? 1.0 : 0.35,
-                  duration: 200.ms,
-                  child: TextButton.icon(
-                    onPressed: canNext
-                        ? () => _pageController.animateToPage(
-                            _currentIndex + 1,
-                            duration: 300.ms,
-                            curve: Curves.easeInOut,
-                          )
-                        : null,
-                    iconAlignment: IconAlignment.end,
-                    icon: const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 14,
-                      color: AppTheme.primaryMint,
-                    ),
-                    label: const Text(
-                      'Next',
-                      style: TextStyle(
-                        color: AppTheme.primaryMint,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
+                ],
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildError() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
-            const Gap(16),
-            Text(
-              _error!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.textSecondary),
+      );
+    }
+  
+    @override
+    Widget build(BuildContext context) {
+      final title = widget.sectionName.isNotEmpty
+          ? widget.sectionName
+          : _bookName.isNotEmpty
+          ? _bookName
+          : 'Reading';
+      final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+      final surfaceColor = Theme.of(context).colorScheme.surface;
+      final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+      final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+  
+      return Scaffold(
+        backgroundColor: canvasColor,
+        appBar: AppBar(
+          backgroundColor: surfaceColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: textPrimary,
+              size: 20,
             ),
-            const Gap(20),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryMint,
-                foregroundColor: AppTheme.darkCanvas,
+            onPressed: () => context.pop(),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: textPrimary,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-              onPressed: _loadSection,
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
-            ),
+              if (_hadiths.isNotEmpty)
+                Text(
+                  'Hadith ${_hadiths[_currentIndex].hadithNumber} · ${_currentIndex + 1} / ${_hadiths.length}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+            ],
+          ),
+          centerTitle: true,
+          actions: [
+            if (_hadiths.isNotEmpty) ...[
+              IconButton(
+                tooltip: 'Jump to hadith',
+                icon: Icon(
+                  Icons.subdirectory_arrow_left,
+                  color: textSecondary,
+                  size: 22,
+                ),
+                onPressed: _showJumpDialog,
+              ),
+              IconButton(
+                tooltip: _viewMode == _ViewMode.page
+                    ? 'Switch to List View'
+                    : 'Switch to Page View',
+                icon: Icon(
+                  _viewMode == _ViewMode.page
+                      ? Icons.view_list_rounded
+                      : Icons.auto_stories_rounded,
+                  color: AppTheme.primaryMint,
+                  size: 22,
+                ),
+                onPressed: _switchView,
+              ),
+            ],
           ],
         ),
-      ),
-    );
-  }
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: AppTheme.primaryMint),
+              )
+            : _error != null
+            ? _buildError()
+            : _hadiths.isEmpty
+            ? Center(
+                child: Text(
+                  'No hadiths available.',
+                  style: TextStyle(color: textSecondary),
+                ),
+              )
+            : _viewMode == _ViewMode.page
+            ? _buildPageView()
+            : _buildListView(),
+        bottomNavigationBar: (_viewMode == _ViewMode.page && _hadiths.isNotEmpty)
+            ? _buildPageNavBar()
+            : null,
+      );
+    }
+  
+    Widget _buildPageNavBar() {
+      final canPrev = _currentIndex > 0;
+      final canNext = _currentIndex < _hadiths.length - 1;
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+      final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+      final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+      final pillBgColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+  
+      return Container(
+        decoration: BoxDecoration(
+          color: navBgColor,
+          border: Border(top: BorderSide(color: borderDividerColor, width: 1)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Row(
+              children: [
+                // Previous button
+                Expanded(
+                  child: AnimatedOpacity(
+                    opacity: canPrev ? 1.0 : 0.35,
+                    duration: 200.ms,
+                    child: TextButton.icon(
+                      onPressed: canPrev
+                          ? () => _pageController.animateToPage(
+                              _currentIndex - 1,
+                              duration: 300.ms,
+                              curve: Curves.easeInOut,
+                            )
+                          : null,
+                      icon: const Icon(
+                        Icons.arrow_back_ios_rounded,
+                        size: 14,
+                        color: AppTheme.primaryMint,
+                      ),
+                      label: const Text(
+                        'Previous',
+                        style: TextStyle(
+                          color: AppTheme.primaryMint,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+  
+                // Centre progress pill
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: pillBgColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderDividerColor),
+                  ),
+                  child: Text(
+                    '${_currentIndex + 1} / ${_hadiths.length}',
+                    style: TextStyle(
+                      color: textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+  
+                // Next button
+                Expanded(
+                  child: AnimatedOpacity(
+                    opacity: canNext ? 1.0 : 0.35,
+                    duration: 200.ms,
+                    child: TextButton.icon(
+                      onPressed: canNext
+                          ? () => _pageController.animateToPage(
+                              _currentIndex + 1,
+                              duration: 300.ms,
+                              curve: Curves.easeInOut,
+                            )
+                          : null,
+                      iconAlignment: IconAlignment.end,
+                      icon: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: AppTheme.primaryMint,
+                      ),
+                      label: const Text(
+                        'Next',
+                        style: TextStyle(
+                          color: AppTheme.primaryMint,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  
+    Widget _buildError() {
+      final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+              const Gap(16),
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: textSecondary),
+              ),
+              const Gap(20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryMint,
+                  foregroundColor: AppTheme.darkCanvas,
+                ),
+                onPressed: _loadSection,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
   Widget _buildPageView() {
     return PageView.builder(
@@ -822,6 +836,12 @@ class _HadithCard extends StatelessWidget {
     String currentNote,
   ) {
     final textController = TextEditingController(text: currentNote);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final sheetBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final dialogCanvasColor = isDark ? AppTheme.darkCanvas : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
 
     showModalBottomSheet(
       context: context,
@@ -834,11 +854,11 @@ class _HadithCard extends StatelessWidget {
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: AppTheme.darkSurface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: sheetBgColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               border: Border(
-                top: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                top: BorderSide(color: borderDividerColor, width: 1.5),
               ),
             ),
             child: Column(
@@ -848,18 +868,18 @@ class _HadithCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Study Notes',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                       ),
                       onPressed: () => Navigator.pop(ctx),
                     ),
@@ -868,27 +888,27 @@ class _HadithCard extends StatelessWidget {
                 const Gap(16),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.darkCanvas,
+                    color: dialogCanvasColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF1E293B)),
+                    border: Border.all(color: borderDividerColor),
                   ),
                   child: TextField(
                     controller: textController,
                     maxLines: 5,
                     autofocus: true,
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                    style: TextStyle(
+                      color: textPrimary,
                       fontSize: 14,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText:
                           'Write your notes, reflection or study guide here...',
                       hintStyle: TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         fontSize: 13,
                       ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
+                      contentPadding: const EdgeInsets.all(16),
                     ),
                   ),
                 ),
@@ -995,6 +1015,12 @@ class _HadithCard extends StatelessWidget {
     final noteText = state.hadithNotes[ref];
     final hasNote = noteText != null && noteText.trim().isNotEmpty;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : Colors.white;
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
@@ -1009,12 +1035,12 @@ class _HadithCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+              color: cardBgColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFF1E293B)),
+              border: Border.all(color: borderDividerColor),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
+                  color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -1067,7 +1093,7 @@ class _HadithCard extends StatelessWidget {
                           border: Border.all(
                             color: isRead
                                 ? AppTheme.primaryMint.withValues(alpha: 0.4)
-                                : AppTheme.textSecondary.withValues(alpha: 0.3),
+                                : textSecondary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
@@ -1079,7 +1105,7 @@ class _HadithCard extends StatelessWidget {
                                   : Icons.radio_button_unchecked_rounded,
                               color: isRead
                                   ? AppTheme.primaryMint
-                                  : AppTheme.textSecondary,
+                                  : textSecondary,
                               size: 14,
                             ),
                             const Gap(4),
@@ -1088,7 +1114,7 @@ class _HadithCard extends StatelessWidget {
                               style: TextStyle(
                                 color: isRead
                                     ? AppTheme.primaryMint
-                                    : AppTheme.textSecondary,
+                                    : textSecondary,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1114,7 +1140,7 @@ class _HadithCard extends StatelessWidget {
                               ? TextStyle(
                                   fontFamily: settingsState.arabicFontFamily,
                                   fontSize: settingsState.arabicFontSize,
-                                  color: AppTheme.textPrimary,
+                                  color: textPrimary,
                                   height: 1.8,
                                   fontFamilyFallback: [
                                     isLocalFont ? 'Me Quran' : 'Arial',
@@ -1123,12 +1149,12 @@ class _HadithCard extends StatelessWidget {
                               : GoogleFonts.getFont(
                                   settingsState.arabicFontFamily,
                                   fontSize: settingsState.arabicFontSize,
-                                  color: AppTheme.textPrimary,
+                                  color: textPrimary,
                                   height: 1.8,
                                 ))
                         : TextStyle(
                             fontSize: settingsState.translationFontSize,
-                            color: AppTheme.textPrimary,
+                            color: textPrimary,
                             height: 1.6,
                             letterSpacing: 0.1,
                             fontFamilyFallback: [
@@ -1186,10 +1212,10 @@ class _HadithCard extends StatelessWidget {
                                 hadith.hadithNumber,
                                 noteText,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Edit',
                                 style: TextStyle(
-                                  color: AppTheme.textSecondary,
+                                  color: textSecondary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1200,8 +1226,8 @@ class _HadithCard extends StatelessWidget {
                         const Gap(8),
                         Text(
                           noteText,
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
+                          style: TextStyle(
+                            color: textPrimary,
                             fontSize: 13,
                             height: 1.5,
                           ),
@@ -1213,14 +1239,14 @@ class _HadithCard extends StatelessWidget {
                 // Grades
                 if (hadith.grades.isNotEmpty) ...[
                   const Gap(20),
-                  const Divider(color: Color(0xFF1E293B), height: 1),
+                  Divider(color: borderDividerColor, height: 1),
                   const Gap(12),
-                  const Text(
+                  Text(
                     'Authenticity Grading',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -1265,7 +1291,7 @@ class _HadithCard extends StatelessWidget {
                 ],
                 // Bottom Action Bar Row
                 const Gap(16),
-                const Divider(color: Color(0xFF1E293B), height: 1),
+                Divider(color: borderDividerColor, height: 1),
                 const Gap(10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1276,7 +1302,7 @@ class _HadithCard extends StatelessWidget {
                           : Icons.bookmark_outline_rounded,
                       color: isBookmarked
                           ? AppTheme.primaryMint
-                          : AppTheme.textSecondary,
+                          : textSecondary,
                       label: 'Bookmark',
                       onTap: () => context.read<HadithCubit>().toggleBookmark(
                         bookKey,
@@ -1289,7 +1315,7 @@ class _HadithCard extends StatelessWidget {
                           : Icons.push_pin_outlined,
                       color: isPinned
                           ? Colors.orangeAccent
-                          : AppTheme.textSecondary,
+                          : textSecondary,
                       label: 'Pin',
                       onTap: () => context.read<HadithCubit>().togglePin(
                         bookKey,
@@ -1302,7 +1328,7 @@ class _HadithCard extends StatelessWidget {
                           : Icons.note_alt_outlined,
                       color: hasNote
                           ? Colors.tealAccent
-                          : AppTheme.textSecondary,
+                          : textSecondary,
                       label: 'Note',
                       onTap: () => _showNoteDialog(
                         context,
@@ -1313,7 +1339,7 @@ class _HadithCard extends StatelessWidget {
                     ),
                     _buildCardAction(
                       icon: Icons.content_copy_rounded,
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                       label: 'Copy',
                       onTap: () {
                         final copyText =
@@ -1331,7 +1357,7 @@ class _HadithCard extends StatelessWidget {
                     ),
                     _buildCardAction(
                       icon: Icons.share_rounded,
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                       label: 'Share',
                       onTap: () => onShare(hadith),
                     ),
@@ -1342,21 +1368,21 @@ class _HadithCard extends StatelessWidget {
                     indexInSection == 0 &&
                     totalInSection > 1) ...[
                   const Gap(14),
-                  const Divider(color: Color(0xFF1E293B), height: 1),
+                  Divider(color: borderDividerColor, height: 1),
                   const Gap(10),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.swipe_rounded,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         size: 14,
                       ),
-                      Gap(6),
+                      const Gap(6),
                       Text(
                         'Swipe left/right to navigate',
                         style: TextStyle(
-                          color: AppTheme.textSecondary,
+                          color: textSecondary,
                           fontSize: 11,
                         ),
                       ),

@@ -131,4 +131,89 @@ class AppTheme {
       ),
     );
   }
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: const Color(0xFFF9FAFB),
+      primaryColor: primaryMint,
+      colorScheme: const ColorScheme.light(
+        primary: primaryMint,
+        secondary: secondaryIndigo,
+        surface: Colors.white,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFE5E7EB), width: 1.5),
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: textDark,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        iconTheme: IconThemeData(color: textDark),
+        actionsIconTheme: IconThemeData(color: textDark),
+      ),
+      textTheme: GoogleFonts.outfitTextTheme().copyWith(
+        displayLarge: GoogleFonts.outfit(
+          color: textDark,
+          fontSize: 32,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.5,
+        ),
+        titleLarge: GoogleFonts.outfit(
+          color: textDark,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+        ),
+        bodyLarge: GoogleFonts.outfit(
+          color: textDark,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+        bodyMedium: GoogleFonts.outfit(
+          color: const Color(0xFF4B5563),
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryMint,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shadowColor: primaryMint.withValues(alpha: 0.3),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: GoogleFonts.outfit(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryMint;
+          }
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(Colors.white),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      ),
+    );
+  }
 }

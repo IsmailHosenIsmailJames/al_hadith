@@ -9,7 +9,7 @@ class SettingsState {
   final bool autoSyncEnabled; // Auto backup to Firebase RTDB
 
   const SettingsState({
-    this.themeMode = 'dark',
+    this.themeMode = 'system',
     this.arabicFontSize = 24.0,
     this.translationFontSize = 16.0,
     this.arabicFontFamily = 'Me Quran',

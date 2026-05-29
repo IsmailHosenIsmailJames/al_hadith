@@ -58,6 +58,12 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     String currentNote,
   ) {
     final textController = TextEditingController(text: currentNote);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     showModalBottomSheet(
       context: context,
@@ -70,11 +76,11 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: AppTheme.darkSurface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               border: Border(
-                top: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                top: BorderSide(color: borderDividerColor, width: 1.5),
               ),
             ),
             child: Column(
@@ -84,18 +90,18 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Edit Note',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                       ),
                       onPressed: () => Navigator.pop(ctx),
                     ),
@@ -104,26 +110,26 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                 const Gap(16),
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.darkCanvas,
+                    color: canvasColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF1E293B)),
+                    border: Border.all(color: borderDividerColor),
                   ),
                   child: TextField(
                     controller: textController,
                     maxLines: 5,
                     autofocus: true,
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                    style: TextStyle(
+                      color: textPrimary,
                       fontSize: 14,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Enter note reflection details...',
                       hintStyle: TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         fontSize: 13,
                       ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
+                      contentPadding: const EdgeInsets.all(16),
                     ),
                   ),
                 ),
@@ -134,7 +140,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryMint,
-                          foregroundColor: AppTheme.darkCanvas,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -167,6 +173,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     required String title,
     required String subtitle,
   }) {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Center(
       child:
           Padding(
@@ -193,19 +202,19 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     const Gap(20),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                       ),
                     ),
                     const Gap(8),
                     Text(
                       subtitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12.5,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -229,12 +238,19 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final hadithResources = _getBookName(state, bookKey);
     final flag = _getFlag(state, bookKey);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderDividerColor),
       ),
       child: Material(
         color: Colors.transparent,
@@ -281,8 +297,8 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     const Gap(8),
                     Text(
                       'Hadith #${hadith.hadithNumber}',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
+                      style: TextStyle(
+                        color: textSecondary,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -306,9 +322,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: AppTheme.darkSurface,
+                          color: surfaceColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF1E293B)),
+                          border: Border.all(color: borderDividerColor),
                         ),
                         child: Icon(
                           isBookmark
@@ -328,15 +344,15 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                   hadith.text,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 13.5,
                     height: 1.5,
                   ),
                 ),
                 if (hadith.grades.isNotEmpty) ...[
                   const Gap(12),
-                  const Divider(color: Color(0xFF1E293B), height: 1),
+                  Divider(color: borderDividerColor, height: 1),
                   const Gap(8),
                   Wrap(
                     spacing: 4,
@@ -392,12 +408,18 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final hadithResources = _getBookName(state, bookKey);
     final flag = _getFlag(state, bookKey);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurfaceCard.withValues(alpha: 0.3),
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderDividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,8 +433,8 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
               ),
-              border: const Border(
-                bottom: BorderSide(color: Color(0xFF1E293B)),
+              border: Border(
+                bottom: BorderSide(color: borderDividerColor),
               ),
             ),
             child: Column(
@@ -456,9 +478,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                         hadith.hadithNumber,
                         noteText,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.edit_rounded,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         size: 14,
                       ),
                     ),
@@ -467,8 +489,8 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                 const Gap(8),
                 Text(
                   noteText,
-                  style: const TextStyle(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: textPrimary,
                     fontSize: 13,
                     height: 1.5,
                     fontStyle: FontStyle.italic,
@@ -498,7 +520,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: borderDividerColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -508,8 +530,8 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                             const Gap(4),
                             Text(
                               hadithResources?.nameNative ?? bookKey,
-                              style: const TextStyle(
-                                color: AppTheme.textSecondary,
+                              style: TextStyle(
+                                color: textSecondary,
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -520,16 +542,16 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       const Gap(8),
                       Text(
                         'Hadith #${hadith.hadithNumber}',
-                        style: const TextStyle(
-                          color: AppTheme.textSecondary,
+                        style: TextStyle(
+                          color: textSecondary,
                           fontSize: 10.5,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const Spacer(),
-                      const Icon(
+                      Icon(
                         Icons.chevron_right_rounded,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         size: 16,
                       ),
                     ],
@@ -539,8 +561,8 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     hadith.text,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
+                    style: TextStyle(
+                      color: textSecondary,
                       fontSize: 12.5,
                       height: 1.4,
                     ),
@@ -654,30 +676,37 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
 
   @override
   Widget build(BuildContext context) {
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: AppTheme.darkCanvas,
+          backgroundColor: canvasColor,
           appBar: AppBar(
-            backgroundColor: AppTheme.darkSurface,
+            backgroundColor: surfaceColor,
             elevation: 0,
-            title: const Text(
+            iconTheme: IconThemeData(color: textPrimary),
+            title: Text(
               'My Library Collections',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
+                color: textPrimary,
               ),
             ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: Container(
-                color: AppTheme.darkSurface,
+                color: surfaceColor,
                 child: TabBar(
                   controller: _tabController,
                   indicatorColor: AppTheme.primaryMint,
                   labelColor: AppTheme.primaryMint,
-                  unselectedLabelColor: AppTheme.textSecondary,
+                  unselectedLabelColor: textSecondary,
                   indicatorSize: TabBarIndicatorSize.label,
                   dividerColor: Colors.transparent,
                   indicatorWeight: 2.5,

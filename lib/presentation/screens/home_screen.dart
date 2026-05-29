@@ -29,6 +29,13 @@ class _HomeScreenState extends State<HomeScreen> {
       const ProfileScreen(),
     ];
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final navIndicatorColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isWideScreen = screenWidth >= AppTheme.wideWidth;
 
@@ -44,8 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-              title: const Text(
+              title: Text(
                 'Al Hadith',
+                style: TextStyle(
+                  color: textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ).animate().fadeIn(duration: 600.ms).scale(delay: 100.ms),
               actions: [
                 IconButton(
@@ -55,9 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.settings_outlined,
-                    color: AppTheme.textSecondary,
+                    color: textSecondary,
                   ),
                   onPressed: () {
                     context.push('/settings');
@@ -71,28 +82,27 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           if (isWideScreen)
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  right: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                  right: BorderSide(color: borderDividerColor, width: 1.5),
                 ),
               ),
               child: NavigationRail(
-                indicatorColor: AppTheme.darkSurfaceCard,
+                indicatorColor: navIndicatorColor,
                 selectedIndex: _currentIndex,
                 scrollable: true,
-
                 minWidth: 120,
                 onDestinationSelected: (index) =>
                     setState(() => _currentIndex = index),
-                backgroundColor: AppTheme.darkSurface,
+                backgroundColor: surfaceColor,
                 extended: screenWidth >= 1100,
                 minExtendedWidth: 300,
                 selectedIconTheme: const IconThemeData(
                   color: AppTheme.primaryMint,
                   size: 28,
                 ),
-                unselectedIconTheme: const IconThemeData(
-                  color: AppTheme.textSecondary,
+                unselectedIconTheme: IconThemeData(
+                  color: textSecondary,
                   size: 24,
                 ),
                 selectedLabelTextStyle: const TextStyle(
@@ -100,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
-                unselectedLabelTextStyle: const TextStyle(
-                  color: AppTheme.textSecondary,
+                unselectedLabelTextStyle: TextStyle(
+                  color: textSecondary,
                   fontSize: 12,
                 ),
                 labelType: screenWidth >= 1100
@@ -154,9 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.settings_outlined,
-                                      color: AppTheme.textSecondary,
+                                      color: textSecondary,
                                     ),
                                     onPressed: () {
                                       context.push('/settings');
@@ -172,10 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child:
-                              const Text(
+                              Text(
                                     'Al Hadith',
                                     style: TextStyle(
-                                      color: AppTheme.textPrimary,
+                                      color: textPrimary,
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: -0.5,
@@ -227,12 +237,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ? null
           : Container(
               decoration: BoxDecoration(
-                border: const Border(
-                  top: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                border: Border(
+                  top: BorderSide(color: borderDividerColor, width: 1.5),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                     blurRadius: 20,
                     offset: const Offset(0, -5),
                   ),
@@ -241,9 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: BottomNavigationBar(
                 currentIndex: _currentIndex,
                 onTap: (index) => setState(() => _currentIndex = index),
-                backgroundColor: AppTheme.darkSurface,
+                backgroundColor: surfaceColor,
                 selectedItemColor: AppTheme.primaryMint,
-                unselectedItemColor: AppTheme.textSecondary,
+                unselectedItemColor: textSecondary,
                 type: BottomNavigationBarType.fixed,
                 selectedLabelStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
@@ -282,8 +292,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Bottom Navigation view builders
-
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
     try {
@@ -298,13 +306,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAboutDialog() {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.darkSurface,
+        backgroundColor: surfaceColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Color(0xFF1E293B), width: 1.5),
+          side: BorderSide(color: borderDividerColor, width: 1.5),
         ),
         title: Row(
           children: [
@@ -321,30 +335,30 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const Gap(12),
-            const Text(
+            Text(
               'About Al Hadith',
               style: TextStyle(
-                color: AppTheme.textPrimary,
+                color: textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
           ],
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Al Hadith is a premium, fully offline reader powered by optimized local SQLite databases. It features state-of-the-art Custom Arabic Fonts, customizable sizes, real-time query filtering, and automated bookmarking/progress tracking.',
               style: TextStyle(
-                color: AppTheme.textPrimary,
+                color: textPrimary,
                 fontSize: 13,
                 height: 1.5,
               ),
             ),
-            Gap(12),
-            Text(
+            const Gap(12),
+            const Text(
               'Hadith Resources:',
               style: TextStyle(
                 color: AppTheme.primaryMint,
@@ -352,17 +366,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Gap(4),
+            const Gap(4),
             Text(
               'Fetched remotely and cached locally from fawazahmed0\'s open-source database repository. Under MIT License.',
               style: TextStyle(
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 fontSize: 11,
                 height: 1.4,
               ),
             ),
-            Gap(12),
-            Text(
+            const Gap(12),
+            const Text(
               'Built With:',
               style: TextStyle(
                 color: AppTheme.primaryMint,
@@ -370,11 +384,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Gap(4),
+            const Gap(4),
             Text(
               'Flutter, Bloc Pattern, sqflite, path_provider, and Google Outfit fonts.',
               style: TextStyle(
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 fontSize: 11,
                 height: 1.4,
               ),
@@ -399,12 +413,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Drawer builder
   Widget _buildDrawer(BuildContext context, bool isWideScreen) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Drawer(
-      backgroundColor: AppTheme.darkCanvas,
+      backgroundColor: canvasColor,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(
-            right: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+            right: BorderSide(color: borderDividerColor, width: 1.5),
           ),
         ),
         child: Column(
@@ -412,10 +433,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Stack(
               children: [
                 UserAccountsDrawerHeader(
-                  decoration: const BoxDecoration(
-                    color: AppTheme.darkSurface,
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
                     border: Border(
-                      bottom: BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                      bottom: BorderSide(color: borderDividerColor, width: 1.5),
                     ),
                   ),
                   currentAccountPicture: Container(
@@ -427,9 +448,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(100),
                         child: Image.asset(
-                          'assets/img/logo.png',
+                           'assets/img/logo.png',
                           height: 100,
                           width: 100,
+                          errorBuilder: (context, error, stackTrace) => const Icon(
+                            Icons.book,
+                            color: Colors.white,
+                            size: 40,
+                          ),
                         ),
                       ),
                     ),
@@ -439,22 +465,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
-                      color: AppTheme.textPrimary,
+                      color: textPrimary,
                     ),
                   ),
-                  accountEmail: const Text(
+                  accountEmail: Text(
                     'Read, search & study authentic Hadith offline with multilingual support & sync',
                     style: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: textSecondary,
                       fontSize: 13,
                     ),
                   ),
                 ),
                 Container(
-                  alignment: Alignment(1, 1),
-                  padding: EdgeInsets.all(16.0),
+                  alignment: const Alignment(1, -0.6),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       FutureBuilder(
                         future: PackageInfo.fromPlatform(),
@@ -462,8 +489,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (snapshot.hasData) {
                             return Text(
                               'Version ${snapshot.data!.version}',
-                              style: const TextStyle(
-                                color: AppTheme.textSecondary,
+                              style: TextStyle(
+                                color: textSecondary,
                                 fontSize: 12,
                               ),
                             );
@@ -471,7 +498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           return const SizedBox.shrink();
                         },
                       ),
-                      if (isWideScreen) Gap(16),
+                      if (isWideScreen) const Gap(16),
                       if (isWideScreen)
                         IconButton(
                           icon: const Icon(
@@ -484,9 +511,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       if (isWideScreen)
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.settings_outlined,
-                            color: AppTheme.textSecondary,
+                            color: textSecondary,
                           ),
                           onPressed: () {
                             context.push('/settings');
@@ -502,6 +529,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.zero,
                 children: [
                   _buildDrawerItem(
+                    context,
                     icon: Icons.library_books,
                     title: 'Manage Resources',
                     subtitle: 'Download, delete & update books',
@@ -511,6 +539,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   _buildDrawerItem(
+                    context,
                     icon: Icons.bug_report_outlined,
                     title: 'Send Bug Report',
                     subtitle: 'Report app issues on GitHub',
@@ -522,6 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   _buildDrawerItem(
+                    context,
                     icon: Icons.feedback_outlined,
                     title: 'Hadith Dataset Feedback',
                     subtitle: 'Submit database edits to API owner',
@@ -531,6 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   _buildDrawerItem(
+                    context,
                     icon: Icons.star_rate_outlined,
                     title: 'Rate App',
                     subtitle: 'Give us 5 stars on Play Store',
@@ -542,6 +573,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   _buildDrawerItem(
+                    context,
                     icon: Icons.star_border,
                     title: 'Star on GitHub',
                     subtitle: 'Show support to open-source repository',
@@ -553,6 +585,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   _buildDrawerItem(
+                    context,
                     icon: Icons.privacy_tip_outlined,
                     title: 'Privacy Policy',
                     subtitle: 'Read our Google Play data policies',
@@ -563,8 +596,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                  const Divider(color: Color(0xFF1E293B), thickness: 1),
+                  Divider(color: borderDividerColor, thickness: 1),
                   _buildDrawerItem(
+                    context,
                     icon: Icons.info_outline,
                     title: 'About App',
                     subtitle: 'Details about API and compilers',
@@ -582,21 +616,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDrawerItem({
+  Widget _buildDrawerItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+
     return ListTile(
       leading: Icon(icon, color: AppTheme.primaryMint, size: 24),
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: textPrimary),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+        style: TextStyle(color: textSecondary, fontSize: 12),
       ),
       onTap: onTap,
     );

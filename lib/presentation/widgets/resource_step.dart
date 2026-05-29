@@ -31,6 +31,12 @@ class ResourceStep extends StatelessWidget {
     if (state.selectedLanguage == null) return const SizedBox.shrink();
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderUncheckedColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final offlineReadyTagBg = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+
     // 1. Flatten languages list for grouped display, prioritizing chosen language at the top
     final List<ResourceListItem> items = [];
     final selectedLang = state.selectedLanguage!;
@@ -58,13 +64,14 @@ class ResourceStep extends StatelessWidget {
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.bold,
+            color: textPrimary,
           ),
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
         const Gap(6),
         Text(
               'Select books to download. Your preferred language is pre-selected by default. You can choose other languages too.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 height: 1.4,
               ),
             )
@@ -105,10 +112,10 @@ class ResourceStep extends StatelessWidget {
                         const Gap(8),
                         Text(
                           '${lang.displayName} Resources',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.textPrimary,
+                            color: textPrimary,
                             letterSpacing: 0.2,
                           ),
                         ),
@@ -143,7 +150,7 @@ class ResourceStep extends StatelessWidget {
                       ],
                     ),
                   ).animate().fadeIn(duration: 300.ms),
-                  Gap(20),
+                  const Gap(20),
                   GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: isWideWindow ? 2 : 1,
@@ -152,7 +159,7 @@ class ResourceStep extends StatelessWidget {
                       mainAxisSpacing: 16,
                     ),
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: itemsOfLang.length,
                     itemBuilder: (context, index) {
                       // Else it is a BookItem
@@ -169,6 +176,10 @@ class ResourceStep extends StatelessWidget {
                           state.downloadStatus[res.book] ==
                               'Completed (Skipped)';
 
+                      final containerBg = isChecked
+                          ? (isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.4) : const Color(0xFFE6F9F5))
+                          : (isDark ? AppTheme.darkSurface.withValues(alpha: 0.5) : Colors.white);
+
                       return GestureDetector(
                             onTap: () => onToggle(res.book),
                             child: Stack(
@@ -177,20 +188,14 @@ class ResourceStep extends StatelessWidget {
                                   margin: const EdgeInsets.only(bottom: 12),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: isChecked
-                                        ? AppTheme.darkSurfaceCard.withValues(
-                                            alpha: 0.4,
-                                          )
-                                        : AppTheme.darkSurface.withValues(
-                                            alpha: 0.5,
-                                          ),
+                                    color: containerBg,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
                                       color: isChecked
                                           ? AppTheme.primaryMint.withValues(
                                               alpha: 0.3,
                                             )
-                                          : const Color(0xFF1E293B),
+                                          : borderUncheckedColor,
                                       width: isChecked ? 1.5 : 1.0,
                                     ),
                                   ),
@@ -210,21 +215,20 @@ class ResourceStep extends StatelessWidget {
                                           children: [
                                             Text(
                                               res.nameNative,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 15,
-                                                color: AppTheme.textPrimary,
+                                                color: textPrimary,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                            Gap(2),
+                                            const Gap(2),
                                             if (res.languageCode != "eng")
                                               Text(
                                                 res.name,
-
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 10,
-                                                  color: AppTheme.textSecondary,
+                                                  color: textSecondary,
                                                 ),
                                               ),
                                             const Gap(6),
@@ -252,39 +256,35 @@ class ResourceStep extends StatelessWidget {
                                                   ),
                                                 ),
                                                 const Gap(8),
-                                                const Text(
+                                                Text(
                                                   '•',
                                                   style: TextStyle(
                                                     fontSize: 12,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                   ),
                                                 ),
                                                 const Gap(8),
                                                 Text(
                                                   '${res.hadithCount} Hadiths',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                   ),
                                                 ),
                                                 const Gap(6),
-                                                const Text(
+                                                Text(
                                                   '•',
                                                   style: TextStyle(
                                                     fontSize: 12,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                   ),
                                                 ),
                                                 const Gap(6),
                                                 Text(
                                                   '${res.sectionCount} Ch',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color:
-                                                        AppTheme.textSecondary,
+                                                    color: textSecondary,
                                                   ),
                                                 ),
                                               ],
@@ -296,7 +296,7 @@ class ResourceStep extends StatelessWidget {
                                                 fontSize: 12,
                                                 color: isChecked
                                                     ? AppTheme.primaryMint
-                                                    : AppTheme.textSecondary,
+                                                    : textSecondary,
                                                 fontWeight: isChecked
                                                     ? FontWeight.bold
                                                     : FontWeight.normal,
@@ -318,8 +318,11 @@ class ResourceStep extends StatelessWidget {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: AppTheme.darkSurfaceCard,
+                                        color: offlineReadyTagBg,
                                         borderRadius: BorderRadius.circular(20),
+                                        border: isDark
+                                            ? null
+                                            : Border.all(color: borderUncheckedColor),
                                       ),
                                       child: const Row(
                                         mainAxisSize: MainAxisSize.min,

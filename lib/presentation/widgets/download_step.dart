@@ -16,6 +16,8 @@ class DownloadStep extends StatelessWidget {
         .expand((lang) => lang.resources)
         .where((r) => state.selectedResources.contains(r.book))
         .toList();
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
 
@@ -33,21 +35,21 @@ class DownloadStep extends StatelessWidget {
                       curve: Curves.easeOutBack,
                     ),
                     const Gap(12),
-                    const Text(
+                    Text(
                       'Downloading Library',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                       ),
                     ),
                     const Gap(4),
-                    const Text(
+                    Text(
                       'Setting up offline SQLite databases and Full-Text Search. Please do not close the app.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppTheme.textSecondary,
+                        color: textSecondary,
                         height: 1.4,
                       ),
                       maxLines: 2,
@@ -56,7 +58,7 @@ class DownloadStep extends StatelessWidget {
                   ],
                 ),
               ),
-              Gap(10),
+              const Gap(10),
 
               IndividualResourcesAndProgress(
                 targetResources: targetResources,
@@ -74,21 +76,21 @@ class DownloadStep extends StatelessWidget {
               ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
 
               const Gap(24),
-              const Text(
+              Text(
                 'Downloading Library',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                 ),
               ),
               const Gap(8),
-              const Text(
+              Text(
                 'Setting up offline SQLite databases and Full-Text Search. Please do not close the app.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppTheme.textSecondary,
+                  color: textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -116,13 +118,20 @@ class IndividualResourcesAndProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final inactiveCircleColor = isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppTheme.darkSurface,
+          color: cardBgColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF1E293B)),
+          border: Border.all(color: borderColor),
         ),
         child: ListView.builder(
           itemCount: targetResources.length,
@@ -136,10 +145,10 @@ class IndividualResourcesAndProgress extends StatelessWidget {
                 status == 'Downloading...' || status == 'Extracting...';
             final isError = status == 'Error';
 
-            Color statusColor = AppTheme.textSecondary;
-            Widget statusIcon = const Icon(
+            Color statusColor = textSecondary;
+            Widget statusIcon = Icon(
               Icons.circle_outlined,
-              color: Color(0xFF334155),
+              color: inactiveCircleColor,
               size: 20,
             );
 
@@ -189,19 +198,19 @@ class IndividualResourcesAndProgress extends StatelessWidget {
                                 children: [
                                   Text(
                                     res.nameNative,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
-                                      color: AppTheme.textPrimary,
+                                      color: textPrimary,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                  Gap(2),
+                                  const Gap(2),
                                   Text(
                                     res.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 10,
-                                      color: AppTheme.textSecondary,
+                                      color: textSecondary,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -225,7 +234,7 @@ class IndividualResourcesAndProgress extends StatelessWidget {
                             child: LinearProgressIndicator(
                               value: progress,
                               minHeight: 4,
-                              backgroundColor: const Color(0xFF1E293B),
+                              backgroundColor: borderColor,
                               color: AppTheme.secondaryIndigo,
                             ),
                           ),
@@ -250,6 +259,12 @@ class OverallProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final circleBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final barBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -258,7 +273,7 @@ class OverallProgress extends StatelessWidget {
           height: 140,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppTheme.darkSurface,
+            color: circleBgColor,
             boxShadow: [
               BoxShadow(
                 color: AppTheme.primaryMint.withValues(alpha: 0.05),
@@ -273,7 +288,7 @@ class OverallProgress extends StatelessWidget {
           child: CircularProgressIndicator(
             value: state.overallProgress,
             strokeWidth: 8,
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: barBgColor,
             color: AppTheme.primaryMint,
           ),
         ),
@@ -282,17 +297,17 @@ class OverallProgress extends StatelessWidget {
           children: [
             Text(
               '${(state.overallProgress * 100).toStringAsFixed(0)}%',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimary,
+                color: textPrimary,
               ),
             ),
-            const Text(
+            Text(
               'Complete',
               style: TextStyle(
                 fontSize: 12,
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -30,8 +30,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   @override
   Widget build(BuildContext context) {
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: AppTheme.darkCanvas,
+      backgroundColor: canvasColor,
       body: SafeArea(
         child: BlocConsumer<SetupCubit, SetupState>(
           listener: (context, state) {
@@ -79,7 +81,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                     child: Column(
                       children: [
                         if (!isWideWindow) _buildHeaderProgress(state, false),
-                        if (!isWideWindow) Gap(24),
+                        if (!isWideWindow) const Gap(24),
                         Expanded(
                           child: AnimatedSwitcher(
                             duration: 300.ms,
@@ -133,6 +135,13 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   }
 
   Widget _buildStepIndicator(int index, String label, bool isCompleted) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final inactiveBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFF3F4F6);
+    final inactiveBorderColor = isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+    final inactiveTextColor = isDark ? Colors.white : AppTheme.textDark;
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -142,22 +151,22 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           height: 36,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isCompleted ? AppTheme.primaryMint : const Color(0xFF1E293B),
+            color: isCompleted ? AppTheme.primaryMint : inactiveBgColor,
             border: Border.all(
               color: isCompleted
                   ? AppTheme.primaryMint
-                  : const Color(0xFF334155),
+                  : inactiveBorderColor,
               width: 1.5,
             ),
           ),
           child: Center(
             child: isCompleted
-                ? const Icon(Icons.check, color: AppTheme.darkCanvas, size: 18)
+                ? Icon(Icons.check, color: tickColor, size: 18)
                 : Text(
                     '${index + 1}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: inactiveTextColor,
                     ),
                   ),
           ),
@@ -167,7 +176,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: isCompleted ? AppTheme.primaryMint : AppTheme.textSecondary,
+            color: isCompleted ? AppTheme.primaryMint : textSecondary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -176,12 +185,15 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   }
 
   Widget _buildLineConnector(bool isDone, bool isWideWindow) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final connectorColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     if (isWideWindow) {
       return Expanded(
         child: AnimatedContainer(
           duration: 300.ms,
           width: 2,
-          color: isDone ? AppTheme.primaryMint : const Color(0xFF1E293B),
+          color: isDone ? AppTheme.primaryMint : connectorColor,
         ),
       );
     } else {
@@ -191,7 +203,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           child: AnimatedContainer(
             duration: 300.ms,
             height: 2,
-            color: isDone ? AppTheme.primaryMint : const Color(0xFF1E293B),
+            color: isDone ? AppTheme.primaryMint : connectorColor,
           ),
         ),
       );
@@ -223,6 +235,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
   // Bottom action buttons
   Widget _buildBottomNavBar(BuildContext context, SetupState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final outlineBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     if (state.isDownloadingStep) {
       // In downloading step: if we hit an error, let the user retry
       final hasError = state.downloadStatus.values.any(
@@ -262,8 +278,8 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               child: OutlinedButton(
                 onPressed: () => context.read<SetupCubit>().previousStep(),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.textPrimary,
-                  side: const BorderSide(color: Color(0xFF1E293B), width: 1.5),
+                  foregroundColor: textPrimary,
+                  side: BorderSide(color: outlineBorderColor, width: 1.5),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -292,6 +308,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
   // Setup completion visual dashboard
   Widget _buildSuccessScreen(BuildContext context) {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -313,7 +332,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 ),
               ],
             ),
-            child: Center(
+            child: const Center(
               child: Icon(
                 Icons.done_all,
                 color: AppTheme.primaryMint,
@@ -323,22 +342,22 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
           const Gap(32),
 
-          const Text(
+          Text(
             'Library Ready!',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: textPrimary,
             ),
           ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
 
           const Gap(12),
-          const Text(
+          Text(
             'Congratulations! Your offline Hadith resources have been successfully compiled and extracted. The application is now fully offline first ready.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: AppTheme.textSecondary,
+              color: textSecondary,
               height: 1.5,
             ),
           ).animate().fadeIn(duration: 450.ms, delay: 200.ms),

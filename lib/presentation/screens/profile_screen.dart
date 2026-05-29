@@ -44,6 +44,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // ── Logged-in view ──
   Widget _buildLoggedInView(BuildContext context, AuthState authState) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(20),
@@ -67,33 +74,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Image.network(
                       authState.photoUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, stack) => const Icon(
+                      errorBuilder: (ctx, err, stack) => Icon(
                         Icons.person,
                         size: 40,
-                        color: AppTheme.darkCanvas,
+                        color: tickColor,
                       ),
                     ),
                   )
-                : const Icon(
+                : Icon(
                     Icons.person,
                     size: 40,
-                    color: AppTheme.darkCanvas,
+                    color: tickColor,
                   ),
           ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
 
           const Gap(16),
           Text(
             authState.displayName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: textPrimary,
             ),
           ),
           const Gap(4),
           Text(
             authState.email,
-            style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+            style: TextStyle(fontSize: 13, color: textSecondary),
           ),
 
           const Gap(28),
@@ -112,9 +119,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.darkSurface,
+                  color: cardBgColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF1E293B)),
+                  border: Border.all(color: borderDividerColor),
                 ),
                 child: Row(
                   children: [
@@ -131,23 +138,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const Gap(12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Auto Sync',
                             style: TextStyle(
-                              color: AppTheme.textPrimary,
+                              color: textPrimary,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Gap(2),
+                          const Gap(2),
                           Text(
                             'Automatically backup data on changes',
                             style: TextStyle(
-                              color: AppTheme.textSecondary,
+                              color: textSecondary,
                               fontSize: 11,
                             ),
                           ),
@@ -163,8 +170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       activeTrackColor: AppTheme.primaryMint.withValues(
                         alpha: 0.3,
                       ),
-                      inactiveThumbColor: AppTheme.textSecondary,
-                      inactiveTrackColor: const Color(0xFF1E293B),
+                      inactiveThumbColor: textSecondary,
+                      inactiveTrackColor: borderDividerColor,
                     ),
                   ],
                 ),
@@ -182,24 +189,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    backgroundColor: AppTheme.darkSurface,
-                    title: const Text(
+                    backgroundColor: cardBgColor,
+                    title: Text(
                       'Sign Out',
                       style: TextStyle(
-                        color: AppTheme.textPrimary,
+                        color: textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    content: const Text(
+                    content: Text(
                       'Your data will be backed up before signing out.',
-                      style: TextStyle(color: AppTheme.textSecondary),
+                      style: TextStyle(color: textSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text(
+                        child: Text(
                           'Cancel',
-                          style: TextStyle(color: AppTheme.textSecondary),
+                          style: TextStyle(color: textSecondary),
                         ),
                       ),
                       ElevatedButton(
@@ -250,7 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    backgroundColor: AppTheme.darkSurface,
+                    backgroundColor: cardBgColor,
                     title: const Text(
                       'Delete Account & Data',
                       style: TextStyle(
@@ -258,16 +265,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    content: const Text(
+                    content: Text(
                       'Are you absolutely sure? This will permanently delete your user account and purge all your synced bookmarks, notes, and progress from the cloud. This action cannot be undone.',
-                      style: TextStyle(color: AppTheme.textSecondary),
+                      style: TextStyle(color: textSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text(
+                        child: Text(
                           'Cancel',
-                          style: TextStyle(color: AppTheme.textSecondary),
+                          style: TextStyle(color: textSecondary),
                         ),
                       ),
                       ElevatedButton(
@@ -318,15 +325,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSyncCard(BuildContext context, AuthState authState) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: authState.isSyncing
               ? AppTheme.primaryMint.withValues(alpha: 0.4)
-              : const Color(0xFF1E293B),
+              : borderDividerColor,
           width: authState.isSyncing ? 1.5 : 1,
         ),
       ),
@@ -362,8 +376,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(
                       authState.isSyncing ? 'Syncing...' : 'Cloud Backup',
-                      style: const TextStyle(
-                        color: AppTheme.textPrimary,
+                      style: TextStyle(
+                        color: textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -373,8 +387,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       authState.lastSyncTime != null
                           ? 'Last synced: ${_formatTime(authState.lastSyncTime!)}'
                           : 'Tap to sync your data now',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
+                      style: TextStyle(
+                        color: textSecondary,
                         fontSize: 11,
                       ),
                     ),
@@ -400,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
-                foregroundColor: AppTheme.darkCanvas,
+                foregroundColor: tickColor,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -437,6 +451,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // ── Login view ──
   Widget _buildLoginView(BuildContext context, AuthState authState) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(24),
@@ -463,20 +484,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
 
           const Gap(20),
-          const Text(
+          Text(
             'Backup & Sync',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: textPrimary,
             ),
           ),
           const Gap(8),
-          const Text(
+          Text(
             'Sign in to backup your bookmarks, notes,\nread progress, and collections to the cloud.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: textSecondary,
               fontSize: 13,
               height: 1.5,
             ),
@@ -492,8 +513,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? null
                   : () => context.read<AuthCubit>().signInWithGoogle(),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF1E293B)),
-                backgroundColor: AppTheme.darkSurface,
+                side: BorderSide(color: borderDividerColor),
+                backgroundColor: cardBgColor,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -503,11 +524,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'assets/img/google-color-svgrepo-com.svg',
                 height: 20,
                 width: 20,
+                placeholderBuilder: (context) => const Icon(
+                  Icons.login_rounded,
+                  color: AppTheme.primaryMint,
+                  size: 20,
+                ),
               ),
-              label: const Text(
+              label: Text(
                 'Continue with Google',
                 style: TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -517,17 +543,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Gap(20),
 
           // Divider
-          const Row(
+          Row(
             children: [
-              Expanded(child: Divider(color: Color(0xFF1E293B))),
+              Expanded(child: Divider(color: borderDividerColor)),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   'OR',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                  style: TextStyle(color: textSecondary, fontSize: 12),
                 ),
               ),
-              Expanded(child: Divider(color: Color(0xFF1E293B))),
+              Expanded(child: Divider(color: borderDividerColor)),
             ],
           ),
 
@@ -535,6 +561,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Email field
           _buildTextField(
+            context,
             controller: _emailController,
             hint: 'Email address',
             icon: Icons.email_outlined,
@@ -544,6 +571,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Password field
           _buildTextField(
+            context,
             controller: _passwordController,
             hint: 'Password',
             icon: Icons.lock_outline,
@@ -551,7 +579,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                color: AppTheme.textSecondary,
+                color: textSecondary,
                 size: 18,
               ),
               onPressed: () =>
@@ -585,18 +613,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryMint,
-                foregroundColor: AppTheme.darkCanvas,
+                foregroundColor: tickColor,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
               child: authState.status == AuthStatus.loading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                        color: AppTheme.darkCanvas,
+                        color: tickColor,
                         strokeWidth: 2.5,
                       ),
                     )
@@ -620,8 +648,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _isRegisterMode
                     ? 'Already have an account?'
                     : "Don't have an account?",
-                style: const TextStyle(
-                  color: AppTheme.textSecondary,
+                style: TextStyle(
+                  color: textSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -654,18 +682,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
                 context.read<AuthCubit>().resetPassword(email);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     backgroundColor: AppTheme.primaryMint,
                     content: Text(
                       'Password reset link sent! Check your email.',
-                      style: TextStyle(color: AppTheme.darkCanvas),
+                      style: TextStyle(color: tickColor),
                     ),
                   ),
                 );
               },
-              child: const Text(
+              child: Text(
                 'Forgot password?',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                style: TextStyle(color: textSecondary, fontSize: 12),
               ),
             ),
 
@@ -709,7 +737,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildTextField(
+    BuildContext context, {
     required TextEditingController controller,
     required String hint,
     required IconData icon,
@@ -717,24 +746,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     TextInputType? keyboardType,
     Widget? suffixIcon,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: borderDividerColor),
       ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
-        style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+        style: TextStyle(color: textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(
-            color: AppTheme.textSecondary,
+          hintStyle: TextStyle(
+            color: textSecondary,
             fontSize: 13,
           ),
-          prefixIcon: Icon(icon, color: AppTheme.textSecondary, size: 18),
+          prefixIcon: Icon(icon, color: textSecondary, size: 18),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
