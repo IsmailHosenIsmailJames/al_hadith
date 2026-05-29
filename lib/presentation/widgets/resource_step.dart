@@ -1,10 +1,13 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:al_hadith/logic/setup/setup_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 
 /// Helper hierarchy for unified flat-list rendering
 abstract class ResourceListItem {}
@@ -29,6 +32,7 @@ class ResourceStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.selectedLanguage == null) return const SizedBox.shrink();
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -60,7 +64,7 @@ class ResourceStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Select Resources',
+          AppLocalization.get('select_resources', appLanguage),
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.bold,
@@ -69,7 +73,7 @@ class ResourceStep extends StatelessWidget {
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
         const Gap(6),
         Text(
-              'Select books to download. Your preferred language is pre-selected by default. You can choose other languages too.',
+              AppLocalization.get('resource_step_desc', appLanguage),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: textSecondary,
                 height: 1.4,
@@ -111,7 +115,7 @@ class ResourceStep extends StatelessWidget {
                         ),
                         const Gap(8),
                         Text(
-                          '${lang.displayName} Resources',
+                          AppLocalization.getResourceHeader(appLanguage, lang.code),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -138,9 +142,9 @@ class ResourceStep extends StatelessWidget {
                                 width: 1.0,
                               ),
                             ),
-                            child: const Text(
-                              'Default',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalization.get('default', appLanguage),
+                              style: const TextStyle(
                                 color: AppTheme.primaryMint,
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
@@ -265,7 +269,7 @@ class ResourceStep extends StatelessWidget {
                                                 ),
                                                 const Gap(8),
                                                 Text(
-                                                  '${res.hadithCount} Hadiths',
+                                                  AppLocalization.get('hadiths', appLanguage, args: {'count': res.hadithCount.toString()}),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: textSecondary,
@@ -281,7 +285,7 @@ class ResourceStep extends StatelessWidget {
                                                 ),
                                                 const Gap(6),
                                                 Text(
-                                                  '${res.sectionCount} Ch',
+                                                  AppLocalization.get('chapters', appLanguage, args: {'count': res.sectionCount.toString()}),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: textSecondary,
@@ -291,7 +295,7 @@ class ResourceStep extends StatelessWidget {
                                             ),
                                             const Gap(4),
                                             Text(
-                                              'Download Size: ${res.formattedZipSize}',
+                                              AppLocalization.get('download_size', appLanguage, args: {'size': res.formattedZipSize}),
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: isChecked
@@ -324,18 +328,18 @@ class ResourceStep extends StatelessWidget {
                                             ? null
                                             : Border.all(color: borderUncheckedColor),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.offline_pin,
                                             color: AppTheme.primaryMint,
                                             size: 14,
                                           ),
-                                          Gap(4),
+                                          const Gap(4),
                                           Text(
-                                            'Offline Ready',
-                                            style: TextStyle(
+                                            AppLocalization.get('offline_ready', appLanguage),
+                                            style: const TextStyle(
                                               color: AppTheme.primaryMint,
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,

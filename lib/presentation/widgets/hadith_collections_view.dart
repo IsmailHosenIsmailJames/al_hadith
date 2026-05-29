@@ -7,6 +7,8 @@ import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 
 import '../../data/models/resource_model.dart';
 
@@ -65,6 +67,8 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -91,7 +95,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Edit Note',
+                      AppLocalization.get('edit_note', appLanguage),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -123,7 +127,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       fontSize: 14,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Enter note reflection details...',
+                      hintText: AppLocalization.get('note_reflection_hint', appLanguage),
                       hintStyle: TextStyle(
                         color: textSecondary,
                         fontSize: 13,
@@ -155,7 +159,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                           Navigator.pop(ctx);
                         },
                         icon: const Icon(Icons.check_rounded, size: 18),
-                        label: const Text('Update Note'),
+                        label: Text(AppLocalization.get('update_note', appLanguage)),
                       ),
                     ),
                   ],
@@ -296,7 +300,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     ),
                     const Gap(8),
                     Text(
-                      'Hadith #${hadith.hadithNumber}',
+                      AppLocalization.get('hadith_no', context.read<SettingsCubit>().state.appLanguage, args: {'number': '${hadith.hadithNumber}'}),
                       style: TextStyle(
                         color: textSecondary,
                         fontSize: 11,
@@ -448,9 +452,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       size: 18,
                     ),
                     const Gap(6),
-                    const Text(
-                      'Study Notes',
-                      style: TextStyle(
+                    Text(
+                      AppLocalization.get('study_notes', context.read<SettingsCubit>().state.appLanguage),
+                      style: const TextStyle(
                         color: AppTheme.primaryMint,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -541,7 +545,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       ),
                       const Gap(8),
                       Text(
-                        'Hadith #${hadith.hadithNumber}',
+                        AppLocalization.get('hadith_no', context.read<SettingsCubit>().state.appLanguage, args: {'number': '${hadith.hadithNumber}'}),
                         style: TextStyle(
                           color: textSecondary,
                           fontSize: 10.5,
@@ -577,12 +581,13 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
   }
 
   Widget _buildBookmarksTab(HadithState state) {
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
     final bookmarks = state.bookmarkedRefs.toList();
     if (bookmarks.isEmpty) {
       return _buildEmptyState(
         icon: Icons.bookmark_outline_rounded,
-        title: 'No Bookmarks Yet',
-        subtitle: 'Save important Hadiths to quick-access them here.',
+        title: AppLocalization.get('no_bookmarks_title', appLanguage),
+        subtitle: AppLocalization.get('no_bookmarks_desc', appLanguage),
       );
     }
 
@@ -609,12 +614,13 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
   }
 
   Widget _buildPinnedTab(HadithState state) {
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
     final pins = state.pinnedRefs.toList();
     if (pins.isEmpty) {
       return _buildEmptyState(
         icon: Icons.push_pin_outlined,
-        title: 'No Pinned Hadiths',
-        subtitle: 'Pin hadiths that you are currently studying or reviewing.',
+        title: AppLocalization.get('no_pins_title', appLanguage),
+        subtitle: AppLocalization.get('no_pins_desc', appLanguage),
       );
     }
 
@@ -641,12 +647,13 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
   }
 
   Widget _buildNotesTab(HadithState state) {
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
     final notes = state.hadithNotes.entries.toList();
     if (notes.isEmpty) {
       return _buildEmptyState(
         icon: Icons.note_alt_outlined,
-        title: 'No Notes Found',
-        subtitle: 'Record personal reflections and bookmarks will show up.',
+        title: AppLocalization.get('no_notes_title', appLanguage),
+        subtitle: AppLocalization.get('no_notes_desc', appLanguage),
       );
     }
 
@@ -676,6 +683,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -690,7 +698,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
             elevation: 0,
             iconTheme: IconThemeData(color: textPrimary),
             title: Text(
-              'My Library Collections',
+              AppLocalization.get('my_library_collections', appLanguage),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -718,21 +726,21 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     fontWeight: FontWeight.normal,
                     fontSize: 13,
                   ),
-                  tabs: const [
+                  tabs: [
                     Tab(
-                      iconMargin: EdgeInsets.only(bottom: 2),
-                      icon: Icon(Icons.bookmark_rounded, size: 18),
-                      text: 'Bookmarks',
+                      iconMargin: const EdgeInsets.only(bottom: 2),
+                      icon: const Icon(Icons.bookmark_rounded, size: 18),
+                      text: AppLocalization.get('bookmarks', appLanguage),
                     ),
                     Tab(
-                      iconMargin: EdgeInsets.only(bottom: 2),
-                      icon: Icon(Icons.push_pin_rounded, size: 18),
-                      text: 'Pinned',
+                      iconMargin: const EdgeInsets.only(bottom: 2),
+                      icon: const Icon(Icons.push_pin_rounded, size: 18),
+                      text: AppLocalization.get('pinned', appLanguage),
                     ),
                     Tab(
-                      iconMargin: EdgeInsets.only(bottom: 2),
-                      icon: Icon(Icons.note_alt_rounded, size: 18),
-                      text: 'Notes',
+                      iconMargin: const EdgeInsets.only(bottom: 2),
+                      icon: const Icon(Icons.note_alt_rounded, size: 18),
+                      text: AppLocalization.get('notes', appLanguage),
                     ),
                   ],
                 ),

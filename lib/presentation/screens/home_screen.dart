@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_collections_view.dart';
@@ -22,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final List<Widget> views = [
       const HadithsDashboardView(),
       const HadithSectionsView(),
@@ -30,11 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final navIndicatorColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final navIndicatorColor = isDark
+        ? AppTheme.darkSurfaceCard
+        : const Color(0xFFF3F4F6);
 
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isWideScreen = screenWidth >= AppTheme.wideWidth;
@@ -66,10 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(
-                    Icons.settings_outlined,
-                    color: textSecondary,
-                  ),
+                  icon: Icon(Icons.settings_outlined, color: textSecondary),
                   onPressed: () {
                     context.push('/settings');
                   },
@@ -201,26 +208,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                destinations: const [
+                destinations: [
                   NavigationRailDestination(
-                    icon: Icon(Icons.book_outlined),
-                    selectedIcon: Icon(Icons.book),
-                    label: Text('Hadiths'),
+                    icon: const Icon(Icons.book_outlined),
+                    selectedIcon: const Icon(Icons.book),
+                    label: Text(
+                      AppLocalization.getTabName('hadiths', appLanguage),
+                    ),
                   ),
                   NavigationRailDestination(
-                    icon: Icon(Icons.grid_view_outlined),
-                    selectedIcon: Icon(Icons.grid_view),
-                    label: Text('Chapters'),
+                    icon: const Icon(Icons.grid_view_outlined),
+                    selectedIcon: const Icon(Icons.grid_view),
+                    label: Text(
+                      AppLocalization.getTabName('chapters', appLanguage),
+                    ),
                   ),
                   NavigationRailDestination(
-                    icon: Icon(Icons.bookmark_outline),
-                    selectedIcon: Icon(Icons.bookmark),
-                    label: Text('Collections'),
+                    icon: const Icon(Icons.bookmark_outline),
+                    selectedIcon: const Icon(Icons.bookmark),
+                    label: Text(
+                      AppLocalization.getTabName('collections', appLanguage),
+                    ),
                   ),
                   NavigationRailDestination(
-                    icon: Icon(Icons.person_outline),
-                    selectedIcon: Icon(Icons.person),
-                    label: Text('Profile'),
+                    icon: const Icon(Icons.person_outline),
+                    selectedIcon: const Icon(Icons.person),
+                    label: Text(
+                      AppLocalization.getTabName('profile', appLanguage),
+                    ),
                   ),
                 ],
               ),
@@ -259,32 +274,41 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.bold,
                 ),
                 elevation: 0,
-                items: const [
+                items: [
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.book_outlined),
-                    activeIcon: Icon(Icons.book, color: AppTheme.primaryMint),
-                    label: 'Hadiths',
+                    icon: const Icon(Icons.book_outlined),
+                    activeIcon: const Icon(
+                      Icons.book,
+                      color: AppTheme.primaryMint,
+                    ),
+                    label: AppLocalization.getTabName('hadiths', appLanguage),
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.grid_view_outlined),
-                    activeIcon: Icon(
+                    icon: const Icon(Icons.grid_view_outlined),
+                    activeIcon: const Icon(
                       Icons.grid_view,
                       color: AppTheme.primaryMint,
                     ),
-                    label: 'Chapters',
+                    label: AppLocalization.getTabName('chapters', appLanguage),
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.bookmark_outline),
-                    activeIcon: Icon(
+                    icon: const Icon(Icons.bookmark_outline),
+                    activeIcon: const Icon(
                       Icons.bookmark,
                       color: AppTheme.primaryMint,
                     ),
-                    label: 'Collections',
+                    label: AppLocalization.getTabName(
+                      'collections',
+                      appLanguage,
+                    ),
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.person_outline),
-                    activeIcon: Icon(Icons.person, color: AppTheme.primaryMint),
-                    label: 'Profile',
+                    icon: const Icon(Icons.person_outline),
+                    activeIcon: const Icon(
+                      Icons.person,
+                      color: AppTheme.primaryMint,
+                    ),
+                    label: AppLocalization.getTabName('profile', appLanguage),
                   ),
                 ],
               ),
@@ -298,18 +322,24 @@ class _HomeScreenState extends State<HomeScreen> {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${AppLocalization.get('error', context.read<SettingsCubit>().state.appLanguage)}: ${e.toString()}',
+            ),
+          ),
+        );
       }
     }
   }
 
-  void _showAboutDialog() {
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+  void _showAboutDialog(String appLanguage) {
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final surfaceColor = Theme.of(context).colorScheme.surface;
 
     showDialog(
@@ -336,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Gap(12),
             Text(
-              'About Al Hadith',
+              AppLocalization.get('about_app', appLanguage),
               style: TextStyle(
                 color: textPrimary,
                 fontWeight: FontWeight.bold,
@@ -350,57 +380,17 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Al Hadith is a premium, fully offline reader powered by optimized local SQLite databases. It features state-of-the-art Custom Arabic Fonts, customizable sizes, real-time query filtering, and automated bookmarking/progress tracking.',
-              style: TextStyle(
-                color: textPrimary,
-                fontSize: 13,
-                height: 1.5,
-              ),
-            ),
-            const Gap(12),
-            const Text(
-              'Hadith Resources:',
-              style: TextStyle(
-                color: AppTheme.primaryMint,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Gap(4),
-            Text(
-              'Fetched remotely and cached locally from fawazahmed0\'s open-source database repository. Under MIT License.',
-              style: TextStyle(
-                color: textSecondary,
-                fontSize: 11,
-                height: 1.4,
-              ),
-            ),
-            const Gap(12),
-            const Text(
-              'Built With:',
-              style: TextStyle(
-                color: AppTheme.primaryMint,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Gap(4),
-            Text(
-              'Flutter, Bloc Pattern, sqflite, path_provider, and Google Outfit fonts.',
-              style: TextStyle(
-                color: textSecondary,
-                fontSize: 11,
-                height: 1.4,
-              ),
+              AppLocalization.get('about_app_desc', appLanguage),
+              style: TextStyle(color: textPrimary, fontSize: 13, height: 1.5),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'Close',
-              style: TextStyle(
+            child: Text(
+              AppLocalization.getTabName('close', appLanguage),
+              style: const TextStyle(
                 color: AppTheme.primaryMint,
                 fontWeight: FontWeight.bold,
               ),
@@ -411,14 +401,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Drawer builder
   Widget _buildDrawer(BuildContext context, bool isWideScreen) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Drawer(
       backgroundColor: canvasColor,
@@ -448,14 +442,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(100),
                         child: Image.asset(
-                           'assets/img/logo.png',
+                          'assets/img/logo.png',
                           height: 100,
                           width: 100,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.book,
-                            color: Colors.white,
-                            size: 40,
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.book,
+                                color: Colors.white,
+                                size: 40,
+                              ),
                         ),
                       ),
                     ),
@@ -469,16 +464,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   accountEmail: Text(
-                    'Read, search & study authentic Hadith offline with multilingual support & sync',
-                    style: TextStyle(
-                      color: textSecondary,
-                      fontSize: 13,
-                    ),
+                    AppLocalization.get('drawer_tagline', appLanguage),
+                    style: TextStyle(color: textSecondary, fontSize: 13),
                   ),
                 ),
                 Container(
                   alignment: const Alignment(1, -0.6),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisSize: MainAxisSize.min,
@@ -531,8 +526,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.library_books,
-                    title: 'Manage Resources',
-                    subtitle: 'Download, delete & update books',
+                    title: AppLocalization.getTabName(
+                      'manage_resources',
+                      appLanguage,
+                    ),
+                    subtitle: AppLocalization.getTabName(
+                      'manage_resources_desc',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       context.push('/resources');
@@ -541,8 +542,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.bug_report_outlined,
-                    title: 'Send Bug Report',
-                    subtitle: 'Report app issues on GitHub',
+                    title: AppLocalization.getTabName(
+                      'send_bug_report',
+                      appLanguage,
+                    ),
+                    subtitle: AppLocalization.getTabName(
+                      'send_bug_report_desc',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       _launchUrl(
@@ -553,8 +560,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.feedback_outlined,
-                    title: 'Hadith Dataset Feedback',
-                    subtitle: 'Submit database edits to API owner',
+                    title: AppLocalization.getTabName(
+                      'dataset_feedback',
+                      appLanguage,
+                    ),
+                    subtitle: AppLocalization.getTabName(
+                      'dataset_feedback_desc',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       _launchUrl('https://github.com/fawazahmed0/hadith-api');
@@ -563,8 +576,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.star_rate_outlined,
-                    title: 'Rate App',
-                    subtitle: 'Give us 5 stars on Play Store',
+                    title: AppLocalization.getTabName('rate_app', appLanguage),
+                    subtitle: AppLocalization.getTabName(
+                      'rate_app_desc',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       _launchUrl(
@@ -575,8 +591,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.star_border,
-                    title: 'Star on GitHub',
-                    subtitle: 'Show support to open-source repository',
+                    title: AppLocalization.get('star_on_github', appLanguage),
+                    subtitle: AppLocalization.get(
+                      'show_support_github',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       _launchUrl(
@@ -587,8 +606,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.privacy_tip_outlined,
-                    title: 'Privacy Policy',
-                    subtitle: 'Read our Google Play data policies',
+                    title: AppLocalization.getTabName(
+                      'privacy_policy',
+                      appLanguage,
+                    ),
+                    subtitle: AppLocalization.getTabName(
+                      'privacy_policy_desc',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
                       _launchUrl(
@@ -600,11 +625,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildDrawerItem(
                     context,
                     icon: Icons.info_outline,
-                    title: 'About App',
-                    subtitle: 'Details about API and compilers',
+                    title: AppLocalization.getTabName(
+                      'about_app_drawer',
+                      appLanguage,
+                    ),
+                    subtitle: AppLocalization.getTabName(
+                      'about_app_drawer_desc',
+                      appLanguage,
+                    ),
                     onTap: () {
                       Navigator.pop(context);
-                      _showAboutDialog();
+                      _showAboutDialog(appLanguage);
                     },
                   ),
                 ],
@@ -623,14 +654,20 @@ class _HomeScreenState extends State<HomeScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
 
     return ListTile(
       leading: Icon(icon, color: AppTheme.primaryMint, size: 24),
       title: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: textPrimary),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          color: textPrimary,
+        ),
       ),
       subtitle: Text(
         subtitle,

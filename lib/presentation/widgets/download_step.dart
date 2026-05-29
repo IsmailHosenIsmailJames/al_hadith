@@ -1,9 +1,12 @@
 import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 import 'package:al_hadith/logic/setup/setup_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 
 class DownloadStep extends StatelessWidget {
   final SetupState state;
@@ -12,6 +15,7 @@ class DownloadStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final targetResources = state.languages
         .expand((lang) => lang.resources)
         .where((r) => state.selectedResources.contains(r.book))
@@ -36,7 +40,7 @@ class DownloadStep extends StatelessWidget {
                     ),
                     const Gap(12),
                     Text(
-                      'Downloading Library',
+                      AppLocalization.get('downloading_library', appLanguage),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -45,7 +49,7 @@ class DownloadStep extends StatelessWidget {
                     ),
                     const Gap(4),
                     Text(
-                      'Setting up offline SQLite databases and Full-Text Search. Please do not close the app.',
+                      AppLocalization.get('download_desc', appLanguage),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
@@ -77,7 +81,7 @@ class DownloadStep extends StatelessWidget {
 
               const Gap(24),
               Text(
-                'Downloading Library',
+                AppLocalization.get('downloading_library', appLanguage),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -86,7 +90,7 @@ class DownloadStep extends StatelessWidget {
               ),
               const Gap(8),
               Text(
-                'Setting up offline SQLite databases and Full-Text Search. Please do not close the app.',
+                AppLocalization.get('download_desc', appLanguage),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
@@ -118,6 +122,7 @@ class IndividualResourcesAndProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -178,6 +183,21 @@ class IndividualResourcesAndProgress extends StatelessWidget {
               );
             }
 
+            String localizedStatus = status;
+            if (status == 'Pending') {
+              localizedStatus = AppLocalization.get('pending', appLanguage);
+            } else if (status == 'Downloading...') {
+              localizedStatus = AppLocalization.get('downloading', appLanguage);
+            } else if (status == 'Extracting...') {
+              localizedStatus = AppLocalization.get('extracting', appLanguage);
+            } else if (status == 'Completed') {
+              localizedStatus = AppLocalization.get('completed', appLanguage);
+            } else if (status == 'Completed (Skipped)') {
+              localizedStatus = AppLocalization.get('completed_skipped', appLanguage);
+            } else if (status == 'Error') {
+              localizedStatus = AppLocalization.get('error', appLanguage);
+            }
+
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
@@ -218,7 +238,7 @@ class IndividualResourcesAndProgress extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              status,
+                              localizedStatus,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: statusColor,
@@ -259,6 +279,7 @@ class OverallProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -304,7 +325,7 @@ class OverallProgress extends StatelessWidget {
               ),
             ),
             Text(
-              'Complete',
+              AppLocalization.get('complete', appLanguage),
               style: TextStyle(
                 fontSize: 12,
                 color: textSecondary,

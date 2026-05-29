@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 
 class BookSectionsScreen extends StatefulWidget {
   final String bookKey;
@@ -34,6 +36,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
@@ -63,7 +66,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
             // Find book name in metadata
             if (!state.downloadedBooks.any((b) => b.book == widget.bookKey)) {
               return Text(
-                'Hadith Book',
+                AppLocalization.get('hadith_book_default_title', appLanguage),
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
@@ -142,7 +145,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                       onPressed: () => context
                           .read<HadithCubit>()
                           .loadBookSections(widget.bookKey),
-                      child: const Text('Retry'),
+                      child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                     ),
                   ],
                 ),
@@ -176,7 +179,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                       fontSize: 14,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Search chapters by name...',
+                      hintText: AppLocalization.get('search_chapters_hint', appLanguage),
                       hintStyle: TextStyle(
                         color: textSecondary,
                         fontSize: 14,
@@ -217,7 +220,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                   bottom: 8.0,
                 ),
                 child: Text(
-                  '${sections.length} Chapters Available',
+                  AppLocalization.get('chapters_available', appLanguage, args: {'count': '${sections.length}'}),
                   style: TextStyle(
                     fontSize: 12,
                     color: textSecondary,
@@ -242,7 +245,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                             ),
                             const Gap(16),
                             Text(
-                              'No chapters found matching your query.',
+                              AppLocalization.get('no_chapters_match', appLanguage),
                               style: TextStyle(
                                 color: textSecondary,
                                 fontSize: 14,
@@ -352,7 +355,10 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                                                 ),
                                                 const Gap(4),
                                                 Text(
-                                                  'Hadith: ${section.startHadithNumber} - ${section.endHadithNumber}',
+                                                  AppLocalization.get('hadith_range', appLanguage, args: {
+                                                     'start': '${section.startHadithNumber}',
+                                                     'end': '${section.endHadithNumber}'
+                                                   }),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: textSecondary,
@@ -368,7 +374,7 @@ class _BookSectionsScreenState extends State<BookSectionsScreen> {
                                                 ),
                                                 const Gap(8),
                                                 Text(
-                                                  '${section.hadithCount} items',
+                                                  AppLocalization.get('items_count', appLanguage, args: {'count': '${section.hadithCount}'}),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: textSecondary,

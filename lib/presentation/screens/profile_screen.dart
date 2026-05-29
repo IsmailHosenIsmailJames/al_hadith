@@ -9,6 +9,7 @@ import 'package:al_hadith/logic/auth/auth_state.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -32,18 +33,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
+
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, authState) {
         if (authState.isLoggedIn) {
-          return _buildLoggedInView(context, authState);
+          return _buildLoggedInView(context, authState, appLanguage);
         }
-        return _buildLoginView(context, authState);
+        return _buildLoginView(context, authState, appLanguage);
       },
     );
   }
 
   // ── Logged-in view ──
-  Widget _buildLoggedInView(BuildContext context, AuthState authState) {
+  Widget _buildLoggedInView(BuildContext context, AuthState authState, String appLanguage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -106,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Gap(28),
 
           // Sync Card
-          _buildSyncCard(context, authState),
+          _buildSyncCard(context, authState, appLanguage),
 
           const Gap(16),
 
@@ -143,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Auto Sync',
+                            AppLocalization.get('auto_sync', appLanguage),
                             style: TextStyle(
                               color: textPrimary,
                               fontSize: 14,
@@ -152,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const Gap(2),
                           Text(
-                            'Automatically backup data on changes',
+                            AppLocalization.get('auto_sync_desc', appLanguage),
                             style: TextStyle(
                               color: textSecondary,
                               fontSize: 11,
@@ -191,21 +194,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   builder: (ctx) => AlertDialog(
                     backgroundColor: cardBgColor,
                     title: Text(
-                      'Sign Out',
+                      AppLocalization.get('sign_out', appLanguage),
                       style: TextStyle(
                         color: textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     content: Text(
-                      'Your data will be backed up before signing out.',
+                      AppLocalization.get('sign_out_desc', appLanguage),
                       style: TextStyle(color: textSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
                         child: Text(
-                          'Cancel',
+                          AppLocalization.get('cancel', appLanguage),
                           style: TextStyle(color: textSecondary),
                         ),
                       ),
@@ -214,9 +217,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: Colors.redAccent,
                         ),
                         onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text(
-                          'Sign Out',
-                          style: TextStyle(color: Colors.white),
+                        child: Text(
+                          AppLocalization.get('sign_out', appLanguage),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ],
@@ -238,9 +241,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.redAccent,
                 size: 18,
               ),
-              label: const Text(
-                'Sign Out',
-                style: TextStyle(
+              label: Text(
+                AppLocalization.get('sign_out', appLanguage),
+                style: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,
                 ),
@@ -258,22 +261,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   context: context,
                   builder: (ctx) => AlertDialog(
                     backgroundColor: cardBgColor,
-                    title: const Text(
-                      'Delete Account & Data',
-                      style: TextStyle(
+                    title: Text(
+                      AppLocalization.get('delete_account_title', appLanguage),
+                      style: const TextStyle(
                         color: Colors.redAccent,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     content: Text(
-                      'Are you absolutely sure? This will permanently delete your user account and purge all your synced bookmarks, notes, and progress from the cloud. This action cannot be undone.',
+                      AppLocalization.get('delete_account_desc', appLanguage),
                       style: TextStyle(color: textSecondary),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
                         child: Text(
-                          'Cancel',
+                          AppLocalization.get('cancel', appLanguage),
                           style: TextStyle(color: textSecondary),
                         ),
                       ),
@@ -282,9 +285,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: Colors.red,
                         ),
                         onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text(
-                          'Delete Forever',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        child: Text(
+                          AppLocalization.get('delete_forever', appLanguage),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -307,9 +310,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.redAccent,
                 size: 18,
               ),
-              label: const Text(
-                'Delete Account & Sync Data',
-                style: TextStyle(
+              label: Text(
+                AppLocalization.get('delete_account_title', appLanguage),
+                style: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -324,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSyncCard(BuildContext context, AuthState authState) {
+  Widget _buildSyncCard(BuildContext context, AuthState authState, String appLanguage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -375,7 +378,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      authState.isSyncing ? 'Syncing...' : 'Cloud Backup',
+                      authState.isSyncing
+                          ? AppLocalization.get('syncing', appLanguage)
+                          : AppLocalization.get('cloud_backup', appLanguage),
                       style: TextStyle(
                         color: textPrimary,
                         fontSize: 16,
@@ -385,8 +390,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Gap(2),
                     Text(
                       authState.lastSyncTime != null
-                          ? 'Last synced: ${_formatTime(authState.lastSyncTime!)}'
-                          : 'Tap to sync your data now',
+                          ? AppLocalization.get('last_synced', appLanguage, args: {
+                              'time': _formatTime(authState.lastSyncTime!, appLanguage)
+                            })
+                          : AppLocalization.get('sync_now', appLanguage), // natural saved term
                       style: TextStyle(
                         color: textSecondary,
                         fontSize: 11,
@@ -422,7 +429,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               icon: const Icon(Icons.sync_rounded, size: 18),
               label: Text(
-                authState.isSyncing ? 'Syncing...' : 'Sync Now',
+                authState.isSyncing
+                    ? AppLocalization.get('syncing', appLanguage)
+                    : AppLocalization.get('sync_now', appLanguage),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -440,17 +449,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ).animate().fadeIn(duration: 350.ms, delay: 100.ms).slideY(begin: 0.03, end: 0);
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(DateTime time, String appLanguage) {
     final now = DateTime.now();
     final diff = now.difference(time);
-    if (diff.inSeconds < 60) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inSeconds < 60) return AppLocalization.get('just_now', appLanguage);
+    if (diff.inMinutes < 60) return AppLocalization.get('minutes_ago', appLanguage, args: {'minutes': diff.inMinutes.toString()});
+    if (diff.inHours < 24) return AppLocalization.get('hours_ago', appLanguage, args: {'hours': diff.inHours.toString()});
     return '${time.day}/${time.month}/${time.year}';
   }
 
   // ── Login view ──
-  Widget _buildLoginView(BuildContext context, AuthState authState) {
+  Widget _buildLoginView(BuildContext context, AuthState authState, String appLanguage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -485,7 +494,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           const Gap(20),
           Text(
-            'Backup & Sync',
+            AppLocalization.get('backup_sync_hero_title', appLanguage),
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -494,7 +503,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const Gap(8),
           Text(
-            'Sign in to backup your bookmarks, notes,\nread progress, and collections to the cloud.',
+            AppLocalization.get('backup_sync_hero_desc', appLanguage),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: textSecondary,
@@ -531,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               label: Text(
-                'Continue with Google',
+                AppLocalization.get('continue_with_google', appLanguage),
                 style: TextStyle(
                   color: textPrimary,
                   fontWeight: FontWeight.w600,
@@ -549,7 +558,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'OR',
+                  AppLocalization.get('or_divider', appLanguage),
                   style: TextStyle(color: textSecondary, fontSize: 12),
                 ),
               ),
@@ -563,7 +572,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildTextField(
             context,
             controller: _emailController,
-            hint: 'Email address',
+            hint: AppLocalization.get('email_address', appLanguage),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
           ),
@@ -573,7 +582,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildTextField(
             context,
             controller: _passwordController,
-            hint: 'Password',
+            hint: AppLocalization.get('password_field', appLanguage),
             icon: Icons.lock_outline,
             obscureText: _obscurePassword,
             suffixIcon: IconButton(
@@ -629,7 +638,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     )
                   : Text(
-                      _isRegisterMode ? 'Create Account' : 'Sign In',
+                      _isRegisterMode
+                          ? AppLocalization.get('create_account', appLanguage)
+                          : AppLocalization.get('sign_in', appLanguage),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -646,8 +657,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text(
                 _isRegisterMode
-                    ? 'Already have an account?'
-                    : "Don't have an account?",
+                    ? AppLocalization.get('toggle_already_have_account', appLanguage)
+                    : AppLocalization.get('toggle_no_account', appLanguage),
                 style: TextStyle(
                   color: textSecondary,
                   fontSize: 13,
@@ -657,7 +668,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () =>
                     setState(() => _isRegisterMode = !_isRegisterMode),
                 child: Text(
-                  _isRegisterMode ? 'Sign In' : 'Register',
+                  _isRegisterMode
+                      ? AppLocalization.get('sign_in', appLanguage)
+                      : AppLocalization.get('register', appLanguage),
                   style: const TextStyle(
                     color: AppTheme.primaryMint,
                     fontWeight: FontWeight.bold,
@@ -674,8 +687,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 final email = _emailController.text.trim();
                 if (email.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Enter your email above to reset password'),
+                    SnackBar(
+                      content: Text(AppLocalization.get('forgot_password_err', appLanguage)),
                     ),
                   );
                   return;
@@ -685,14 +698,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SnackBar(
                     backgroundColor: AppTheme.primaryMint,
                     content: Text(
-                      'Password reset link sent! Check your email.',
+                      AppLocalization.get('forgot_password_success', appLanguage),
                       style: TextStyle(color: tickColor),
                     ),
                   ),
                 );
               },
               child: Text(
-                'Forgot password?',
+                AppLocalization.get('forgot_password', appLanguage),
                 style: TextStyle(color: textSecondary, fontSize: 12),
               ),
             ),

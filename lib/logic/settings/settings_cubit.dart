@@ -11,6 +11,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   void _loadSettings() {
+    final explicit = _prefs.isAppLocaleExplicit();
+    final appLocale = _prefs.getAppLocale() ?? 'eng';
+    final resourceLang = _prefs.getAppLanguage() ?? 'eng';
+    final activeLanguage = explicit ? appLocale : resourceLang;
+
     emit(SettingsState(
       themeMode: _prefs.getThemeMode(),
       arabicFontSize: _prefs.getArabicFontSize(),
@@ -18,11 +23,31 @@ class SettingsCubit extends Cubit<SettingsState> {
       arabicFontFamily: _prefs.getArabicFontFamily(),
       wakeLockEnabled: _prefs.isWakeLockEnabled(),
       autoSyncEnabled: _prefs.isAutoSyncEnabled(),
+      appLanguage: activeLanguage,
+      isAppLanguageExplicit: explicit,
     ));
 
     // Apply wake lock on startup if enabled
     if (_prefs.isWakeLockEnabled()) {
       WakelockPlus.enable();
+    }
+  }
+
+  Future<void> setAppLanguage(String languageCode, {bool explicit = true}) async {
+    await _prefs.setAppLocale(languageCode);
+    await _prefs.setAppLocaleExplicit(explicit);
+    emit(state.copyWith(
+      appLanguage: languageCode,
+      isAppLanguageExplicit: explicit,
+    ));
+  }
+
+  Future<void> updateLanguageImplicitly(String languageCode) async {
+    if (!state.isAppLanguageExplicit) {
+      await _prefs.setAppLocale(languageCode);
+      emit(state.copyWith(
+        appLanguage: languageCode,
+      ));
     }
   }
 

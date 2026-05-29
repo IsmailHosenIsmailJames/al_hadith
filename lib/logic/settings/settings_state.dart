@@ -7,6 +7,8 @@ class SettingsState {
   final bool autoMarkRead; // Auto mark hadith as read after dwell time
   final int dwellTimerSeconds; // Dwell time in seconds
   final bool autoSyncEnabled; // Auto backup to Firebase RTDB
+  final String appLanguage; // Active app interface locale (e.g. 'eng', 'ben')
+  final bool isAppLanguageExplicit; // Flag to lock app language from resource selection sync
 
   const SettingsState({
     this.themeMode = 'system',
@@ -17,6 +19,8 @@ class SettingsState {
     this.autoMarkRead = true,
     this.dwellTimerSeconds = 5,
     this.autoSyncEnabled = true,
+    this.appLanguage = 'eng',
+    this.isAppLanguageExplicit = false,
   });
 
   SettingsState copyWith({
@@ -28,6 +32,8 @@ class SettingsState {
     bool? autoMarkRead,
     int? dwellTimerSeconds,
     bool? autoSyncEnabled,
+    String? appLanguage,
+    bool? isAppLanguageExplicit,
   }) {
     return SettingsState(
       themeMode: themeMode ?? this.themeMode,
@@ -38,6 +44,8 @@ class SettingsState {
       autoMarkRead: autoMarkRead ?? this.autoMarkRead,
       dwellTimerSeconds: dwellTimerSeconds ?? this.dwellTimerSeconds,
       autoSyncEnabled: autoSyncEnabled ?? this.autoSyncEnabled,
+      appLanguage: appLanguage ?? this.appLanguage,
+      isAppLanguageExplicit: isAppLanguageExplicit ?? this.isAppLanguageExplicit,
     );
   }
 }

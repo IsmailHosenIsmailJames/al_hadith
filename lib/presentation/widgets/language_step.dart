@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:al_hadith/logic/setup/setup_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 
 class LanguageStep extends StatelessWidget {
   final SetupState state;
@@ -30,13 +33,82 @@ class LanguageStep extends StatelessWidget {
     final inactiveBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Dropdown section for App Interface Language
         Text(
-          'Select Language',
+          AppLocalization.get('app_interface_lang', appLanguage),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: textSecondary,
+            letterSpacing: 0.5,
+          ),
+        ).animate().fadeIn(duration: 400.ms),
+        const Gap(8),
+        Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            color: cardBgColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: inactiveBorderColor, width: 1.5),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.translate, color: AppTheme.primaryMint, size: 20),
+              const Gap(12),
+              Expanded(
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: appLanguage,
+                    isExpanded: true,
+                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    icon: Icon(Icons.arrow_drop_down, color: textSecondary),
+                    style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold),
+                    items: HadithLanguage.languageMetadata.entries.map((entry) {
+                      final code = entry.key;
+                      final meta = entry.value;
+                      return DropdownMenuItem<String>(
+                        value: code,
+                        child: Row(
+                          children: [
+                            Text(meta['flag'] ?? '', style: const TextStyle(fontSize: 18)),
+                            const Gap(10),
+                            Text(
+                              meta['native'] ?? '',
+                              style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold),
+                            ),
+                            if (meta['native'] != meta['display']) ...[
+                              const Gap(6),
+                              Text(
+                                '(${meta['display']})',
+                                style: TextStyle(color: textSecondary, fontSize: 13),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (newLangCode) {
+                      if (newLangCode != null) {
+                        context.read<SettingsCubit>().setAppLanguage(newLangCode, explicit: true);
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+
+        Text(
+          AppLocalization.get('select_language', appLanguage),
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.bold,
@@ -45,7 +117,7 @@ class LanguageStep extends StatelessWidget {
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
         const Gap(6),
         Text(
-              'Choose your preferred translation language. You can download and manage resources for other languages later.',
+              AppLocalization.get('lang_step_desc', appLanguage),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: textSecondary,
                 height: 1.4,
@@ -54,7 +126,7 @@ class LanguageStep extends StatelessWidget {
             .animate()
             .fadeIn(duration: 450.ms, delay: 100.ms)
             .slideY(begin: 0.1, end: 0),
-        Gap(isWideWindow ? 12 : 24),
+        Gap(isWideWindow ? 12 : 20),
         Expanded(
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

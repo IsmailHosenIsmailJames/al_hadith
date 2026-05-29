@@ -15,6 +15,7 @@ import 'package:al_hadith/data/services/history_service.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 
 enum _ViewMode { page, list }
 
@@ -226,6 +227,7 @@ class _HadithReadPlaceholderScreenState
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     showModalBottomSheet(
       context: context,
@@ -252,7 +254,7 @@ class _HadithReadPlaceholderScreenState
               ),
               const Gap(20),
               Text(
-                'Jump to Hadith',
+                AppLocalization.get('jump_to_hadith', appLanguage),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -261,7 +263,7 @@ class _HadithReadPlaceholderScreenState
               ),
               const Gap(6),
               Text(
-                '${selected + 1} of ${_hadiths.length}',
+                AppLocalization.get('jump_to_hadith_count', appLanguage, args: {'current': '${selected + 1}', 'total': '${_hadiths.length}'}),
                 style: TextStyle(
                   fontSize: 13,
                   color: textSecondary,
@@ -287,14 +289,14 @@ class _HadithReadPlaceholderScreenState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Hadith #${_hadiths.first.hadithNumber}',
+                    AppLocalization.get('hadith_no', appLanguage, args: {'number': '${_hadiths.first.hadithNumber}'}),
                     style: TextStyle(
                       color: textSecondary,
                       fontSize: 12,
                     ),
                   ),
                   Text(
-                    'Hadith #${_hadiths.last.hadithNumber}',
+                    AppLocalization.get('hadith_no', appLanguage, args: {'number': '${_hadiths.last.hadithNumber}'}),
                     style: TextStyle(
                       color: textSecondary,
                       fontSize: 12,
@@ -327,7 +329,7 @@ class _HadithReadPlaceholderScreenState
                     });
                   },
                   child: Text(
-                    'Go to Hadith #${_hadiths[selected].hadithNumber}',
+                    AppLocalization.get('go_to_hadith_number', appLanguage, args: {'number': '${_hadiths[selected].hadithNumber}'}),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -348,6 +350,7 @@ class _HadithReadPlaceholderScreenState
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     showModalBottomSheet(
       context: context,
@@ -388,74 +391,6 @@ class _HadithReadPlaceholderScreenState
                   color: AppTheme.primaryMint.withValues(alpha: 0.25),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryMint.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Hadith #${hadith.hadithNumber}',
-                          style: const TextStyle(
-                            color: AppTheme.primaryMint,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      const Icon(
-                        Icons.menu_book_rounded,
-                        color: AppTheme.primaryMint,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                  const Gap(14),
-                  Text(
-                    hadith.text,
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      color: textPrimary,
-                      height: 1.6,
-                    ),
-                    maxLines: 8,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Gap(16),
-                  Divider(color: borderDividerColor, height: 1),
-                  const Gap(12),
-                  Row(
-                    children: [
-                      Text(
-                        _bookName,
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Spacer(),
-                      const Text(
-                        'Al Hadith App',
-                        style: TextStyle(
-                          color: AppTheme.primaryMint,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
             const Gap(20),
             Row(
@@ -472,164 +407,165 @@ class _HadithReadPlaceholderScreenState
                     ),
                     onPressed: () {
                       final text =
-                          'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\n— $_bookName\n\nShared via Al Hadith App';
+                          '${AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'})}\n\n${hadith.text}\n\n— $_bookName\n\n${AppLocalization.get('shared_via_app', appLanguage)}';
                       Clipboard.setData(ClipboardData(text: text));
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Row(
+                          content: Row(
                             children: [
-                              Icon(
-                                  Icons.copy_all,
-                                  color: AppTheme.darkCanvas,
-                                  size: 16,
-                                ),
-                                Gap(8),
-                                Text('Copied to clipboard!'),
-                              ],
-                            ),
-                            backgroundColor: AppTheme.primaryMint,
-                            behavior: SnackBarBehavior.floating,
-                            duration: const Duration(seconds: 2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                              const Icon(
+                                Icons.copy_all,
+                                color: AppTheme.darkCanvas,
+                                size: 16,
+                              ),
+                              const Gap(8),
+                              Text(AppLocalization.get('copied_to_clipboard', appLanguage)),
+                            ],
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.copy_outlined, size: 16),
-                      label: const Text('Copy'),
-                    ),
-                  ),
-                  const Gap(12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryMint,
-                        foregroundColor: AppTheme.darkCanvas,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          backgroundColor: AppTheme.primaryMint,
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
+                      );
+                    },
+                    icon: const Icon(Icons.copy_outlined, size: 16),
+                    label: Text(AppLocalization.get('copy', appLanguage)),
+                  ),
+                ),
+                const Gap(12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryMint,
+                      foregroundColor: AppTheme.darkCanvas,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      onPressed: () {
-                        final text =
-                            'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\n— $_bookName\n\nShared via Al Hadith App';
-                        Share.share(
-                          text,
-                          subject: 'Hadith #${hadith.hadithNumber}',
-                        );
-                        Navigator.pop(ctx);
-                      },
-                      icon: const Icon(Icons.share_rounded, size: 16),
-                      label: const Text('Share'),
                     ),
+                    onPressed: () {
+                      final text =
+                          '${AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'})}\n\n${hadith.text}\n\n— $_bookName\n\n${AppLocalization.get('shared_via_app', appLanguage)}';
+                      Share.share(
+                        text,
+                        subject: AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'}),
+                      );
+                      Navigator.pop(ctx);
+                    },
+                    icon: const Icon(Icons.share_rounded, size: 16),
+                    label: Text(AppLocalization.get('share', appLanguage)),
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-  
-    @override
-    Widget build(BuildContext context) {
-      final title = widget.sectionName.isNotEmpty
-          ? widget.sectionName
-          : _bookName.isNotEmpty
-          ? _bookName
-          : 'Reading';
-      final canvasColor = Theme.of(context).scaffoldBackgroundColor;
-      final surfaceColor = Theme.of(context).colorScheme.surface;
-      final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-      final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-  
-      return Scaffold(
-        backgroundColor: canvasColor,
-        appBar: AppBar(
-          backgroundColor: surfaceColor,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: textPrimary,
-              size: 20,
+                ),
+              ],
             ),
-            onPressed: () => context.pop(),
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: textPrimary,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (_hadiths.isNotEmpty)
-                Text(
-                  'Hadith ${_hadiths[_currentIndex].hadithNumber} · ${_currentIndex + 1} / ${_hadiths.length}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-            ],
-          ),
-          centerTitle: true,
-          actions: [
-            if (_hadiths.isNotEmpty) ...[
-              IconButton(
-                tooltip: 'Jump to hadith',
-                icon: Icon(
-                  Icons.subdirectory_arrow_left,
-                  color: textSecondary,
-                  size: 22,
-                ),
-                onPressed: _showJumpDialog,
-              ),
-              IconButton(
-                tooltip: _viewMode == _ViewMode.page
-                    ? 'Switch to List View'
-                    : 'Switch to Page View',
-                icon: Icon(
-                  _viewMode == _ViewMode.page
-                      ? Icons.view_list_rounded
-                      : Icons.auto_stories_rounded,
-                  color: AppTheme.primaryMint,
-                  size: 22,
-                ),
-                onPressed: _switchView,
-              ),
-            ],
           ],
         ),
-        body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: AppTheme.primaryMint),
-              )
-            : _error != null
-            ? _buildError()
-            : _hadiths.isEmpty
-            ? Center(
-                child: Text(
-                  'No hadiths available.',
-                  style: TextStyle(color: textSecondary),
+      ),
+    );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
+    final title = widget.sectionName.isNotEmpty
+        ? widget.sectionName
+        : _bookName.isNotEmpty
+        ? _bookName
+        : AppLocalization.get('hadith_book_default_title', appLanguage);
+    final canvasColor = Theme.of(context).scaffoldBackgroundColor;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
+    return Scaffold(
+      backgroundColor: canvasColor,
+      appBar: AppBar(
+        backgroundColor: surfaceColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: textPrimary,
+            size: 20,
+          ),
+          onPressed: () => context.pop(),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: textPrimary,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (_hadiths.isNotEmpty)
+              Text(
+                '${AppLocalization.get('hadith_no', appLanguage, args: {'number': '${_hadiths[_currentIndex].hadithNumber}'})} · ${AppLocalization.get('jump_to_hadith_count', appLanguage, args: {'current': '${_currentIndex + 1}', 'total': '${_hadiths.length}'})}',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
-              )
-            : _viewMode == _ViewMode.page
-            ? _buildPageView()
-            : _buildListView(),
-        bottomNavigationBar: (_viewMode == _ViewMode.page && _hadiths.isNotEmpty)
-            ? _buildPageNavBar()
-            : null,
-      );
-    }
+              ),
+          ],
+        ),
+        centerTitle: true,
+        actions: [
+          if (_hadiths.isNotEmpty) ...[
+            IconButton(
+              tooltip: AppLocalization.get('jump_to_hadith', appLanguage),
+              icon: Icon(
+                Icons.subdirectory_arrow_left,
+                color: textSecondary,
+                size: 22,
+              ),
+              onPressed: _showJumpDialog,
+            ),
+            IconButton(
+              tooltip: _viewMode == _ViewMode.page
+                  ? 'Switch to List View'
+                  : 'Switch to Page View',
+              icon: Icon(
+                _viewMode == _ViewMode.page
+                    ? Icons.view_list_rounded
+                    : Icons.auto_stories_rounded,
+                color: AppTheme.primaryMint,
+                size: 22,
+              ),
+              onPressed: _switchView,
+            ),
+          ],
+        ],
+      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.primaryMint),
+            )
+          : _error != null
+          ? _buildError()
+          : _hadiths.isEmpty
+          ? Center(
+              child: Text(
+                AppLocalization.get('no_hadiths_available', appLanguage),
+                style: TextStyle(color: textSecondary),
+              ),
+            )
+          : _viewMode == _ViewMode.page
+          ? _buildPageView()
+          : _buildListView(),
+      bottomNavigationBar: (_viewMode == _ViewMode.page && _hadiths.isNotEmpty)
+          ? _buildPageNavBar()
+          : null,
+    );
+  }
   
     Widget _buildPageNavBar() {
       final canPrev = _currentIndex > 0;
@@ -639,6 +575,7 @@ class _HadithReadPlaceholderScreenState
       final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
       final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
       final pillBgColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+      final appLanguage = context.read<SettingsCubit>().state.appLanguage;
   
       return Container(
         decoration: BoxDecoration(
@@ -668,9 +605,9 @@ class _HadithReadPlaceholderScreenState
                         size: 14,
                         color: AppTheme.primaryMint,
                       ),
-                      label: const Text(
-                        'Previous',
-                        style: TextStyle(
+                      label: Text(
+                        AppLocalization.get('previous', appLanguage),
+                        style: const TextStyle(
                           color: AppTheme.primaryMint,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -692,7 +629,7 @@ class _HadithReadPlaceholderScreenState
                     border: Border.all(color: borderDividerColor),
                   ),
                   child: Text(
-                    '${_currentIndex + 1} / ${_hadiths.length}',
+                    AppLocalization.get('jump_to_hadith_count', appLanguage, args: {'current': '${_currentIndex + 1}', 'total': '${_hadiths.length}'}),
                     style: TextStyle(
                       color: textSecondary,
                       fontSize: 12,
@@ -720,9 +657,9 @@ class _HadithReadPlaceholderScreenState
                         size: 14,
                         color: AppTheme.primaryMint,
                       ),
-                      label: const Text(
-                        'Next',
-                        style: TextStyle(
+                      label: Text(
+                        AppLocalization.get('next', appLanguage),
+                        style: const TextStyle(
                           color: AppTheme.primaryMint,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -740,6 +677,7 @@ class _HadithReadPlaceholderScreenState
   
     Widget _buildError() {
       final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+      final appLanguage = context.read<SettingsCubit>().state.appLanguage;
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -761,7 +699,7 @@ class _HadithReadPlaceholderScreenState
                 ),
                 onPressed: _loadSection,
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Retry'),
+                label: Text(AppLocalization.get('retry_setup_download', appLanguage)),
               ),
             ],
           ),
@@ -842,6 +780,7 @@ class _HadithCard extends StatelessWidget {
     final sheetBgColor = isDark ? AppTheme.darkSurface : Colors.white;
     final dialogCanvasColor = isDark ? AppTheme.darkCanvas : const Color(0xFFF3F4F6);
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     showModalBottomSheet(
       context: context,
@@ -869,7 +808,7 @@ class _HadithCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Study Notes',
+                      AppLocalization.get('study_notes', appLanguage),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -902,7 +841,7 @@ class _HadithCard extends StatelessWidget {
                     ),
                     decoration: InputDecoration(
                       hintText:
-                          'Write your notes, reflection or study guide here...',
+                          AppLocalization.get('write_notes_hint', appLanguage),
                       hintStyle: TextStyle(
                         color: textSecondary,
                         fontSize: 13,
@@ -936,7 +875,7 @@ class _HadithCard extends StatelessWidget {
                           Navigator.pop(ctx);
                         },
                         icon: const Icon(Icons.delete_outline, size: 18),
-                        label: const Text('Delete'),
+                        label: Text(AppLocalization.get('delete', appLanguage)),
                       ),
                       const Gap(12),
                     ],
@@ -959,7 +898,7 @@ class _HadithCard extends StatelessWidget {
                           Navigator.pop(ctx);
                         },
                         icon: const Icon(Icons.save_rounded, size: 18),
-                        label: const Text('Save Note'),
+                        label: Text(AppLocalization.get('save', appLanguage)),
                       ),
                     ),
                   ],
@@ -1004,8 +943,13 @@ class _HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final historyService = context.read<HistoryService>();
     final isRead = historyService.isHadithRead(bookKey, hadith.hadithNumber);
+
+    final books = context.read<HadithCubit>().state.downloadedBooks;
+    final book = books.any((b) => b.book == bookKey) ? books.firstWhere((b) => b.book == bookKey) : null;
+    final bookName = book != null ? (book.nameNative.isNotEmpty ? book.nameNative : book.name) : bookKey;
 
     // Watch Collections states for live color feedback
     final state = context.watch<HadithCubit>().state;
@@ -1062,7 +1006,7 @@ class _HadithCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        'Hadith #${hadith.hadithNumber}',
+                        AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'}),
                         style: const TextStyle(
                           color: AppTheme.primaryMint,
                           fontSize: 11,
@@ -1110,7 +1054,7 @@ class _HadithCard extends StatelessWidget {
                             ),
                             const Gap(4),
                             Text(
-                              isRead ? 'Read' : 'Mark Read',
+                              isRead ? AppLocalization.get('read', appLanguage) : AppLocalization.get('mark_read', appLanguage),
                               style: TextStyle(
                                 color: isRead
                                     ? AppTheme.primaryMint
@@ -1196,9 +1140,9 @@ class _HadithCard extends StatelessWidget {
                               size: 18,
                             ),
                             const Gap(6),
-                            const Text(
-                              'My Notes',
-                              style: TextStyle(
+                            Text(
+                              AppLocalization.get('my_notes', appLanguage),
+                              style: const TextStyle(
                                 color: AppTheme.primaryMint,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -1213,7 +1157,7 @@ class _HadithCard extends StatelessWidget {
                                 noteText,
                               ),
                               child: Text(
-                                'Edit',
+                                AppLocalization.get('edit', appLanguage),
                                 style: TextStyle(
                                   color: textSecondary,
                                   fontSize: 11,
@@ -1242,7 +1186,7 @@ class _HadithCard extends StatelessWidget {
                   Divider(color: borderDividerColor, height: 1),
                   const Gap(12),
                   Text(
-                    'Authenticity Grading',
+                    AppLocalization.get('authenticity_grading', appLanguage),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -1260,7 +1204,7 @@ class _HadithCard extends StatelessWidget {
                       if (gl.contains('sahih')) {
                         c = Colors.green;
                       } else if (gl.contains('hasan')) {
-                        c = Colors.orangeAccent;
+                         c = Colors.orangeAccent;
                       } else if (gl.contains('da') || gl.contains('weak')) {
                         c = Colors.redAccent;
                       }
@@ -1303,7 +1247,7 @@ class _HadithCard extends StatelessWidget {
                       color: isBookmarked
                           ? AppTheme.primaryMint
                           : textSecondary,
-                      label: 'Bookmark',
+                      label: AppLocalization.get('bookmarks', appLanguage),
                       onTap: () => context.read<HadithCubit>().toggleBookmark(
                         bookKey,
                         hadith.hadithNumber,
@@ -1316,7 +1260,7 @@ class _HadithCard extends StatelessWidget {
                       color: isPinned
                           ? Colors.orangeAccent
                           : textSecondary,
-                      label: 'Pin',
+                      label: AppLocalization.get('pinned', appLanguage),
                       onTap: () => context.read<HadithCubit>().togglePin(
                         bookKey,
                         hadith.hadithNumber,
@@ -1329,7 +1273,7 @@ class _HadithCard extends StatelessWidget {
                       color: hasNote
                           ? Colors.tealAccent
                           : textSecondary,
-                      label: 'Note',
+                      label: AppLocalization.get('notes', appLanguage),
                       onTap: () => _showNoteDialog(
                         context,
                         bookKey,
@@ -1340,14 +1284,14 @@ class _HadithCard extends StatelessWidget {
                     _buildCardAction(
                       icon: Icons.content_copy_rounded,
                       color: textSecondary,
-                      label: 'Copy',
+                      label: AppLocalization.get('copy', appLanguage),
                       onTap: () {
                         final copyText =
-                            'Hadith #${hadith.hadithNumber}\n\n${hadith.text}\n\nShared via Al Hadith App';
+                            '${AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'})}\n\n${hadith.text}\n\n— $bookName\n\n${AppLocalization.get('shared_via_app', appLanguage)}';
                         Clipboard.setData(ClipboardData(text: copyText));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('Hadith copied to clipboard!'),
+                            content: Text(AppLocalization.get('copied_to_clipboard', appLanguage)),
                             backgroundColor: AppTheme.primaryMint,
                             behavior: SnackBarBehavior.floating,
                             duration: const Duration(seconds: 1),
@@ -1358,7 +1302,7 @@ class _HadithCard extends StatelessWidget {
                     _buildCardAction(
                       icon: Icons.share_rounded,
                       color: textSecondary,
-                      label: 'Share',
+                      label: AppLocalization.get('share', appLanguage),
                       onTap: () => onShare(hadith),
                     ),
                   ],
@@ -1380,7 +1324,7 @@ class _HadithCard extends StatelessWidget {
                       ),
                       const Gap(6),
                       Text(
-                        'Swipe left/right to navigate',
+                        AppLocalization.get('swipe_nav_hint', appLanguage),
                         style: TextStyle(
                           color: textSecondary,
                           fontSize: 11,

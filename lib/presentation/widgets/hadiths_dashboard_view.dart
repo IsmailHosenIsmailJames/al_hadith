@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 
 class HadithsDashboardView extends StatefulWidget {
   const HadithsDashboardView({super.key});
@@ -29,6 +31,8 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final surfaceColor = Theme.of(context).colorScheme.surface;
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
 
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
@@ -67,7 +71,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                     ),
                     onPressed: () =>
                         context.read<HadithCubit>().loadDashboard(),
-                    child: const Text('Retry'),
+                    child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                   ),
                 ],
               ),
@@ -76,7 +80,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
         }
 
         if (state.downloadedBooks.isEmpty) {
-          return _buildEmptyState(context);
+          return _buildEmptyState(context, appLanguage);
         }
 
         return RefreshIndicator(
@@ -88,7 +92,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             padding: const EdgeInsets.all(16.0),
             children: [
               // 1. History or Daily Inspiration Panel
-              _buildHistoryHeader(context, state),
+              _buildHistoryHeader(context, state, appLanguage),
 
               const Gap(28),
 
@@ -96,7 +100,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               Padding(
                 padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
                 child: Text(
-                  'Your Offline Library',
+                  AppLocalization.get('your_offline_library', appLanguage),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -194,7 +198,10 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                           ),
                                         const Gap(4),
                                         Text(
-                                          '${book.hadithCount} Hadiths • ${book.sectionCount} Chapters',
+                                          AppLocalization.get('hadiths_chapters_summary', appLanguage, args: {
+                                            'hadiths': '${book.hadithCount}',
+                                            'chapters': '${book.sectionCount}'
+                                          }),
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: textSecondary,
@@ -273,7 +280,10 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    '$readCount / $totalHadiths read',
+                                    AppLocalization.get('read_progress', appLanguage, args: {
+                                      'read': '$readCount',
+                                      'total': '$totalHadiths'
+                                    }),
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: textSecondary,
@@ -306,7 +316,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
     );
   }
 
-  Widget _buildHistoryHeader(BuildContext context, HadithState state) {
+  Widget _buildHistoryHeader(BuildContext context, HadithState state, String appLanguage) {
     final history = state.history;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
@@ -359,9 +369,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                     )
                     .scale(end: const Offset(1.5, 1.5), duration: 1000.ms),
                 const Gap(8),
-                const Text(
-                  'RESUME READING',
-                  style: TextStyle(
+                Text(
+                  AppLocalization.get('resume_reading', appLanguage),
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.primaryMint,
@@ -381,7 +391,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             ),
             const Gap(4),
             Text(
-              'Hadith Reference: #${history.hadithNumber}',
+              AppLocalization.get('hadith_reference', appLanguage, args: {'number': '${history.hadithNumber}'}),
               style: TextStyle(
                 fontSize: 14,
                 color: textSecondary,
@@ -433,14 +443,14 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                   '/book/${history.bookKey}/hadith/${history.hadithNumber}?sectionName=$encodedSection',
                 );
               },
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.play_arrow_rounded, size: 18),
-                  Gap(6),
+                  const Icon(Icons.play_arrow_rounded, size: 18),
+                  const Gap(6),
                   Text(
-                    'Continue Reading',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    AppLocalization.get('continue_reading', appLanguage),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ],
               ),
@@ -470,7 +480,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
           ),
           const Gap(12),
           Text(
-            '"Verily, actions are judged by intentions, and every person will have only what they intended."',
+            AppLocalization.get('daily_inspiration_quote', appLanguage),
             style: TextStyle(
               fontSize: 14.5,
               fontWeight: FontWeight.w500,
@@ -481,7 +491,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
           ),
           const Gap(12),
           Text(
-            '— Sahih al-Bukhari, Hadith 1',
+            AppLocalization.get('daily_inspiration_source', appLanguage),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
@@ -493,7 +503,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
     ).animate().fadeIn(duration: 400.ms);
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, String appLanguage) {
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -520,7 +530,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             ),
             const Gap(24),
             Text(
-              'Your Library is Empty',
+              AppLocalization.get('library_empty_title', appLanguage),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -529,7 +539,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             ),
             const Gap(8),
             Text(
-              'No downloaded hadith books detected on this device. Click the button below to download static resources.',
+              AppLocalization.get('library_empty_desc', appLanguage),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5,
@@ -555,9 +565,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                 context.push('/setup');
               },
               icon: const Icon(Icons.download_rounded, size: 18),
-              label: const Text(
-                'Configure Resources',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              label: Text(
+                AppLocalization.get('setup_books_cta', appLanguage),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],

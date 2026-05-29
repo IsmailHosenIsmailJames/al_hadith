@@ -7,6 +7,8 @@ import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 
 class HadithSearchScreen extends StatefulWidget {
   const HadithSearchScreen({super.key});
@@ -136,7 +138,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Target Search Scope',
+                AppLocalization.get('search_scope', context.read<SettingsCubit>().state.appLanguage),
                 style: TextStyle(
                   color: textSecondary,
                   fontSize: 11,
@@ -162,8 +164,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                 child: Text(
                   state.selectedSearchBooks.length ==
                           state.downloadedBooks.length
-                      ? 'Deselect All'
-                      : 'Select All',
+                      ? AppLocalization.get('deselect_all', context.read<SettingsCubit>().state.appLanguage)
+                      : AppLocalization.get('select_all', context.read<SettingsCubit>().state.appLanguage),
                   style: const TextStyle(
                     color: AppTheme.primaryMint,
                     fontSize: 11,
@@ -234,7 +236,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     );
   }
 
-  Widget _buildSuggestionsView() {
+  Widget _buildSuggestionsView(String appLanguage) {
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -242,13 +244,13 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
 
     final trending = [
-      'Intention',
-      'Charity',
-      'Prayer',
-      'Fasting',
-      'Parents',
-      'Greetings',
-      'Patience',
+      {'key': 'topic_intention', 'default': 'Intention'},
+      {'key': 'topic_charity', 'default': 'Charity'},
+      {'key': 'topic_prayer', 'default': 'Prayer'},
+      {'key': 'topic_fasting', 'default': 'Fasting'},
+      {'key': 'topic_parents', 'default': 'Parents'},
+      {'key': 'topic_greetings', 'default': 'Greetings'},
+      {'key': 'topic_patience', 'default': 'Patience'},
     ];
 
     return Column(
@@ -257,7 +259,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Text(
-            'Trending Search Suggestions',
+            AppLocalization.get('trending_suggestions', appLanguage),
             style: TextStyle(
               color: textSecondary,
               fontSize: 11.5,
@@ -272,6 +274,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             spacing: 8,
             runSpacing: 8,
             children: trending.map((topic) {
+              final localizedTopic = AppLocalization.get(topic['key']!, appLanguage);
               return ActionChip(
                 backgroundColor: chipBgColor,
                 shape: RoundedRectangleBorder(
@@ -288,7 +291,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     ),
                     const Gap(6),
                     Text(
-                      topic,
+                      localizedTopic,
                       style: TextStyle(
                         color: textPrimary,
                         fontSize: 12,
@@ -297,8 +300,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                   ],
                 ),
                 onPressed: () {
-                  _searchController.text = topic;
-                  _triggerSearch(topic);
+                  _searchController.text = localizedTopic;
+                  _triggerSearch(localizedTopic);
                 },
               );
             }).toList(),
@@ -307,9 +310,8 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
         const Spacer(),
         _buildEmptyState(
           icon: Icons.search_rounded,
-          title: 'Search Offline Hadiths',
-          subtitle:
-              'Search terms across matching grading authorities or text schemas instantly.',
+          title: AppLocalization.get('search_offline_title', appLanguage),
+          subtitle: AppLocalization.get('search_offline_desc', appLanguage),
         ),
         const Spacer(),
       ],
@@ -320,6 +322,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     required HadithItem hadith,
     required String bookKey,
     required HadithState state,
+    required String appLanguage,
   }) {
     final flag = _getFlag(state, bookKey);
     final bookName = _getBookName(state, bookKey);
@@ -381,7 +384,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     ),
                     const Gap(8),
                     Text(
-                      'Hadith #${hadith.hadithNumber}',
+                      AppLocalization.get('hadith_no', appLanguage, args: {'number': hadith.hadithNumber.toString()}),
                       style: TextStyle(
                         color: textSecondary,
                         fontSize: 11,
@@ -462,6 +465,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
 
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
@@ -487,7 +491,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
               textInputAction: TextInputAction.search,
               onSubmitted: _triggerSearch,
               decoration: InputDecoration(
-                hintText: 'Search Hadith text offline...',
+                hintText: AppLocalization.get('search_hadith_hint', appLanguage),
                 hintStyle: TextStyle(
                   color: textSecondary,
                   fontSize: 13,
@@ -531,15 +535,14 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     }
 
                     if (state.searchQuery.isEmpty) {
-                      return _buildSuggestionsView();
+                      return _buildSuggestionsView(appLanguage);
                     }
 
                     if (resultsKeys.isEmpty) {
                       return _buildEmptyState(
                         icon: Icons.search_off_rounded,
-                        title: 'No Matches Found',
-                        subtitle:
-                            'No results found for "${state.searchQuery}". Try related terms.',
+                        title: AppLocalization.get('no_matches_title', appLanguage),
+                        subtitle: AppLocalization.get('no_matches_desc', appLanguage, args: {'query': state.searchQuery}),
                       );
                     }
 
@@ -589,6 +592,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                                           hadith: hadith,
                                           bookKey: key,
                                           state: state,
+                                          appLanguage: appLanguage,
                                         )
                                         .animate()
                                         .fadeIn(

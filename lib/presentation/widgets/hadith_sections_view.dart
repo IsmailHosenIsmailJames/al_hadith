@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
 
 class HadithSectionsView extends StatefulWidget {
   const HadithSectionsView({super.key});
@@ -45,6 +47,8 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
     final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
     final searchBgColor = Theme.of(context).colorScheme.surface;
 
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
+
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {
         if (state.isLoading) {
@@ -82,7 +86,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                     ),
                     onPressed: () =>
                         context.read<HadithCubit>().loadDashboard(),
-                    child: const Text('Retry'),
+                    child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                   ),
                 ],
               ),
@@ -91,7 +95,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
         }
 
         if (state.downloadedBooks.isEmpty) {
-          return _buildEmptyState();
+          return _buildEmptyState(appLanguage);
         }
 
         final selectedKey =
@@ -104,7 +108,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
               child: Text(
-                'Select Resource',
+                AppLocalization.get('select_book', appLanguage),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -248,14 +252,14 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            '${book.sectionCount} Ch.',
+                                            AppLocalization.get('chapters', appLanguage, args: {'count': '${book.sectionCount}'}),
                                             style: TextStyle(
                                               fontSize: 10,
                                               color: textSecondary,
                                             ),
                                           ),
                                           Text(
-                                            '${(ratio * 100).toStringAsFixed(0)}% Read',
+                                            AppLocalization.get('percent_read', appLanguage, args: {'percent': (ratio * 100).toStringAsFixed(0)}),
                                             style: TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
@@ -320,7 +324,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                     fontSize: 14,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Search chapters by name...',
+                    hintText: AppLocalization.get('search_chapters_hint', appLanguage),
                     hintStyle: TextStyle(
                       color: textSecondary,
                       fontSize: 14,
@@ -382,7 +386,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                           onPressed: () => context
                               .read<HadithCubit>()
                               .loadBookSections(selectedKey),
-                          child: const Text('Retry'),
+                          child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                         ),
                       ],
                     ),
@@ -396,7 +400,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                   vertical: 6.0,
                 ),
                 child: Text(
-                  '${state.filteredSections.length} Chapters Available',
+                  AppLocalization.get('chapters_available', appLanguage, args: {'count': '${state.filteredSections.length}'}),
                   style: TextStyle(
                     fontSize: 12,
                     color: textSecondary,
@@ -511,25 +515,28 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
                                                   size: 12,
                                                 ),
                                                 const Gap(4),
-                                                Text(
-                                                  'Hadith: ${section.startHadithNumber} - ${section.endHadithNumber}',
-                                                  style: TextStyle(
-                                                    fontSize: 11.5,
-                                                    color: textSecondary,
-                                                  ),
-                                                ),
-                                                const Gap(8),
-                                                Text(
-                                                  '•',
-                                                  style: TextStyle(
-                                                    color: textSecondary,
-                                                    fontSize: 11.5,
-                                                  ),
-                                                ),
-                                                const Gap(8),
-                                                Text(
-                                                  '${section.hadithCount} items',
-                                                  style: TextStyle(
+                                                 Text(
+                                                   AppLocalization.get('hadith_range', appLanguage, args: {
+                                                     'start': '${section.startHadithNumber}',
+                                                     'end': '${section.endHadithNumber}'
+                                                   }),
+                                                   style: TextStyle(
+                                                     fontSize: 11.5,
+                                                     color: textSecondary,
+                                                   ),
+                                                 ),
+                                                 const Gap(8),
+                                                 Text(
+                                                   '•',
+                                                   style: TextStyle(
+                                                     color: textSecondary,
+                                                     fontSize: 11.5,
+                                                   ),
+                                                 ),
+                                                 const Gap(8),
+                                                 Text(
+                                                   AppLocalization.get('items_count', appLanguage, args: {'count': '${section.hadithCount}'}),
+                                                   style: TextStyle(
                                                     fontSize: 11.5,
                                                     color: textSecondary,
                                                     fontWeight: FontWeight.bold,
@@ -563,7 +570,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(String appLanguage) {
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
@@ -587,7 +594,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
             ),
             const Gap(24),
             Text(
-              'No Offline Books',
+              AppLocalization.get('no_offline_books_title', appLanguage),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -596,7 +603,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
             ),
             const Gap(8),
             Text(
-              'Chapters will appear here once you download resources from the setup wizard or download center.',
+              AppLocalization.get('no_offline_books_desc', appLanguage),
               textAlign: TextAlign.center,
               style: TextStyle(color: textSecondary, height: 1.4),
             ),
@@ -622,7 +629,7 @@ class _HadithSectionsViewState extends State<HadithSectionsView> {
             ),
             const Gap(16),
             Text(
-              'No chapters match your query.',
+              AppLocalization.get('no_chapters_match', context.read<SettingsCubit>().state.appLanguage),
               style: TextStyle(color: textSecondary, fontSize: 14),
             ),
           ],

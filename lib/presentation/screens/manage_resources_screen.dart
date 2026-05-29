@@ -8,6 +8,8 @@ import 'package:al_hadith/data/repositories/resource_repository.dart';
 import 'package:al_hadith/data/services/download_service.dart';
 import 'package:al_hadith/data/services/preferences_service.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 
 class ManageResourcesScreen extends StatefulWidget {
   const ManageResourcesScreen({super.key});
@@ -53,6 +55,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       _errorMessage = null;
     });
 
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
+
     try {
       final resourceRepo = RepositoryProvider.of<ResourceRepository>(context);
       final downloadService = RepositoryProvider.of<DownloadService>(context);
@@ -80,7 +84,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = 'Failed to load resources: ${e.toString()}';
+          _errorMessage = AppLocalization.get('load_failed', appLanguage, args: {'error': e.toString()});
         });
       }
     }
@@ -89,6 +93,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
   Future<void> _startDownload(HadithResource resource) async {
     final downloadService = RepositoryProvider.of<DownloadService>(context);
     final prefs = RepositoryProvider.of<PreferencesService>(context);
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     setState(() {
       _isDownloading[resource.book] = true;
@@ -133,7 +138,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: AppTheme.primaryMint,
             content: Text(
-              'Successfully downloaded ${resource.name}!',
+              AppLocalization.get('download_success', appLanguage, args: {'name': resource.name}),
               style: const TextStyle(
                 color: AppTheme.darkCanvas,
                 fontWeight: FontWeight.bold,
@@ -154,7 +159,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Download failed: ${e.toString()}',
+              AppLocalization.get('download_failed', appLanguage, args: {'error': e.toString()}),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -173,6 +178,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final dialogBg = isDark ? AppTheme.darkSurface : Colors.white;
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     // Confirm dialog
     final confirm = await showDialog<bool>(
@@ -180,28 +186,28 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: dialogBg,
         title: Text(
-          'Delete Book',
+          AppLocalization.get('delete_book', appLanguage),
           style: TextStyle(
             color: textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
-          'Are you sure you want to delete ${resource.name}? This will remove the offline database file from your device.',
+          AppLocalization.get('delete_book_desc', appLanguage, args: {'name': resource.name}),
           style: TextStyle(color: textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
-              'Cancel',
+              AppLocalization.get('cancel', appLanguage),
               style: TextStyle(color: textSecondary),
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(AppLocalization.get('delete', appLanguage), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -229,7 +235,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: AppTheme.primaryMint,
             content: Text(
-              'Successfully deleted ${resource.name} offline files.',
+              AppLocalization.get('delete_success', appLanguage, args: {'name': resource.name}),
+              style: const TextStyle(
+                color: AppTheme.darkCanvas,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         );
@@ -239,7 +249,13 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.redAccent,
-            content: Text('Deletion failed: ${e.toString()}'),
+            content: Text(
+              AppLocalization.get('delete_failed', appLanguage, args: {'error': e.toString()}),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         );
       }
@@ -277,6 +293,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final downloadedList = _getFilteredResources(downloadedOnly: true);
     final allList = _getFilteredResources(downloadedOnly: false);
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -295,7 +312,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         elevation: 0,
         iconTheme: IconThemeData(color: textPrimary),
         title: Text(
-          'Manage Resources',
+          AppLocalization.getTabName('manage_resources', appLanguage),
           style: TextStyle(
             color: textPrimary,
             fontSize: 17,
@@ -319,8 +336,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           labelColor: AppTheme.primaryMint,
           unselectedLabelColor: textSecondary,
           tabs: [
-            Tab(text: 'Downloaded (${downloadedList.length})'),
-            Tab(text: 'All Books (${allList.length})'),
+            Tab(text: AppLocalization.get('downloaded_tab_title', appLanguage, args: {'count': '${downloadedList.length}'})),
+            Tab(text: AppLocalization.get('all_books_tab_title', appLanguage, args: {'count': '${allList.length}'})),
           ],
         ),
       ),
@@ -349,7 +366,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                     const Gap(16),
                     ElevatedButton(
                       onPressed: _loadMetadata,
-                      child: const Text('Retry'),
+                      child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                     ),
                   ],
                 ),
@@ -382,7 +399,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                               });
                             },
                             decoration: InputDecoration(
-                              hintText: 'Search books...',
+                              hintText: AppLocalization.get('search_books_hint', appLanguage),
                               hintStyle: TextStyle(
                                 color: textSecondary,
                                 fontSize: 13,
@@ -426,16 +443,16 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                             ),
                             onChanged: (value) {
                               if (value != null) {
-                                setState(() {
-                                  _selectedLangFilter = value;
-                                });
-                              }
-                            },
-                            items: [
-                              DropdownMenuItem(
-                                value: 'All',
-                                child: Text('All Languages', style: TextStyle(color: textPrimary)),
-                              ),
+                                  setState(() {
+                                    _selectedLangFilter = value;
+                                  });
+                                }
+                              },
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'All',
+                                  child: Text(AppLocalization.get('all_languages', appLanguage), style: TextStyle(color: textPrimary)),
+                                ),
                               ..._languages.map(
                                 (lang) => DropdownMenuItem(
                                   value: lang.code,
@@ -473,6 +490,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     required bool downloadedOnly,
   }) {
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     if (books.isEmpty) {
       return Center(
@@ -489,8 +507,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
             const Gap(14),
             Text(
               downloadedOnly
-                  ? 'No downloaded books found'
-                  : 'No books match search query',
+                  ? AppLocalization.get('no_downloaded_books', appLanguage)
+                  : AppLocalization.get('no_books_match', appLanguage),
               style: TextStyle(
                 color: textSecondary,
                 fontSize: 14,
@@ -530,6 +548,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         ? AppTheme.primaryMint.withValues(alpha: 0.1)
         : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB));
     final pillBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFF3F4F6);
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -647,7 +666,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         color: textSecondary,
                         size: 20,
                       ),
-                      tooltip: 'Re-download / Update',
+                      tooltip: AppLocalization.get('retry_setup_download', appLanguage),
                       onPressed: () => _startDownload(resource),
                     ),
                     IconButton(
@@ -656,7 +675,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         color: Colors.redAccent,
                         size: 20,
                       ),
-                      tooltip: 'Delete offline file',
+                      tooltip: AppLocalization.get('delete', appLanguage),
                       onPressed: () => _deleteResource(resource),
                     ),
                   ],
@@ -668,7 +687,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                     color: AppTheme.primaryMint,
                     size: 26,
                   ),
-                  tooltip: 'Download now',
+                  tooltip: AppLocalization.get('install', appLanguage),
                   onPressed: () => _startDownload(resource),
                 ),
             ],

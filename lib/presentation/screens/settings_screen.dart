@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
+import 'package:al_hadith/data/models/resource_model.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -25,6 +27,7 @@ class SettingsScreen extends StatelessWidget {
         final canvasColor = Theme.of(context).scaffoldBackgroundColor;
         final surfaceColor = Theme.of(context).colorScheme.surface;
         final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+        final appLanguage = state.appLanguage;
 
         return Scaffold(
           backgroundColor: canvasColor,
@@ -33,7 +36,7 @@ class SettingsScreen extends StatelessWidget {
             elevation: 0,
             iconTheme: IconThemeData(color: textPrimary),
             title: Text(
-              'Settings',
+              AppLocalization.get('settings', appLanguage),
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -46,19 +49,24 @@ class SettingsScreen extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 16),
             children: [
+              // ── Language ──
+              _buildSectionHeader(context, AppLocalization.get('language', appLanguage)),
+              _buildLanguageSelector(context, state),
+              const Gap(8),
+
               // ── Appearance ──
-              _buildSectionHeader(context, 'Appearance'),
+              _buildSectionHeader(context, AppLocalization.get('appearance', appLanguage)),
               _buildThemeSelector(context, state),
               const Gap(8),
 
               // ── Font Settings ──
-              _buildSectionHeader(context, 'Font Settings'),
+              _buildSectionHeader(context, AppLocalization.get('font_settings', appLanguage)),
               _buildArabicFontPicker(context, state),
               const Gap(8),
               _buildSliderTile(
                 context,
                 icon: Icons.format_size_rounded,
-                title: 'Arabic Font Size',
+                title: AppLocalization.get('arabic_font_size', appLanguage),
                 subtitle: '${state.arabicFontSize.toInt()} pt',
                 value: state.arabicFontSize,
                 min: 16,
@@ -71,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
               _buildSliderTile(
                 context,
                 icon: Icons.text_fields_rounded,
-                title: 'Translation Font Size',
+                title: AppLocalization.get('translation_font_size', appLanguage),
                 subtitle: '${state.translationFontSize.toInt()} pt',
                 value: state.translationFontSize,
                 min: 12,
@@ -83,20 +91,20 @@ class SettingsScreen extends StatelessWidget {
               const Gap(8),
 
               // ── Reading Behavior ──
-              _buildSectionHeader(context, 'Reading Behavior'),
+              _buildSectionHeader(context, AppLocalization.get('reading_behavior', appLanguage)),
               _buildToggleTile(
                 context,
                 icon: Icons.screen_lock_portrait_rounded,
-                title: 'Keep Screen Awake',
-                subtitle: 'Prevent screen from sleeping while reading',
+                title: AppLocalization.get('keep_screen_awake', appLanguage),
+                subtitle: AppLocalization.get('keep_screen_awake_desc', appLanguage),
                 value: state.wakeLockEnabled,
                 onChanged: (v) => context.read<SettingsCubit>().setWakeLockEnabled(v),
               ),
               _buildToggleTile(
                 context,
                 icon: Icons.auto_stories_rounded,
-                title: 'Auto Mark as Read',
-                subtitle: 'Automatically mark hadith read after dwell time',
+                title: AppLocalization.get('auto_mark_read', appLanguage),
+                subtitle: AppLocalization.get('auto_mark_read_desc', appLanguage),
                 value: state.autoMarkRead,
                 onChanged: (v) => context.read<SettingsCubit>().setAutoMarkRead(v),
               ),
@@ -104,8 +112,10 @@ class SettingsScreen extends StatelessWidget {
                 _buildSliderTile(
                   context,
                   icon: Icons.timer_outlined,
-                  title: 'Dwell Timer',
-                  subtitle: '${state.dwellTimerSeconds} seconds',
+                  title: AppLocalization.get('dwell_timer', appLanguage),
+                  subtitle: AppLocalization.get('dwell_timer_seconds', appLanguage, args: {
+                    'seconds': state.dwellTimerSeconds.toString()
+                  }),
                   value: state.dwellTimerSeconds.toDouble(),
                   min: 2,
                   max: 15,
@@ -115,17 +125,17 @@ class SettingsScreen extends StatelessWidget {
               const Gap(8),
 
               // ── About ──
-              _buildSectionHeader(context, 'About'),
+              _buildSectionHeader(context, AppLocalization.get('about_section', appLanguage)),
               _buildInfoTile(
                 context,
                 icon: Icons.info_outline_rounded,
-                title: 'Version',
+                title: AppLocalization.get('version', appLanguage),
                 trailing: '1.0.0',
               ),
               _buildInfoTile(
                 context,
                 icon: Icons.code_rounded,
-                title: 'Developed by',
+                title: AppLocalization.get('developed_by', appLanguage),
                 trailing: 'Ismail Hosen',
               ),
               const Gap(32),
@@ -173,7 +183,7 @@ class SettingsScreen extends StatelessWidget {
               const Icon(Icons.palette_rounded, color: AppTheme.primaryMint, size: 18),
               const Gap(10),
               Text(
-                'Theme',
+                AppLocalization.get('theme', state.appLanguage),
                 style: TextStyle(
                   color: textPrimary,
                   fontSize: 14,
@@ -188,7 +198,7 @@ class SettingsScreen extends StatelessWidget {
               _buildThemeOption(
                 context,
                 icon: Icons.dark_mode_rounded,
-                label: 'Dark',
+                label: AppLocalization.get('theme_dark', state.appLanguage),
                 isSelected: state.themeMode == 'dark',
                 onTap: () => context.read<SettingsCubit>().setThemeMode('dark'),
               ),
@@ -196,7 +206,7 @@ class SettingsScreen extends StatelessWidget {
               _buildThemeOption(
                 context,
                 icon: Icons.light_mode_rounded,
-                label: 'Light',
+                label: AppLocalization.get('theme_light', state.appLanguage),
                 isSelected: state.themeMode == 'light',
                 onTap: () => context.read<SettingsCubit>().setThemeMode('light'),
               ),
@@ -204,7 +214,7 @@ class SettingsScreen extends StatelessWidget {
               _buildThemeOption(
                 context,
                 icon: Icons.brightness_auto_rounded,
-                label: 'System',
+                label: AppLocalization.get('theme_system', state.appLanguage),
                 isSelected: state.themeMode == 'system',
                 onTap: () => context.read<SettingsCubit>().setThemeMode('system'),
               ),
@@ -289,7 +299,7 @@ class SettingsScreen extends StatelessWidget {
               const Icon(Icons.font_download_rounded, color: AppTheme.primaryMint, size: 18),
               const Gap(10),
               Text(
-                'Arabic Font Family',
+                AppLocalization.get('arabic_font_family', state.appLanguage),
                 style: TextStyle(
                   color: textPrimary,
                   fontSize: 14,
@@ -390,7 +400,7 @@ class SettingsScreen extends StatelessWidget {
         border: Border.all(color: borderColor),
       ),
       child: Text(
-        'The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended.',
+        AppLocalization.get('translation_preview', state.appLanguage),
         style: TextStyle(
           fontSize: state.translationFontSize,
           color: textPrimary,
@@ -585,6 +595,71 @@ class SettingsScreen extends StatelessWidget {
             style: TextStyle(
               color: textSecondary,
               fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.05, end: 0);
+  }
+
+  Widget _buildLanguageSelector(BuildContext context, SettingsState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.translate_rounded, color: AppTheme.primaryMint, size: 18),
+          const Gap(14),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: state.appLanguage,
+                isExpanded: true,
+                dropdownColor: isDark ? AppTheme.darkSurfaceCard : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                icon: Icon(Icons.arrow_drop_down_rounded, color: textSecondary),
+                style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold),
+                items: HadithLanguage.languageMetadata.entries.map((entry) {
+                  final code = entry.key;
+                  final meta = entry.value;
+                  return DropdownMenuItem<String>(
+                    value: code,
+                    child: Row(
+                      children: [
+                        Text(meta['flag'] ?? '', style: const TextStyle(fontSize: 16)),
+                        const Gap(10),
+                        Text(
+                          meta['native'] ?? '',
+                          style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold, fontSize: 13.5),
+                        ),
+                        if (meta['native'] != meta['display']) ...[
+                          const Gap(6),
+                          Text(
+                            '(${meta['display']})',
+                            style: TextStyle(color: textSecondary, fontSize: 12),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (newLangCode) {
+                  if (newLangCode != null) {
+                    context.read<SettingsCubit>().setAppLanguage(newLangCode, explicit: true);
+                  }
+                },
+              ),
             ),
           ),
         ],

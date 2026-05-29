@@ -6,6 +6,8 @@ import 'package:gap/gap.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/setup/setup_cubit.dart';
 import 'package:al_hadith/logic/setup/setup_state.dart';
+import 'package:al_hadith/core/localization/app_localization.dart';
+import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/presentation/widgets/language_step.dart';
 import 'package:al_hadith/presentation/widgets/resource_step.dart';
 import 'package:al_hadith/presentation/widgets/download_step.dart';
@@ -29,6 +31,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
 
@@ -39,10 +42,17 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           listener: (context, state) {
             // Handle error messages with premium Snackbar
             if (state.errorMessage != null) {
+              String displayError = state.errorMessage!;
+              if (displayError == 'Please select a language to proceed.') {
+                displayError = AppLocalization.get('select_language_err', appLanguage);
+              } else if (displayError == 'Please select at least one resource.') {
+                displayError = AppLocalization.get('select_resource_err', appLanguage);
+              }
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    state.errorMessage!,
+                    displayError,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -66,7 +76,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
             // Render Success State when complete
             if (state.isCompletedStep) {
-              return _buildSuccessScreen(context);
+              return _buildSuccessScreen(context, appLanguage);
             }
 
             return Padding(
@@ -80,7 +90,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                     padding: EdgeInsets.only(right: isWideWindow ? 80.0 : 0.0),
                     child: Column(
                       children: [
-                        if (!isWideWindow) _buildHeaderProgress(state, false),
+                        if (!isWideWindow) _buildHeaderProgress(state, false, appLanguage),
                         if (!isWideWindow) const Gap(24),
                         Expanded(
                           child: AnimatedSwitcher(
@@ -88,14 +98,14 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                             child: _buildCurrentStep(state),
                           ),
                         ),
-                        _buildBottomNavBar(context, state),
+                        _buildBottomNavBar(context, state, appLanguage),
                       ],
                     ),
                   ),
                   if (isWideWindow)
                     Align(
                       alignment: Alignment.centerRight,
-                      child: _buildHeaderProgress(state, true),
+                      child: _buildHeaderProgress(state, true, appLanguage),
                     ),
                 ],
               ),
@@ -107,28 +117,28 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   }
 
   // Header progress/stepper widget
-  Widget _buildHeaderProgress(SetupState state, bool isWideWindow) {
+  Widget _buildHeaderProgress(SetupState state, bool isWideWindow, String appLanguage) {
     int activeIndex = 0;
     if (state.isSecondStep) activeIndex = 1;
     if (state.isDownloadingStep) activeIndex = 2;
     if (isWideWindow) {
       return Column(
         children: [
-          _buildStepIndicator(0, 'Language', activeIndex >= 0),
+          _buildStepIndicator(0, AppLocalization.get('language', appLanguage), activeIndex >= 0),
           _buildLineConnector(activeIndex >= 1, isWideWindow),
-          _buildStepIndicator(1, 'Resources', activeIndex >= 1),
+          _buildStepIndicator(1, AppLocalization.get('resources', appLanguage), activeIndex >= 1),
           _buildLineConnector(activeIndex >= 2, isWideWindow),
-          _buildStepIndicator(2, 'Install', activeIndex >= 2),
+          _buildStepIndicator(2, AppLocalization.get('install', appLanguage), activeIndex >= 2),
         ],
       ).animate().fadeIn(duration: 400.ms);
     } else {
       return Row(
         children: [
-          _buildStepIndicator(0, 'Language', activeIndex >= 0),
+          _buildStepIndicator(0, AppLocalization.get('language', appLanguage), activeIndex >= 0),
           _buildLineConnector(activeIndex >= 1, isWideWindow),
-          _buildStepIndicator(1, 'Resources', activeIndex >= 1),
+          _buildStepIndicator(1, AppLocalization.get('resources', appLanguage), activeIndex >= 1),
           _buildLineConnector(activeIndex >= 2, isWideWindow),
-          _buildStepIndicator(2, 'Install', activeIndex >= 2),
+          _buildStepIndicator(2, AppLocalization.get('install', appLanguage), activeIndex >= 2),
         ],
       ).animate().fadeIn(duration: 400.ms);
     }
@@ -217,7 +227,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
         return LanguageStep(
           key: const ValueKey('lang_step'),
           state: state,
-          onSelected: (lang) => context.read<SetupCubit>().selectLanguage(lang),
+          onSelected: (lang) {
+            context.read<SetupCubit>().selectLanguage(lang);
+            context.read<SettingsCubit>().updateLanguageImplicitly(lang.code);
+          },
         );
       case SetupStep.resourceSelection:
         return ResourceStep(
@@ -234,7 +247,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   }
 
   // Bottom action buttons
-  Widget _buildBottomNavBar(BuildContext context, SetupState state) {
+  Widget _buildBottomNavBar(BuildContext context, SetupState state, String appLanguage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final outlineBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
@@ -256,7 +269,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                     backgroundColor: Colors.redAccent,
                     shadowColor: Colors.redAccent.withValues(alpha: 0.3),
                   ),
-                  child: const Text('Retry Setup Download'),
+                  child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                 ),
               ),
             ],
@@ -285,7 +298,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text('Back'),
+                child: Text(AppLocalization.get('back', appLanguage)),
               ),
             ),
             const Gap(16),
@@ -296,8 +309,8 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               onPressed: () => context.read<SetupCubit>().nextStep(),
               child: Text(
                 isFirst
-                    ? 'Continue to Resources'
-                    : 'Download Offline Library (${state.formattedTotalSize})',
+                    ? AppLocalization.get('continue_to_resources', appLanguage)
+                    : AppLocalization.get('download_offline_library', appLanguage, args: {'size': state.formattedTotalSize}),
               ),
             ),
           ),
@@ -307,7 +320,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   }
 
   // Setup completion visual dashboard
-  Widget _buildSuccessScreen(BuildContext context) {
+  Widget _buildSuccessScreen(BuildContext context, String appLanguage) {
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
@@ -343,7 +356,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           const Gap(32),
 
           Text(
-            'Library Ready!',
+            AppLocalization.get('library_ready', appLanguage),
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -353,7 +366,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
           const Gap(12),
           Text(
-            'Congratulations! Your offline Hadith resources have been successfully compiled and extracted. The application is now fully offline first ready.',
+            AppLocalization.get('setup_success_desc', appLanguage),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -372,7 +385,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                         // Navigate to main home view
                         context.go('/home');
                       },
-                      child: const Text('Enter Hadith Library'),
+                      child: Text(AppLocalization.get('enter_hadith_library', appLanguage)),
                     )
                     .animate(
                       onPlay: (controller) => controller.repeat(reverse: true),

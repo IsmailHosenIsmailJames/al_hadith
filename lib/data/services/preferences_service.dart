@@ -6,6 +6,8 @@ class PreferencesService {
   PreferencesService(this._prefs);
 
   static const String _keyLanguage = 'app_language_code';
+  static const String _keyAppLocale = 'app_locale_code';
+  static const String _keyAppLocaleExplicit = 'app_locale_explicit';
   static const String _keySelectedResources = 'selected_resources_keys';
   static const String _keyDownloadedResources = 'downloaded_resources_keys';
   static const String _keyIsSetupCompleted = 'is_setup_completed';
@@ -22,6 +24,23 @@ class PreferencesService {
 
   Future<bool> setAppLanguage(String languageCode) {
     return _prefs.setString(_keyLanguage, languageCode);
+  }
+
+  // App Interface Localization settings
+  String? getAppLocale() {
+    return _prefs.getString(_keyAppLocale);
+  }
+
+  Future<bool> setAppLocale(String localeCode) {
+    return _prefs.setString(_keyAppLocale, localeCode);
+  }
+
+  bool isAppLocaleExplicit() {
+    return _prefs.getBool(_keyAppLocaleExplicit) ?? false;
+  }
+
+  Future<bool> setAppLocaleExplicit(bool explicit) {
+    return _prefs.setBool(_keyAppLocaleExplicit, explicit);
   }
 
   // Selected Resources keys (to be downloaded)
