@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:al_hadith/core/database/database_helper.dart';
 import 'package:al_hadith/data/models/hadith_model.dart';
 
@@ -15,13 +16,11 @@ class HadithRepository {
   Future<Map<String, dynamic>?> getBookInfo(String bookKey) async {
     try {
       final db = await _dbHelper.getDatabase(bookKey);
-      // book_name_native is available in newer database versions
-      final List<Map<String, dynamic>> results = await db.query(
-        'book_info',
-        limit: 1,
-      );
+      final List<QueryRow> results = await db.customSelect(
+        'SELECT * FROM book_info LIMIT 1',
+      ).get();
       if (results.isNotEmpty) {
-        return results.first;
+        return results.first.data;
       }
     } catch (_) {
       // Fallback if db is locked or schema is corrupted
@@ -32,12 +31,10 @@ class HadithRepository {
   /// Fetches all sections/chapters inside a specific offline database
   Future<List<HadithSection>> getSections(String bookKey) async {
     final db = await _dbHelper.getDatabase(bookKey);
-    // section_name_native is available in newer database versions
-    final List<Map<String, dynamic>> results = await db.query(
-      'sections',
-      orderBy: 'id ASC',
-    );
-    return results.map((map) => HadithSection.fromMap(map)).toList();
+    final List<QueryRow> results = await db.customSelect(
+      'SELECT * FROM sections ORDER BY id ASC',
+    ).get();
+    return results.map((row) => HadithSection.fromMap(row.data)).toList();
   }
 
   /// Fetches all Hadith items for a specific section, including their scholarly gradings.
@@ -49,34 +46,34 @@ class HadithRepository {
     final db = await _dbHelper.getDatabase(bookKey);
 
     // Query 1: Fetch all hadiths in this section
-    final List<Map<String, dynamic>> hadithMaps = await db.query(
-      'hadiths',
-      where: 'section_id = ?',
-      whereArgs: [sectionId],
-      orderBy: 'hadith_number ASC',
-    );
+    final List<QueryRow> hadithMaps = await db.customSelect(
+      'SELECT * FROM hadiths WHERE section_id = ? ORDER BY hadith_number ASC',
+      variables: [Variable.withInt(sectionId)],
+    ).get();
 
     if (hadithMaps.isEmpty) return [];
 
     // Query 2: Fetch all scholarly grades for these hadiths at once
-    final List<Map<String, dynamic>> gradeMaps = await db.rawQuery(
+    final List<QueryRow> gradeMaps = await db.customSelect(
       '''
       SELECT g.* FROM grades g
       JOIN hadiths h ON g.hadith_id = h.id
       WHERE h.section_id = ?
     ''',
-      [sectionId],
-    );
+      variables: [Variable.withInt(sectionId)],
+    ).get();
 
     // Group grades by hadith_id in memory
     final Map<int, List<HadithGrade>> groupedGrades = {};
-    for (final map in gradeMaps) {
+    for (final row in gradeMaps) {
+      final map = row.data;
       final hId = parseInt(map['hadith_id']);
       groupedGrades.putIfAbsent(hId, () => []).add(HadithGrade.fromMap(map));
     }
 
     // Map into HadithItem objects
-    return hadithMaps.map((map) {
+    return hadithMaps.map((row) {
+      final map = row.data;
       final hadithId = parseInt(map['id']);
       final grades = groupedGrades[hadithId] ?? const [];
       return HadithItem.fromMap(map, grades: grades);
@@ -90,29 +87,26 @@ class HadithRepository {
   ) async {
     final db = await _dbHelper.getDatabase(bookKey);
 
-    final List<Map<String, dynamic>> hadithMaps = await db.query(
-      'hadiths',
-      where: 'hadith_number = ?',
-      whereArgs: [hadithNumber],
-      limit: 1,
-    );
+    final List<QueryRow> hadithMaps = await db.customSelect(
+      'SELECT * FROM hadiths WHERE hadith_number = ? LIMIT 1',
+      variables: [Variable.withInt(hadithNumber)],
+    ).get();
 
     if (hadithMaps.isEmpty) return null;
-    final hadithMap = hadithMaps.first;
+    final hadithMap = hadithMaps.first.data;
     final hadithId = parseInt(hadithMap['id']);
 
     // Fetch grades for this single hadith
-    final List<Map<String, dynamic>> gradeMaps = await db.query(
-      'grades',
-      where: 'hadith_id = ?',
-      whereArgs: [hadithId],
-    );
+    final List<QueryRow> gradeMaps = await db.customSelect(
+      'SELECT * FROM grades WHERE hadith_id = ?',
+      variables: [Variable.withInt(hadithId)],
+    ).get();
 
-    final grades = gradeMaps.map((map) => HadithGrade.fromMap(map)).toList();
+    final grades = gradeMaps.map((row) => HadithGrade.fromMap(row.data)).toList();
     return HadithItem.fromMap(hadithMap, grades: grades);
   }
 
-  /// Offline text search across the database using SQL LIKE
+  /// Offline text search across the database using FTS5 search
   Future<List<HadithItem>> searchHadiths(
     String bookKey,
     String query, {
@@ -120,37 +114,47 @@ class HadithRepository {
   }) async {
     final db = await _dbHelper.getDatabase(bookKey);
 
-    // Use LIKE for broad text matching (works on all SQLite builds)
-    final searchPattern = '%$query%';
-    final List<Map<String, dynamic>> searchResults = await db.rawQuery(
+    // Sanitize search query to make it safe for FTS5 tokenizer
+    final cleanQuery = query.replaceAll(RegExp(r'[*":()^+&|~?]'), ' ').trim();
+    if (cleanQuery.isEmpty) return [];
+
+    // Format terms for FTS5 prefix match: e.g. "term1* term2*"
+    final terms = cleanQuery.split(RegExp(r'\s+'));
+    final ftsQuery = terms.map((t) => '$t*').join(' ');
+
+    // Query 1: Search hadiths using FTS5 MATCH on virtual table
+    final List<QueryRow> searchResults = await db.customSelect(
       '''
-      SELECT * FROM hadiths
-      WHERE text LIKE ?
+      SELECT h.* FROM hadiths_fts f
+      JOIN hadiths h ON f.rowid = h.id
+      WHERE hadiths_fts MATCH ?
       LIMIT ?
     ''',
-      [searchPattern, limit],
-    );
+      variables: [Variable.withString(ftsQuery), Variable.withInt(limit)],
+    ).get();
 
     if (searchResults.isEmpty) return [];
 
     // Fetch grades for these search results
     final List<int> hadithIds = searchResults
-        .map((map) => parseInt(map['id']))
+        .map((row) => parseInt(row.data['id']))
         .toList();
     final String idPlaceholders = List.filled(hadithIds.length, '?').join(',');
 
-    final List<Map<String, dynamic>> gradeMaps = await db.rawQuery('''
-      SELECT * FROM grades 
-      WHERE hadith_id IN ($idPlaceholders)
-    ''', hadithIds);
+    final List<QueryRow> gradeMaps = await db.customSelect(
+      'SELECT * FROM grades WHERE hadith_id IN ($idPlaceholders)',
+      variables: hadithIds.map((id) => Variable.withInt(id)).toList(),
+    ).get();
 
     final Map<int, List<HadithGrade>> groupedGrades = {};
-    for (final map in gradeMaps) {
+    for (final row in gradeMaps) {
+      final map = row.data;
       final hId = parseInt(map['hadith_id']);
       groupedGrades.putIfAbsent(hId, () => []).add(HadithGrade.fromMap(map));
     }
 
-    return searchResults.map((map) {
+    return searchResults.map((row) {
+      final map = row.data;
       final hadithId = parseInt(map['id']);
       final grades = groupedGrades[hadithId] ?? const [];
       return HadithItem.fromMap(map, grades: grades);
