@@ -143,6 +143,17 @@ class PreferencesService {
     return _prefs.setBool(_keyAutoSync, enabled);
   }
 
+  // Hadith View Mode preference
+  static const String _keyHadithViewMode = 'hadith_view_mode';
+
+  String getHadithViewMode() {
+    return _prefs.getString(_keyHadithViewMode) ?? 'page';
+  }
+
+  Future<bool> setHadithViewMode(String mode) {
+    return _prefs.setString(_keyHadithViewMode, mode);
+  }
+
   // Clear preferences (useful for reset / testing)
   Future<bool> clearAll() {
     return _prefs.clear();

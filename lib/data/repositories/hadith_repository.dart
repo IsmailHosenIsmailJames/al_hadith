@@ -37,6 +37,24 @@ class HadithRepository {
     return results.map((row) => HadithSection.fromMap(row.data)).toList();
   }
 
+  /// Fetches a specific section by its ID
+  Future<HadithSection?> getSectionById(
+    String bookKey,
+    int sectionId,
+  ) async {
+    try {
+      final db = await _dbHelper.getDatabase(bookKey);
+      final List<QueryRow> results = await db.customSelect(
+        'SELECT * FROM sections WHERE id = ? LIMIT 1',
+        variables: [Variable.withInt(sectionId)],
+      ).get();
+      if (results.isNotEmpty) {
+        return HadithSection.fromMap(results.first.data);
+      }
+    } catch (_) {}
+    return null;
+  }
+
   /// Fetches all Hadith items for a specific section, including their scholarly gradings.
   /// Uses a highly optimized two-query approach to avoid N+1 query loops.
   Future<List<HadithItem>> getHadithsForSection(

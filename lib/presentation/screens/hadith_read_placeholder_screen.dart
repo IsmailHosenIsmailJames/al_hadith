@@ -12,6 +12,7 @@ import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/data/repositories/hadith_repository.dart';
 import 'package:al_hadith/data/services/history_service.dart';
+import 'package:al_hadith/data/services/preferences_service.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
@@ -46,6 +47,7 @@ class _HadithReadPlaceholderScreenState
   String? _error;
   _ViewMode _viewMode = _ViewMode.page;
   String _bookName = '';
+  String _sectionName = '';
 
   late PageController _pageController;
   final ItemScrollController _listScrollController = ItemScrollController();
@@ -60,6 +62,13 @@ class _HadithReadPlaceholderScreenState
   @override
   void initState() {
     super.initState();
+    _sectionName = widget.sectionName;
+
+    // Load saved view mode preference
+    final prefs = context.read<PreferencesService>();
+    final savedMode = prefs.getHadithViewMode();
+    _viewMode = savedMode == 'list' ? _ViewMode.list : _ViewMode.page;
+
     _pageController = PageController(initialPage: 0);
     _loadSection();
   }
@@ -89,19 +98,43 @@ class _HadithReadPlaceholderScreenState
         _bookName = widget.bookKey;
       }
 
+      int? resolvedSectionId = widget.initialSectionId;
       List<HadithItem> loaded;
-      if (widget.initialSectionId != null) {
+      if (resolvedSectionId != null) {
         loaded = await repo.getHadithsForSection(
           widget.bookKey,
-          widget.initialSectionId!,
+          resolvedSectionId,
         );
       } else {
-        // Fallback: load single hadith
+        // Fallback: load single hadith to find sectionId, then load entire section!
         final single = await repo.getHadithByNumber(
           widget.bookKey,
           widget.initialHadithNumber,
         );
-        loaded = single != null ? [single] : [];
+        if (single != null) {
+          resolvedSectionId = single.sectionId;
+          loaded = await repo.getHadithsForSection(
+            widget.bookKey,
+            resolvedSectionId,
+          );
+          if (loaded.isEmpty) {
+            loaded = [single];
+          }
+        } else {
+          loaded = [];
+        }
+      }
+
+      if (_sectionName.isEmpty && resolvedSectionId != null) {
+        final section = await repo.getSectionById(
+          widget.bookKey,
+          resolvedSectionId,
+        );
+        if (section != null) {
+          _sectionName = section.sectionNameNative.isNotEmpty
+              ? section.sectionNameNative
+              : section.sectionName;
+        }
       }
 
       if (loaded.isEmpty) {
@@ -124,10 +157,12 @@ class _HadithReadPlaceholderScreenState
         _isLoading = false;
       });
 
-      // Jump PageController to correct page after first frame
+      // Jump to correct page/index after first frame
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_pageController.hasClients && startIdx > 0) {
+        if (_viewMode == _ViewMode.page && _pageController.hasClients && startIdx > 0) {
           _pageController.jumpToPage(startIdx);
+        } else if (_viewMode == _ViewMode.list && _listScrollController.isAttached && startIdx > 0) {
+          _listScrollController.jumpTo(index: startIdx);
         }
       });
 
@@ -136,7 +171,7 @@ class _HadithReadPlaceholderScreenState
         bookKey: widget.bookKey,
         bookName: _bookName,
         hadithNumber: loaded[startIdx].hadithNumber,
-        sectionTitle: widget.sectionName,
+        sectionTitle: _sectionName,
       );
     } catch (e) {
       setState(() {
@@ -173,7 +208,7 @@ class _HadithReadPlaceholderScreenState
       bookKey: widget.bookKey,
       bookName: _bookName,
       hadithNumber: _hadiths[_currentIndex].hadithNumber,
-      sectionTitle: widget.sectionName,
+      sectionTitle: _sectionName,
     );
   }
 
@@ -210,6 +245,11 @@ class _HadithReadPlaceholderScreenState
         : _ViewMode.page;
     setState(() => _viewMode = newMode);
 
+    // Save view mode preference
+    context.read<PreferencesService>().setHadithViewMode(
+      newMode == _ViewMode.list ? 'list' : 'page',
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (newMode == _ViewMode.list && _listScrollController.isAttached) {
         _listScrollController.jumpTo(index: _currentIndex);
@@ -223,10 +263,14 @@ class _HadithReadPlaceholderScreenState
     if (_hadiths.isEmpty) return;
     int selected = _currentIndex;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     showModalBottomSheet(
@@ -263,11 +307,15 @@ class _HadithReadPlaceholderScreenState
               ),
               const Gap(6),
               Text(
-                AppLocalization.get('jump_to_hadith_count', appLanguage, args: {'current': '${selected + 1}', 'total': '${_hadiths.length}'}),
-                style: TextStyle(
-                  fontSize: 13,
-                  color: textSecondary,
+                AppLocalization.get(
+                  'jump_to_hadith_count',
+                  appLanguage,
+                  args: {
+                    'current': '${selected + 1}',
+                    'total': '${_hadiths.length}',
+                  },
                 ),
+                style: TextStyle(fontSize: 13, color: textSecondary),
               ),
               const Gap(20),
               SliderTheme(
@@ -289,18 +337,20 @@ class _HadithReadPlaceholderScreenState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    AppLocalization.get('hadith_no', appLanguage, args: {'number': '${_hadiths.first.hadithNumber}'}),
-                    style: TextStyle(
-                      color: textSecondary,
-                      fontSize: 12,
+                    AppLocalization.get(
+                      'hadith_no',
+                      appLanguage,
+                      args: {'number': '${_hadiths.first.hadithNumber}'},
                     ),
+                    style: TextStyle(color: textSecondary, fontSize: 12),
                   ),
                   Text(
-                    AppLocalization.get('hadith_no', appLanguage, args: {'number': '${_hadiths.last.hadithNumber}'}),
-                    style: TextStyle(
-                      color: textSecondary,
-                      fontSize: 12,
+                    AppLocalization.get(
+                      'hadith_no',
+                      appLanguage,
+                      args: {'number': '${_hadiths.last.hadithNumber}'},
                     ),
+                    style: TextStyle(color: textSecondary, fontSize: 12),
                   ),
                 ],
               ),
@@ -329,7 +379,11 @@ class _HadithReadPlaceholderScreenState
                     });
                   },
                   child: Text(
-                    AppLocalization.get('go_to_hadith_number', appLanguage, args: {'number': '${_hadiths[selected].hadithNumber}'}),
+                    AppLocalization.get(
+                      'go_to_hadith_number',
+                      appLanguage,
+                      args: {'number': '${_hadiths[selected].hadithNumber}'},
+                    ),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -346,10 +400,14 @@ class _HadithReadPlaceholderScreenState
 
   void _shareHadith(HadithItem hadith) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     showModalBottomSheet(
@@ -420,7 +478,12 @@ class _HadithReadPlaceholderScreenState
                                 size: 16,
                               ),
                               const Gap(8),
-                              Text(AppLocalization.get('copied_to_clipboard', appLanguage)),
+                              Text(
+                                AppLocalization.get(
+                                  'copied_to_clipboard',
+                                  appLanguage,
+                                ),
+                              ),
                             ],
                           ),
                           backgroundColor: AppTheme.primaryMint,
@@ -452,7 +515,11 @@ class _HadithReadPlaceholderScreenState
                           '${AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'})}\n\n${hadith.text}\n\n— $_bookName\n\n${AppLocalization.get('shared_via_app', appLanguage)}';
                       Share.share(
                         text,
-                        subject: AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'}),
+                        subject: AppLocalization.get(
+                          'hadith_no',
+                          appLanguage,
+                          args: {'number': '${hadith.hadithNumber}'},
+                        ),
                       );
                       Navigator.pop(ctx);
                     },
@@ -467,19 +534,21 @@ class _HadithReadPlaceholderScreenState
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
-    final title = widget.sectionName.isNotEmpty
-        ? widget.sectionName
+    final title = _sectionName.isNotEmpty
+        ? _sectionName
         : _bookName.isNotEmpty
         ? _bookName
         : AppLocalization.get('hadith_book_default_title', appLanguage);
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Scaffold(
       backgroundColor: canvasColor,
@@ -487,11 +556,7 @@ class _HadithReadPlaceholderScreenState
         backgroundColor: surfaceColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: textPrimary,
-            size: 20,
-          ),
+          icon: Icon(Icons.arrow_back_ios_new, color: textPrimary, size: 20),
           onPressed: () => context.pop(),
         ),
         title: Column(
@@ -566,146 +631,161 @@ class _HadithReadPlaceholderScreenState
           : null,
     );
   }
-  
-    Widget _buildPageNavBar() {
-      final canPrev = _currentIndex > 0;
-      final canNext = _currentIndex < _hadiths.length - 1;
-      final isDark = Theme.of(context).brightness == Brightness.dark;
-      final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-      final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-      final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-      final pillBgColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
-      final appLanguage = context.read<SettingsCubit>().state.appLanguage;
-  
-      return Container(
-        decoration: BoxDecoration(
-          color: navBgColor,
-          border: Border(top: BorderSide(color: borderDividerColor, width: 1)),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: Row(
-              children: [
-                // Previous button
-                Expanded(
-                  child: AnimatedOpacity(
-                    opacity: canPrev ? 1.0 : 0.35,
-                    duration: 200.ms,
-                    child: TextButton.icon(
-                      onPressed: canPrev
-                          ? () => _pageController.animateToPage(
-                              _currentIndex - 1,
-                              duration: 300.ms,
-                              curve: Curves.easeInOut,
-                            )
-                          : null,
-                      icon: const Icon(
-                        Icons.arrow_back_ios_rounded,
-                        size: 14,
-                        color: AppTheme.primaryMint,
-                      ),
-                      label: Text(
-                        AppLocalization.get('previous', appLanguage),
-                        style: const TextStyle(
-                          color: AppTheme.primaryMint,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-  
-                // Centre progress pill
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: pillBgColor,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: borderDividerColor),
-                  ),
-                  child: Text(
-                    AppLocalization.get('jump_to_hadith_count', appLanguage, args: {'current': '${_currentIndex + 1}', 'total': '${_hadiths.length}'}),
-                    style: TextStyle(
-                      color: textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-  
-                // Next button
-                Expanded(
-                  child: AnimatedOpacity(
-                    opacity: canNext ? 1.0 : 0.35,
-                    duration: 200.ms,
-                    child: TextButton.icon(
-                      onPressed: canNext
-                          ? () => _pageController.animateToPage(
-                              _currentIndex + 1,
-                              duration: 300.ms,
-                              curve: Curves.easeInOut,
-                            )
-                          : null,
-                      iconAlignment: IconAlignment.end,
-                      icon: const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 14,
-                        color: AppTheme.primaryMint,
-                      ),
-                      label: Text(
-                        AppLocalization.get('next', appLanguage),
-                        style: const TextStyle(
-                          color: AppTheme.primaryMint,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-  
-    Widget _buildError() {
-      final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-      final appLanguage = context.read<SettingsCubit>().state.appLanguage;
-      return Center(
+
+  Widget _buildPageNavBar() {
+    final canPrev = _currentIndex > 0;
+    final canNext = _currentIndex < _hadiths.length - 1;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final pillBgColor = isDark
+        ? AppTheme.darkSurfaceCard
+        : const Color(0xFFF3F4F6);
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: navBgColor,
+        border: Border(top: BorderSide(color: borderDividerColor, width: 1)),
+      ),
+      child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
             children: [
-              const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
-              const Gap(16),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: textSecondary),
-              ),
-              const Gap(20),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryMint,
-                  foregroundColor: AppTheme.darkCanvas,
+              // Previous button
+              Expanded(
+                child: AnimatedOpacity(
+                  opacity: canPrev ? 1.0 : 0.35,
+                  duration: 200.ms,
+                  child: TextButton.icon(
+                    onPressed: canPrev
+                        ? () => _pageController.animateToPage(
+                            _currentIndex - 1,
+                            duration: 300.ms,
+                            curve: Curves.easeInOut,
+                          )
+                        : null,
+                    icon: const Icon(
+                      Icons.arrow_back_ios_rounded,
+                      size: 14,
+                      color: AppTheme.primaryMint,
+                    ),
+                    label: Text(
+                      AppLocalization.get('previous', appLanguage),
+                      style: const TextStyle(
+                        color: AppTheme.primaryMint,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: _loadSection,
-                icon: const Icon(Icons.refresh_rounded),
-                label: Text(AppLocalization.get('retry_setup_download', appLanguage)),
+              ),
+
+              // Centre progress pill
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: pillBgColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: borderDividerColor),
+                ),
+                child: Text(
+                  AppLocalization.get(
+                    'jump_to_hadith_count',
+                    appLanguage,
+                    args: {
+                      'current': '${_currentIndex + 1}',
+                      'total': '${_hadiths.length}',
+                    },
+                  ),
+                  style: TextStyle(
+                    color: textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              // Next button
+              Expanded(
+                child: AnimatedOpacity(
+                  opacity: canNext ? 1.0 : 0.35,
+                  duration: 200.ms,
+                  child: TextButton.icon(
+                    onPressed: canNext
+                        ? () => _pageController.animateToPage(
+                            _currentIndex + 1,
+                            duration: 300.ms,
+                            curve: Curves.easeInOut,
+                          )
+                        : null,
+                    iconAlignment: IconAlignment.end,
+                    icon: const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: AppTheme.primaryMint,
+                    ),
+                    label: Text(
+                      AppLocalization.get('next', appLanguage),
+                      style: const TextStyle(
+                        color: AppTheme.primaryMint,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
+
+  Widget _buildError() {
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+            const Gap(16),
+            Text(
+              _error!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: textSecondary),
+            ),
+            const Gap(20),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryMint,
+                foregroundColor: AppTheme.darkCanvas,
+              ),
+              onPressed: _loadSection,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(
+                AppLocalization.get('retry_setup_download', appLanguage),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildPageView() {
     return PageView.builder(
@@ -775,11 +855,17 @@ class _HadithCard extends StatelessWidget {
   ) {
     final textController = TextEditingController(text: currentNote);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final sheetBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final dialogCanvasColor = isDark ? AppTheme.darkCanvas : const Color(0xFFF3F4F6);
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final dialogCanvasColor = isDark
+        ? AppTheme.darkCanvas
+        : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     showModalBottomSheet(
@@ -795,7 +881,9 @@ class _HadithCard extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: sheetBgColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               border: Border(
                 top: BorderSide(color: borderDividerColor, width: 1.5),
               ),
@@ -816,10 +904,7 @@ class _HadithCard extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: textSecondary,
-                      ),
+                      icon: Icon(Icons.close, color: textSecondary),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
@@ -835,17 +920,13 @@ class _HadithCard extends StatelessWidget {
                     controller: textController,
                     maxLines: 5,
                     autofocus: true,
-                    style: TextStyle(
-                      color: textPrimary,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: textPrimary, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText:
-                          AppLocalization.get('write_notes_hint', appLanguage),
-                      hintStyle: TextStyle(
-                        color: textSecondary,
-                        fontSize: 13,
+                      hintText: AppLocalization.get(
+                        'write_notes_hint',
+                        appLanguage,
                       ),
+                      hintStyle: TextStyle(color: textSecondary, fontSize: 13),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
@@ -948,8 +1029,12 @@ class _HadithCard extends StatelessWidget {
     final isRead = historyService.isHadithRead(bookKey, hadith.hadithNumber);
 
     final books = context.read<HadithCubit>().state.downloadedBooks;
-    final book = books.any((b) => b.book == bookKey) ? books.firstWhere((b) => b.book == bookKey) : null;
-    final bookName = book != null ? (book.nameNative.isNotEmpty ? book.nameNative : book.name) : bookKey;
+    final book = books.any((b) => b.book == bookKey)
+        ? books.firstWhere((b) => b.book == bookKey)
+        : null;
+    final bookName = book != null
+        ? (book.nameNative.isNotEmpty ? book.nameNative : book.name)
+        : bookKey;
 
     // Watch Collections states for live color feedback
     final state = context.watch<HadithCubit>().state;
@@ -960,10 +1045,16 @@ class _HadithCard extends StatelessWidget {
     final hasNote = noteText != null && noteText.trim().isNotEmpty;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : Colors.white;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final cardBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        : Colors.white;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -1006,7 +1097,11 @@ class _HadithCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        AppLocalization.get('hadith_no', appLanguage, args: {'number': '${hadith.hadithNumber}'}),
+                        AppLocalization.get(
+                          'hadith_no',
+                          appLanguage,
+                          args: {'number': '${hadith.hadithNumber}'},
+                        ),
                         style: const TextStyle(
                           color: AppTheme.primaryMint,
                           fontSize: 11,
@@ -1054,7 +1149,12 @@ class _HadithCard extends StatelessWidget {
                             ),
                             const Gap(4),
                             Text(
-                              isRead ? AppLocalization.get('read', appLanguage) : AppLocalization.get('mark_read', appLanguage),
+                              isRead
+                                  ? AppLocalization.get('read', appLanguage)
+                                  : AppLocalization.get(
+                                      'mark_read',
+                                      appLanguage,
+                                    ),
                               style: TextStyle(
                                 color: isRead
                                     ? AppTheme.primaryMint
@@ -1204,7 +1304,7 @@ class _HadithCard extends StatelessWidget {
                       if (gl.contains('sahih')) {
                         c = Colors.green;
                       } else if (gl.contains('hasan')) {
-                         c = Colors.orangeAccent;
+                        c = Colors.orangeAccent;
                       } else if (gl.contains('da') || gl.contains('weak')) {
                         c = Colors.redAccent;
                       }
@@ -1257,9 +1357,7 @@ class _HadithCard extends StatelessWidget {
                       icon: isPinned
                           ? Icons.push_pin_rounded
                           : Icons.push_pin_outlined,
-                      color: isPinned
-                          ? Colors.orangeAccent
-                          : textSecondary,
+                      color: isPinned ? Colors.orangeAccent : textSecondary,
                       label: AppLocalization.get('pinned', appLanguage),
                       onTap: () => context.read<HadithCubit>().togglePin(
                         bookKey,
@@ -1270,9 +1368,7 @@ class _HadithCard extends StatelessWidget {
                       icon: hasNote
                           ? Icons.note_alt_rounded
                           : Icons.note_alt_outlined,
-                      color: hasNote
-                          ? Colors.tealAccent
-                          : textSecondary,
+                      color: hasNote ? Colors.tealAccent : textSecondary,
                       label: AppLocalization.get('notes', appLanguage),
                       onTap: () => _showNoteDialog(
                         context,
@@ -1291,7 +1387,12 @@ class _HadithCard extends StatelessWidget {
                         Clipboard.setData(ClipboardData(text: copyText));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(AppLocalization.get('copied_to_clipboard', appLanguage)),
+                            content: Text(
+                              AppLocalization.get(
+                                'copied_to_clipboard',
+                                appLanguage,
+                              ),
+                            ),
                             backgroundColor: AppTheme.primaryMint,
                             behavior: SnackBarBehavior.floating,
                             duration: const Duration(seconds: 1),
@@ -1317,18 +1418,11 @@ class _HadithCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.swipe_rounded,
-                        color: textSecondary,
-                        size: 14,
-                      ),
+                      Icon(Icons.swipe_rounded, color: textSecondary, size: 14),
                       const Gap(6),
                       Text(
                         AppLocalization.get('swipe_nav_hint', appLanguage),
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 11,
-                        ),
+                        style: TextStyle(color: textSecondary, fontSize: 11),
                       ),
                     ],
                   ),
