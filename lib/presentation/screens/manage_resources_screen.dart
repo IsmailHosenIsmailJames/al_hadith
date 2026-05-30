@@ -84,7 +84,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _errorMessage = AppLocalization.get('load_failed', appLanguage, args: {'error': e.toString()});
+          _errorMessage = AppLocalization.get(
+            'load_failed',
+            appLanguage,
+            args: {'error': e.toString()},
+          );
         });
       }
     }
@@ -138,7 +142,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: AppTheme.primaryMint,
             content: Text(
-              AppLocalization.get('download_success', appLanguage, args: {'name': resource.name}),
+              AppLocalization.get(
+                'download_success',
+                appLanguage,
+                args: {'name': resource.name},
+              ),
               style: const TextStyle(
                 color: AppTheme.darkCanvas,
                 fontWeight: FontWeight.bold,
@@ -159,7 +167,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              AppLocalization.get('download_failed', appLanguage, args: {'error': e.toString()}),
+              AppLocalization.get(
+                'download_failed',
+                appLanguage,
+                args: {'error': e.toString()},
+              ),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -175,8 +187,10 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     final downloadService = RepositoryProvider.of<DownloadService>(context);
     final prefs = RepositoryProvider.of<PreferencesService>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final dialogBg = isDark ? AppTheme.darkSurface : Colors.white;
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
@@ -187,13 +201,14 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
         backgroundColor: dialogBg,
         title: Text(
           AppLocalization.get('delete_book', appLanguage),
-          style: TextStyle(
-            color: textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold),
         ),
         content: Text(
-          AppLocalization.get('delete_book_desc', appLanguage, args: {'name': resource.name}),
+          AppLocalization.get(
+            'delete_book_desc',
+            appLanguage,
+            args: {'name': resource.name},
+          ),
           style: TextStyle(color: textSecondary),
         ),
         actions: [
@@ -207,7 +222,10 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(AppLocalization.get('delete', appLanguage), style: const TextStyle(color: Colors.white)),
+            child: Text(
+              AppLocalization.get('delete', appLanguage),
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -235,7 +253,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: AppTheme.primaryMint,
             content: Text(
-              AppLocalization.get('delete_success', appLanguage, args: {'name': resource.name}),
+              AppLocalization.get(
+                'delete_success',
+                appLanguage,
+                args: {'name': resource.name},
+              ),
               style: const TextStyle(
                 color: AppTheme.darkCanvas,
                 fontWeight: FontWeight.bold,
@@ -250,7 +272,11 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              AppLocalization.get('delete_failed', appLanguage, args: {'error': e.toString()}),
+              AppLocalization.get(
+                'delete_failed',
+                appLanguage,
+                args: {'error': e.toString()},
+              ),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -299,10 +325,16 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final inputBgColor = isDark ? AppTheme.darkSurface : const Color(0xFFF3F4F6);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final inputBgColor = isDark
+        ? AppTheme.darkSurface
+        : const Color(0xFFF3F4F6);
     final dropdownBgColor = isDark ? AppTheme.darkSurface : Colors.white;
 
     return Scaffold(
@@ -335,153 +367,185 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
           indicatorColor: AppTheme.primaryMint,
           labelColor: AppTheme.primaryMint,
           unselectedLabelColor: textSecondary,
+          dividerColor: surfaceColor,
           tabs: [
-            Tab(text: AppLocalization.get('downloaded_tab_title', appLanguage, args: {'count': '${downloadedList.length}'})),
-            Tab(text: AppLocalization.get('all_books_tab_title', appLanguage, args: {'count': '${allList.length}'})),
+            Tab(
+              text: AppLocalization.get(
+                'downloaded_tab_title',
+                appLanguage,
+                args: {'count': '${downloadedList.length}'},
+              ),
+            ),
+            Tab(
+              text: AppLocalization.get(
+                'all_books_tab_title',
+                appLanguage,
+                args: {'count': '${allList.length}'},
+              ),
+            ),
           ],
         ),
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primaryMint),
-            )
-          : _errorMessage != null
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: AppTheme.wideWidth),
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: AppTheme.primaryMint),
+                )
+              : _errorMessage != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          color: Colors.redAccent,
+                          size: 48,
+                        ),
+                        const Gap(16),
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(color: textSecondary),
+                          textAlign: TextAlign.center,
+                        ),
+                        const Gap(16),
+                        ElevatedButton(
+                          onPressed: _loadMetadata,
+                          child: Text(
+                            AppLocalization.get(
+                              'retry_setup_download',
+                              appLanguage,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Column(
                   children: [
-                    const Icon(
-                      Icons.error_outline_rounded,
-                      color: Colors.redAccent,
-                      size: 48,
-                    ),
-                    const Gap(16),
-                    Text(
-                      _errorMessage!,
-                      style: TextStyle(color: textSecondary),
-                      textAlign: TextAlign.center,
-                    ),
-                    const Gap(16),
-                    ElevatedButton(
-                      onPressed: _loadMetadata,
-                      child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          : Column(
-              children: [
-                // Search & Language filter row
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: inputBgColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: borderDividerColor),
-                          ),
-                          child: TextField(
-                            controller: _searchController,
-                            style: TextStyle(
-                              color: textPrimary,
-                              fontSize: 14,
-                            ),
-                            onChanged: (val) {
-                              setState(() {
-                                _searchQuery = val;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              hintText: AppLocalization.get('search_books_hint', appLanguage),
-                              hintStyle: TextStyle(
-                                color: textSecondary,
-                                fontSize: 13,
+                    // Search & Language filter row
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: inputBgColor,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: borderDividerColor),
                               ),
-                              prefixIcon: Icon(
-                                Icons.search,
-                                color: textSecondary,
-                                size: 18,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const Gap(12),
-                      // Language selector pill
-                      Container(
-                        height: 48,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: inputBgColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: borderDividerColor),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _selectedLangFilter,
-                            dropdownColor: dropdownBgColor,
-                            style: TextStyle(
-                              color: textPrimary,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: AppTheme.primaryMint,
-                              size: 18,
-                            ),
-                            onChanged: (value) {
-                              if (value != null) {
-                                  setState(() {
-                                    _selectedLangFilter = value;
-                                  });
-                                }
-                              },
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'All',
-                                  child: Text(AppLocalization.get('all_languages', appLanguage), style: TextStyle(color: textPrimary)),
+                              child: TextField(
+                                controller: _searchController,
+                                style: TextStyle(
+                                  color: textPrimary,
+                                  fontSize: 14,
                                 ),
-                              ..._languages.map(
-                                (lang) => DropdownMenuItem(
-                                  value: lang.code,
-                                  child: Text(
-                                    lang.code == "eng"
-                                        ? lang.displayName
-                                        : "${lang.nativeName} (${lang.displayName})",
-                                    style: TextStyle(color: textPrimary),
+                                onChanged: (val) {
+                                  setState(() {
+                                    _searchQuery = val;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  hintText: AppLocalization.get(
+                                    'search_books_hint',
+                                    appLanguage,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: 13,
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.search,
+                                    color: textSecondary,
+                                    size: 18,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 14,
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          const Gap(12),
+                          // Language selector pill
+                          Container(
+                            height: 48,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: inputBgColor,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: borderDividerColor),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedLangFilter,
+                                dropdownColor: dropdownBgColor,
+                                style: TextStyle(
+                                  color: textPrimary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: AppTheme.primaryMint,
+                                  size: 18,
+                                ),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      _selectedLangFilter = value;
+                                    });
+                                  }
+                                },
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'All',
+                                    child: Text(
+                                      AppLocalization.get(
+                                        'all_languages',
+                                        appLanguage,
+                                      ),
+                                      style: TextStyle(color: textPrimary),
+                                    ),
+                                  ),
+                                  ..._languages.map(
+                                    (lang) => DropdownMenuItem(
+                                      value: lang.code,
+                                      child: Text(
+                                        lang.code == "eng"
+                                            ? lang.displayName
+                                            : "${lang.nativeName} (${lang.displayName})",
+                                        style: TextStyle(color: textPrimary),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          _buildBookList(downloadedList, downloadedOnly: true),
+                          _buildBookList(allList, downloadedOnly: false),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildBookList(downloadedList, downloadedOnly: true),
-                      _buildBookList(allList, downloadedOnly: false),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        ),
+      ),
     );
   }
 
@@ -489,7 +553,8 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     List<HadithResource> books, {
     required bool downloadedOnly,
   }) {
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     if (books.isEmpty) {
@@ -509,10 +574,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               downloadedOnly
                   ? AppLocalization.get('no_downloaded_books', appLanguage)
                   : AppLocalization.get('no_books_match', appLanguage),
-              style: TextStyle(
-                color: textSecondary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: textSecondary, fontSize: 14),
             ),
           ],
         ),
@@ -540,14 +602,20 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
     final isCompleted = status == 'Completed';
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
     final badgeBgColor = isCompleted
         ? AppTheme.primaryMint.withValues(alpha: 0.1)
         : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB));
-    final pillBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFF3F4F6);
+    final pillBgColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFF3F4F6);
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
     return Container(
@@ -580,9 +648,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                 child: Center(
                   child: Icon(
                     Icons.menu_book_rounded,
-                    color: isCompleted
-                        ? AppTheme.primaryMint
-                        : textSecondary,
+                    color: isCompleted ? AppTheme.primaryMint : textSecondary,
                     size: 20,
                   ),
                 ),
@@ -605,10 +671,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                     if (resource.languageCode != "eng")
                       Text(
                         resource.name,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 10, color: textSecondary),
                       ),
                     const Gap(4),
                     Row(
@@ -636,10 +699,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         const Gap(8),
                         Text(
                           resource.formattedZipSize,
-                          style: TextStyle(
-                            color: textSecondary,
-                            fontSize: 11,
-                          ),
+                          style: TextStyle(color: textSecondary, fontSize: 11),
                         ),
                       ],
                     ),
@@ -666,7 +726,10 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
                         color: textSecondary,
                         size: 20,
                       ),
-                      tooltip: AppLocalization.get('retry_setup_download', appLanguage),
+                      tooltip: AppLocalization.get(
+                        'retry_setup_download',
+                        appLanguage,
+                      ),
                       onPressed: () => _startDownload(resource),
                     ),
                     IconButton(
@@ -699,10 +762,7 @@ class _ManageResourcesScreenState extends State<ManageResourcesScreen>
               children: [
                 Text(
                   status,
-                  style: TextStyle(
-                    color: textSecondary,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: textSecondary, fontSize: 11),
                 ),
                 Text(
                   '${(progress * 100).toInt()}%',

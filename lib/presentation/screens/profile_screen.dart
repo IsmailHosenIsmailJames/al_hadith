@@ -36,23 +36,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
 
-    return BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, authState) {
-        if (authState.isLoggedIn) {
-          return _buildLoggedInView(context, authState, appLanguage);
-        }
-        return _buildLoginView(context, authState, appLanguage);
-      },
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: AppTheme.wideWidth),
+        child: BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, authState) {
+            if (authState.isLoggedIn) {
+              return _buildLoggedInView(context, authState, appLanguage);
+            }
+            return _buildLoginView(context, authState, appLanguage);
+          },
+        ),
+      ),
     );
   }
 
   // ── Logged-in view ──
-  Widget _buildLoggedInView(BuildContext context, AuthState authState, String appLanguage) {
+  Widget _buildLoggedInView(
+    BuildContext context,
+    AuthState authState,
+    String appLanguage,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
     return SingleChildScrollView(
@@ -78,18 +91,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Image.network(
                       authState.photoUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, stack) => Icon(
-                        Icons.person,
-                        size: 40,
-                        color: tickColor,
-                      ),
+                      errorBuilder: (ctx, err, stack) =>
+                          Icon(Icons.person, size: 40, color: tickColor),
                     ),
                   )
-                : Icon(
-                    Icons.person,
-                    size: 40,
-                    color: tickColor,
-                  ),
+                : Icon(Icons.person, size: 40, color: tickColor),
           ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
 
           const Gap(16),
@@ -288,7 +294,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onPressed: () => Navigator.pop(ctx, true),
                         child: Text(
                           AppLocalization.get('delete_forever', appLanguage),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -303,7 +312,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
-                  side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.2)),
+                  side: BorderSide(
+                    color: Colors.redAccent.withValues(alpha: 0.2),
+                  ),
                 ),
               ),
               icon: const Icon(
@@ -328,146 +339,186 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSyncCard(BuildContext context, AuthState authState, String appLanguage) {
+  Widget _buildSyncCard(
+    BuildContext context,
+    AuthState authState,
+    String appLanguage,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardBgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: authState.isSyncing
-              ? AppTheme.primaryMint.withValues(alpha: 0.4)
-              : borderDividerColor,
-          width: authState.isSyncing ? 1.5 : 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: cardBgColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: authState.isSyncing
+                  ? AppTheme.primaryMint.withValues(alpha: 0.4)
+                  : borderDividerColor,
+              width: authState.isSyncing ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryMint.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: authState.isSyncing
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          color: AppTheme.primaryMint,
-                          strokeWidth: 2.5,
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryMint.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: authState.isSyncing
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: AppTheme.primaryMint,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.cloud_done_rounded,
+                            color: AppTheme.primaryMint,
+                            size: 22,
+                          ),
+                  ),
+                  const Gap(14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          authState.isSyncing
+                              ? AppLocalization.get('syncing', appLanguage)
+                              : AppLocalization.get(
+                                  'cloud_backup',
+                                  appLanguage,
+                                ),
+                          style: TextStyle(
+                            color: textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      )
-                    : const Icon(
-                        Icons.cloud_done_rounded,
-                        color: AppTheme.primaryMint,
-                        size: 22,
-                      ),
+                        const Gap(2),
+                        Text(
+                          authState.lastSyncTime != null
+                              ? AppLocalization.get(
+                                  'last_synced',
+                                  appLanguage,
+                                  args: {
+                                    'time': _formatTime(
+                                      authState.lastSyncTime!,
+                                      appLanguage,
+                                    ),
+                                  },
+                                )
+                              : AppLocalization.get(
+                                  'sync_now',
+                                  appLanguage,
+                                ), // natural saved term
+                          style: TextStyle(color: textSecondary, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const Gap(14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      authState.isSyncing
-                          ? AppLocalization.get('syncing', appLanguage)
-                          : AppLocalization.get('cloud_backup', appLanguage),
-                      style: TextStyle(
-                        color: textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              const Gap(16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: authState.isSyncing
+                      ? null
+                      : () {
+                          context.read<AuthCubit>().syncNow();
+                          // Reload dashboard after sync to reflect restored data
+                          Future.delayed(const Duration(seconds: 2), () {
+                            if (context.mounted) {
+                              context.read<HadithCubit>().loadDashboard();
+                            }
+                          });
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryMint,
+                    foregroundColor: tickColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const Gap(2),
-                    Text(
-                      authState.lastSyncTime != null
-                          ? AppLocalization.get('last_synced', appLanguage, args: {
-                              'time': _formatTime(authState.lastSyncTime!, appLanguage)
-                            })
-                          : AppLocalization.get('sync_now', appLanguage), // natural saved term
-                      style: TextStyle(
-                        color: textSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
+                  ),
+                  icon: const Icon(Icons.sync_rounded, size: 18),
+                  label: Text(
+                    authState.isSyncing
+                        ? AppLocalization.get('syncing', appLanguage)
+                        : AppLocalization.get('sync_now', appLanguage),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
+              if (authState.errorMessage != null) ...[
+                const Gap(10),
+                Text(
+                  authState.errorMessage!,
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 11),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
           ),
-          const Gap(16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: authState.isSyncing
-                  ? null
-                  : () {
-                      context.read<AuthCubit>().syncNow();
-                      // Reload dashboard after sync to reflect restored data
-                      Future.delayed(const Duration(seconds: 2), () {
-                        if (context.mounted) {
-                          context.read<HadithCubit>().loadDashboard();
-                        }
-                      });
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryMint,
-                foregroundColor: tickColor,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(Icons.sync_rounded, size: 18),
-              label: Text(
-                authState.isSyncing
-                    ? AppLocalization.get('syncing', appLanguage)
-                    : AppLocalization.get('sync_now', appLanguage),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          if (authState.errorMessage != null) ...[
-            const Gap(10),
-            Text(
-              authState.errorMessage!,
-              style: const TextStyle(color: Colors.redAccent, fontSize: 11),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ],
-      ),
-    ).animate().fadeIn(duration: 350.ms, delay: 100.ms).slideY(begin: 0.03, end: 0);
+        )
+        .animate()
+        .fadeIn(duration: 350.ms, delay: 100.ms)
+        .slideY(begin: 0.03, end: 0);
   }
 
   String _formatTime(DateTime time, String appLanguage) {
     final now = DateTime.now();
     final diff = now.difference(time);
-    if (diff.inSeconds < 60) return AppLocalization.get('just_now', appLanguage);
-    if (diff.inMinutes < 60) return AppLocalization.get('minutes_ago', appLanguage, args: {'minutes': diff.inMinutes.toString()});
-    if (diff.inHours < 24) return AppLocalization.get('hours_ago', appLanguage, args: {'hours': diff.inHours.toString()});
+    if (diff.inSeconds < 60)
+      return AppLocalization.get('just_now', appLanguage);
+    if (diff.inMinutes < 60)
+      return AppLocalization.get(
+        'minutes_ago',
+        appLanguage,
+        args: {'minutes': diff.inMinutes.toString()},
+      );
+    if (diff.inHours < 24)
+      return AppLocalization.get(
+        'hours_ago',
+        appLanguage,
+        args: {'hours': diff.inHours.toString()},
+      );
     return '${time.day}/${time.month}/${time.year}';
   }
 
   // ── Login view ──
-  Widget _buildLoginView(BuildContext context, AuthState authState, String appLanguage) {
+  Widget _buildLoginView(
+    BuildContext context,
+    AuthState authState,
+    String appLanguage,
+  ) {
     if (!isFirebaseSupported) {
       return _buildUnsupportedPlatformView(context, appLanguage);
     }
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
@@ -509,11 +560,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             AppLocalization.get('backup_sync_hero_desc', appLanguage),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: textSecondary,
-              fontSize: 13,
-              height: 1.5,
-            ),
+            style: TextStyle(color: textSecondary, fontSize: 13, height: 1.5),
           ),
 
           const Gap(32),
@@ -661,12 +708,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text(
                 _isRegisterMode
-                    ? AppLocalization.get('toggle_already_have_account', appLanguage)
+                    ? AppLocalization.get(
+                        'toggle_already_have_account',
+                        appLanguage,
+                      )
                     : AppLocalization.get('toggle_no_account', appLanguage),
-                style: TextStyle(
-                  color: textSecondary,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: textSecondary, fontSize: 13),
               ),
               TextButton(
                 onPressed: () =>
@@ -692,7 +739,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (email.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(AppLocalization.get('forgot_password_err', appLanguage)),
+                      content: Text(
+                        AppLocalization.get('forgot_password_err', appLanguage),
+                      ),
                     ),
                   );
                   return;
@@ -702,7 +751,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SnackBar(
                     backgroundColor: AppTheme.primaryMint,
                     content: Text(
-                      AppLocalization.get('forgot_password_success', appLanguage),
+                      AppLocalization.get(
+                        'forgot_password_success',
+                        appLanguage,
+                      ),
                       style: TextStyle(color: tickColor),
                     ),
                   ),
@@ -764,10 +816,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Widget? suffixIcon,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
 
     return Container(
       decoration: BoxDecoration(
@@ -782,10 +838,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: TextStyle(color: textPrimary, fontSize: 14),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(
-            color: textSecondary,
-            fontSize: 13,
-          ),
+          hintStyle: TextStyle(color: textSecondary, fontSize: 13),
           prefixIcon: Icon(icon, color: textSecondary, size: 18),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
@@ -795,12 +848,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildUnsupportedPlatformView(BuildContext context, String appLanguage) {
+  Widget _buildUnsupportedPlatformView(
+    BuildContext context,
+    String appLanguage,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -840,11 +900,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             'Cloud backup and sync features depend on Firebase services, which are currently only supported on Android, iOS, macOS, Web, and Windows.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: textSecondary,
-              fontSize: 13,
-              height: 1.5,
-            ),
+            style: TextStyle(color: textSecondary, fontSize: 13, height: 1.5),
           ),
           const Gap(24),
 
@@ -873,7 +929,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.check_circle_rounded,
                   iconColor: AppTheme.primaryMint,
                   title: 'Offline Database & Search',
-                  desc: 'Full offline access to the complete Hadith collections with fast FTS5 search.',
+                  desc:
+                      'Full offline access to the complete Hadith collections with fast FTS5 search.',
                 ),
                 const Gap(12),
                 _buildFeatureRow(
@@ -881,7 +938,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.check_circle_rounded,
                   iconColor: AppTheme.primaryMint,
                   title: 'Local Bookmarks & Pins',
-                  desc: 'Save and pin your favorite Hadiths locally on this machine.',
+                  desc:
+                      'Save and pin your favorite Hadiths locally on this machine.',
                 ),
                 const Gap(12),
                 _buildFeatureRow(
@@ -897,7 +955,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.check_circle_rounded,
                   iconColor: AppTheme.primaryMint,
                   title: 'Themes & Settings',
-                  desc: 'Custom fonts, sizes, and full support for Dark & Light themes.',
+                  desc:
+                      'Custom fonts, sizes, and full support for Dark & Light themes.',
                 ),
                 const Divider(height: 24),
                 _buildFeatureRow(
@@ -905,7 +964,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.cancel_rounded,
                   iconColor: Colors.redAccent.withValues(alpha: 0.6),
                   title: 'Cloud Sync & Backup',
-                  desc: 'Automatic cloud syncing across multiple devices is disabled on this platform.',
+                  desc:
+                      'Automatic cloud syncing across multiple devices is disabled on this platform.',
                 ),
               ],
             ),
@@ -924,8 +984,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String title,
     required String desc,
   }) {
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

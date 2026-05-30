@@ -20,6 +20,7 @@ import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
 import 'package:al_hadith/logic/auth/auth_cubit.dart';
 import 'package:al_hadith/core/utils/platform_utils.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   // Ensure Flutter engine is fully bootstrapped
@@ -27,7 +28,22 @@ void main() async {
 
   // Initialize Firebase if supported on the current platform
   if (isFirebaseSupported) {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  if (isDesktop) {
+    await windowManager.ensureInitialized();
+
+    WindowOptions windowOptions = WindowOptions(
+      minimumSize: Size(800, 600),
+      center: true,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
 
   // Initialize SharedPreferences persistently

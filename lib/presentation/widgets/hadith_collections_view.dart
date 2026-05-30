@@ -63,9 +63,13 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     final appLanguage = context.read<SettingsCubit>().state.appLanguage;
 
@@ -82,7 +86,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: surfaceColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               border: Border(
                 top: BorderSide(color: borderDividerColor, width: 1.5),
               ),
@@ -103,10 +109,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       ),
                     ),
                     IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: textSecondary,
-                      ),
+                      icon: Icon(Icons.close, color: textSecondary),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
@@ -122,16 +125,13 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     controller: textController,
                     maxLines: 5,
                     autofocus: true,
-                    style: TextStyle(
-                      color: textPrimary,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: textPrimary, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: AppLocalization.get('note_reflection_hint', appLanguage),
-                      hintStyle: TextStyle(
-                        color: textSecondary,
-                        fontSize: 13,
+                      hintText: AppLocalization.get(
+                        'note_reflection_hint',
+                        appLanguage,
                       ),
+                      hintStyle: TextStyle(color: textSecondary, fontSize: 13),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
@@ -159,7 +159,9 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                           Navigator.pop(ctx);
                         },
                         icon: const Icon(Icons.check_rounded, size: 18),
-                        label: Text(AppLocalization.get('update_note', appLanguage)),
+                        label: Text(
+                          AppLocalization.get('update_note', appLanguage),
+                        ),
                       ),
                     ),
                   ],
@@ -177,8 +179,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     required String title,
     required String subtitle,
   }) {
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Center(
       child:
@@ -243,10 +247,16 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final flag = _getFlag(state, bookKey);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final surfaceColor = Theme.of(context).colorScheme.surface;
 
     return Container(
@@ -300,7 +310,11 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     ),
                     const Gap(8),
                     Text(
-                      AppLocalization.get('hadith_no', context.read<SettingsCubit>().state.appLanguage, args: {'number': '${hadith.hadithNumber}'}),
+                      AppLocalization.get(
+                        'hadith_no',
+                        context.read<SettingsCubit>().state.appLanguage,
+                        args: {'number': '${hadith.hadithNumber}'},
+                      ),
                       style: TextStyle(
                         color: textSecondary,
                         fontSize: 11,
@@ -413,10 +427,16 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final flag = _getFlag(state, bookKey);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -437,9 +457,7 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
               ),
-              border: Border(
-                bottom: BorderSide(color: borderDividerColor),
-              ),
+              border: Border(bottom: BorderSide(color: borderDividerColor)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,7 +471,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                     ),
                     const Gap(6),
                     Text(
-                      AppLocalization.get('study_notes', context.read<SettingsCubit>().state.appLanguage),
+                      AppLocalization.get(
+                        'study_notes',
+                        context.read<SettingsCubit>().state.appLanguage,
+                      ),
                       style: const TextStyle(
                         color: AppTheme.primaryMint,
                         fontSize: 12,
@@ -545,7 +566,11 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       ),
                       const Gap(8),
                       Text(
-                        AppLocalization.get('hadith_no', context.read<SettingsCubit>().state.appLanguage, args: {'number': '${hadith.hadithNumber}'}),
+                        AppLocalization.get(
+                          'hadith_no',
+                          context.read<SettingsCubit>().state.appLanguage,
+                          args: {'number': '${hadith.hadithNumber}'},
+                        ),
                         style: TextStyle(
                           color: textSecondary,
                           fontSize: 10.5,
@@ -686,8 +711,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
 
     return BlocBuilder<HadithCubit, HadithState>(
       builder: (context, state) {

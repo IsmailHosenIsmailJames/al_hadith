@@ -33,6 +33,7 @@ dependencies:
   flutter_svg: ^2.3.0
   package_info_plus: ^9.0.1
   dartx: ^1.2.0
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_test:

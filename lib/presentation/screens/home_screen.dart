@@ -344,59 +344,68 @@ class _HomeScreenState extends State<HomeScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: surfaceColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: borderDividerColor, width: 1.5),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryMint.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.info_outline_rounded,
-                color: AppTheme.primaryMint,
-                size: 24,
-              ),
+      builder: (ctx) => Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: AppTheme.wideWidth),
+          child: AlertDialog(
+            backgroundColor: surfaceColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: borderDividerColor, width: 1.5),
             ),
-            const Gap(12),
-            Text(
-              AppLocalization.get('about_app', appLanguage),
-              style: TextStyle(
-                color: textPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMint.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.info_outline_rounded,
+                    color: AppTheme.primaryMint,
+                    size: 24,
+                  ),
+                ),
+                const Gap(12),
+                Text(
+                  AppLocalization.get('about_app', appLanguage),
+                  style: TextStyle(
+                    color: textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalization.get('about_app_desc', appLanguage),
+                  style: TextStyle(
+                    color: textPrimary,
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  AppLocalization.getTabName('close', appLanguage),
+                  style: const TextStyle(
+                    color: AppTheme.primaryMint,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppLocalization.get('about_app_desc', appLanguage),
-              style: TextStyle(color: textPrimary, fontSize: 13, height: 1.5),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              AppLocalization.getTabName('close', appLanguage),
-              style: const TextStyle(
-                color: AppTheme.primaryMint,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

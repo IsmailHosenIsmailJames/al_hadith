@@ -65,8 +65,10 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     required String title,
     required String subtitle,
   }) {
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Center(
       child:
@@ -123,10 +125,16 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     if (state.downloadedBooks.isEmpty) return const SizedBox();
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final chipBgColor = isDark ? AppTheme.darkSurfaceCard : const Color(0xFFF3F4F6);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final chipBgColor = isDark
+        ? AppTheme.darkSurfaceCard
+        : const Color(0xFFF3F4F6);
     final tickColor = AppTheme.darkCanvas;
 
     return Column(
@@ -138,7 +146,10 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                AppLocalization.get('search_scope', context.read<SettingsCubit>().state.appLanguage),
+                AppLocalization.get(
+                  'search_scope',
+                  context.read<SettingsCubit>().state.appLanguage,
+                ),
                 style: TextStyle(
                   color: textSecondary,
                   fontSize: 11,
@@ -164,8 +175,14 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                 child: Text(
                   state.selectedSearchBooks.length ==
                           state.downloadedBooks.length
-                      ? AppLocalization.get('deselect_all', context.read<SettingsCubit>().state.appLanguage)
-                      : AppLocalization.get('select_all', context.read<SettingsCubit>().state.appLanguage),
+                      ? AppLocalization.get(
+                          'deselect_all',
+                          context.read<SettingsCubit>().state.appLanguage,
+                        )
+                      : AppLocalization.get(
+                          'select_all',
+                          context.read<SettingsCubit>().state.appLanguage,
+                        ),
                   style: const TextStyle(
                     color: AppTheme.primaryMint,
                     fontSize: 11,
@@ -200,9 +217,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                             ? book.nameNative
                             : book.name,
                         style: TextStyle(
-                          color: isSelected
-                              ? tickColor
-                              : textPrimary,
+                          color: isSelected ? tickColor : textPrimary,
                           fontSize: 11.5,
                           fontWeight: FontWeight.bold,
                         ),
@@ -237,11 +252,17 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
   }
 
   Widget _buildSuggestionsView(String appLanguage) {
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chipBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.4) : const Color(0xFFF3F4F6);
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final chipBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.4)
+        : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
 
     final trending = [
       {'key': 'topic_intention', 'default': 'Intention'},
@@ -274,7 +295,10 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
             spacing: 8,
             runSpacing: 8,
             children: trending.map((topic) {
-              final localizedTopic = AppLocalization.get(topic['key']!, appLanguage);
+              final localizedTopic = AppLocalization.get(
+                topic['key']!,
+                appLanguage,
+              );
               return ActionChip(
                 backgroundColor: chipBgColor,
                 shape: RoundedRectangleBorder(
@@ -292,10 +316,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     const Gap(6),
                     Text(
                       localizedTopic,
-                      style: TextStyle(
-                        color: textPrimary,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: textPrimary, fontSize: 12),
                     ),
                   ],
                 ),
@@ -328,10 +349,16 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     final bookName = _getBookName(state, bookKey);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3) : const Color(0xFFF3F4F6);
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        : const Color(0xFFF3F4F6);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -384,7 +411,11 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     ),
                     const Gap(8),
                     Text(
-                      AppLocalization.get('hadith_no', appLanguage, args: {'number': hadith.hadithNumber.toString()}),
+                      AppLocalization.get(
+                        'hadith_no',
+                        appLanguage,
+                        args: {'number': hadith.hadithNumber.toString()},
+                      ),
                       style: TextStyle(
                         color: textSecondary,
                         fontSize: 11,
@@ -462,9 +493,13 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
 
     return BlocBuilder<HadithCubit, HadithState>(
@@ -491,11 +526,11 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
               textInputAction: TextInputAction.search,
               onSubmitted: _triggerSearch,
               decoration: InputDecoration(
-                hintText: AppLocalization.get('search_hadith_hint', appLanguage),
-                hintStyle: TextStyle(
-                  color: textSecondary,
-                  fontSize: 13,
+                hintText: AppLocalization.get(
+                  'search_hadith_hint',
+                  appLanguage,
                 ),
+                hintStyle: TextStyle(color: textSecondary, fontSize: 13),
                 prefixIcon: const Icon(
                   Icons.search,
                   color: AppTheme.primaryMint,
@@ -503,11 +538,7 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: Icon(
-                          Icons.close,
-                          color: textSecondary,
-                          size: 18,
-                        ),
+                        icon: Icon(Icons.close, color: textSecondary, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           context.read<HadithCubit>().clearSearch();
@@ -541,8 +572,15 @@ class _HadithSearchScreenState extends State<HadithSearchScreen> {
                     if (resultsKeys.isEmpty) {
                       return _buildEmptyState(
                         icon: Icons.search_off_rounded,
-                        title: AppLocalization.get('no_matches_title', appLanguage),
-                        subtitle: AppLocalization.get('no_matches_desc', appLanguage, args: {'query': state.searchQuery}),
+                        title: AppLocalization.get(
+                          'no_matches_title',
+                          appLanguage,
+                        ),
+                        subtitle: AppLocalization.get(
+                          'no_matches_desc',
+                          appLanguage,
+                          args: {'query': state.searchQuery},
+                        ),
                       );
                     }
 
