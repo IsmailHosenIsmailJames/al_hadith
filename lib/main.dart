@@ -19,13 +19,16 @@ import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
 import 'package:al_hadith/logic/auth/auth_cubit.dart';
+import 'package:al_hadith/core/utils/platform_utils.dart';
 
 void main() async {
   // Ensure Flutter engine is fully bootstrapped
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Initialize Firebase if supported on the current platform
+  if (isFirebaseSupported) {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  }
 
   // Initialize SharedPreferences persistently
   final sharedPrefs = await SharedPreferences.getInstance();
@@ -39,9 +42,9 @@ void main() async {
   final downloadService = DownloadService(prefsService);
   final appRouter = AppRouter(prefsService);
 
-  // Firebase services
-  final firebaseAuth = FirebaseAuth.instance;
-  final firebaseDb = FirebaseDatabase.instance;
+  // Firebase services (null on unsupported platforms like Linux)
+  final firebaseAuth = isFirebaseSupported ? FirebaseAuth.instance : null;
+  final firebaseDb = isFirebaseSupported ? FirebaseDatabase.instance : null;
   final backupService = BackupService(
     db: firebaseDb,
     historyService: historyService,

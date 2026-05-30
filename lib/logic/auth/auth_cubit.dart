@@ -7,13 +7,13 @@ import 'package:al_hadith/data/services/preferences_service.dart';
 import 'package:al_hadith/logic/auth/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final FirebaseAuth _auth;
+  final FirebaseAuth? _auth;
   final BackupService _backupService;
   final PreferencesService _prefs;
   StreamSubscription<User?>? _authSubscription;
 
   AuthCubit({
-    required FirebaseAuth auth,
+    required FirebaseAuth? auth,
     required BackupService backupService,
     required PreferencesService prefs,
   })  : _auth = auth,
@@ -24,6 +24,14 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void _init() {
+    if (_auth == null) {
+      emit(state.copyWith(
+        status: AuthStatus.unauthenticated,
+        clearUser: true,
+        clearError: true,
+      ));
+      return;
+    }
     // Listen to auth state changes
     _authSubscription = _auth.authStateChanges().listen((user) {
       if (user != null) {
@@ -48,6 +56,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Sign in with Google
   Future<void> signInWithGoogle() async {
+    if (_auth == null) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Sync features are not supported on this platform.',
+      ));
+      return;
+    }
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
     try {
       final googleUser = await GoogleSignIn().signIn();
@@ -80,6 +95,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Sign in with Email & Password
   Future<void> signInWithEmail(String email, String password) async {
+    if (_auth == null) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Sync features are not supported on this platform.',
+      ));
+      return;
+    }
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
     try {
       await _auth.signInWithEmailAndPassword(
@@ -101,6 +123,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Register with Email & Password
   Future<void> registerWithEmail(String email, String password) async {
+    if (_auth == null) {
+      emit(state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Sync features are not supported on this platform.',
+      ));
+      return;
+    }
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
     try {
       await _auth.createUserWithEmailAndPassword(
@@ -122,6 +151,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Send password reset email
   Future<void> resetPassword(String email) async {
+    if (_auth == null) return;
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
     } catch (_) {
@@ -131,6 +161,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Sign out
   Future<void> signOut() async {
+    if (_auth == null) return;
     try {
       // Upload one final backup before signing out
       if (state.user != null && _prefs.isAutoSyncEnabled()) {
@@ -145,7 +176,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Manual sync: merge local ↔ remote
   Future<void> syncNow() async {
-    if (state.user == null) return;
+    if (state.user == null || _auth == null) return;
 
     emit(state.copyWith(isSyncing: true, clearError: true));
     try {
@@ -164,7 +195,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Upload-only backup (used by auto-sync triggers)
   Future<void> autoUpload() async {
-    if (state.user == null || !_prefs.isAutoSyncEnabled()) return;
+    if (state.user == null || !_prefs.isAutoSyncEnabled() || _auth == null) return;
     try {
       await _backupService.uploadBackup(state.user!.uid);
     } catch (_) {
@@ -174,6 +205,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   /// Delete both account and all cloud sync data permanently (Google Play compliance)
   Future<void> deleteAccountAndData() async {
+    if (_auth == null) return;
     final user = _auth.currentUser;
     if (user == null) return;
 

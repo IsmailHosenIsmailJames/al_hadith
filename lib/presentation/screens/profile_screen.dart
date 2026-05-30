@@ -10,6 +10,7 @@ import 'package:al_hadith/logic/settings/settings_cubit.dart';
 import 'package:al_hadith/logic/settings/settings_state.dart';
 import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
 import 'package:al_hadith/core/localization/app_localization.dart';
+import 'package:al_hadith/core/utils/platform_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -460,6 +461,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // ── Login view ──
   Widget _buildLoginView(BuildContext context, AuthState authState, String appLanguage) {
+    if (!isFirebaseSupported) {
+      return _buildUnsupportedPlatformView(context, appLanguage);
+    }
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
@@ -788,6 +792,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
+    );
+  }
+
+  Widget _buildUnsupportedPlatformView(BuildContext context, String appLanguage) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          const Gap(32),
+          // Hero Cloud Offline/Local-First Icon
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppTheme.primaryMint.withValues(alpha: 0.1),
+              border: Border.all(
+                color: AppTheme.primaryMint.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: const Icon(
+              Icons.cloud_off_rounded,
+              size: 36,
+              color: AppTheme.primaryMint,
+            ),
+          ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
+
+          const Gap(20),
+          Text(
+            'Local-First Offline Mode',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          const Gap(12),
+          Text(
+            'Cloud backup and sync features depend on Firebase services, which are currently only supported on Android, iOS, macOS, Web, and Windows.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textSecondary,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+          const Gap(24),
+
+          // Feature Grid or List explaining what's supported vs not
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderDividerColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Active Features',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
+                ),
+                const Gap(16),
+                _buildFeatureRow(
+                  context,
+                  icon: Icons.check_circle_rounded,
+                  iconColor: AppTheme.primaryMint,
+                  title: 'Offline Database & Search',
+                  desc: 'Full offline access to the complete Hadith collections with fast FTS5 search.',
+                ),
+                const Gap(12),
+                _buildFeatureRow(
+                  context,
+                  icon: Icons.check_circle_rounded,
+                  iconColor: AppTheme.primaryMint,
+                  title: 'Local Bookmarks & Pins',
+                  desc: 'Save and pin your favorite Hadiths locally on this machine.',
+                ),
+                const Gap(12),
+                _buildFeatureRow(
+                  context,
+                  icon: Icons.check_circle_rounded,
+                  iconColor: AppTheme.primaryMint,
+                  title: 'Personal Study Notes',
+                  desc: 'Write and maintain study notes and history locally.',
+                ),
+                const Gap(12),
+                _buildFeatureRow(
+                  context,
+                  icon: Icons.check_circle_rounded,
+                  iconColor: AppTheme.primaryMint,
+                  title: 'Themes & Settings',
+                  desc: 'Custom fonts, sizes, and full support for Dark & Light themes.',
+                ),
+                const Divider(height: 24),
+                _buildFeatureRow(
+                  context,
+                  icon: Icons.cancel_rounded,
+                  iconColor: Colors.redAccent.withValues(alpha: 0.6),
+                  title: 'Cloud Sync & Backup',
+                  desc: 'Automatic cloud syncing across multiple devices is disabled on this platform.',
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
+
+          const Gap(32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureRow(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String desc,
+  }) {
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: iconColor, size: 20),
+        const Gap(12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
+                ),
+              ),
+              const Gap(2),
+              Text(
+                desc,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

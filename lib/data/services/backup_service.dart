@@ -6,12 +6,12 @@ import 'package:al_hadith/data/services/preferences_service.dart';
 /// (bookmarks, pins, notes, read progress, last session) to/from
 /// Firebase Realtime Database under the authenticated user's UID.
 class BackupService {
-  final FirebaseDatabase _db;
+  final FirebaseDatabase? _db;
   final HistoryService _historyService;
   final PreferencesService _prefsService;
 
   BackupService({
-    required FirebaseDatabase db,
+    required FirebaseDatabase? db,
     required HistoryService historyService,
     required PreferencesService prefsService,
   })  : _db = db,
@@ -19,11 +19,12 @@ class BackupService {
         _prefsService = prefsService;
 
   /// Reference to the authenticated user's backup node
-  DatabaseReference _userRef(String uid) => _db.ref('users/$uid');
+  DatabaseReference? _userRef(String uid) => _db?.ref('users/$uid');
 
   /// Uploads all local data to RTDB
   Future<void> uploadBackup(String uid) async {
     final ref = _userRef(uid);
+    if (ref == null) return;
 
     final Map<String, dynamic> payload = {
       'lastUpdated': ServerValue.timestamp,
@@ -40,12 +41,14 @@ class BackupService {
   /// Deletes all remote data from RTDB for the given user
   Future<void> deleteBackup(String uid) async {
     final ref = _userRef(uid);
+    if (ref == null) return;
     await ref.remove();
   }
 
   /// Downloads data from RTDB and restores it locally
   Future<void> restoreBackup(String uid) async {
     final ref = _userRef(uid);
+    if (ref == null) return;
     final snapshot = await ref.get();
 
     if (!snapshot.exists || snapshot.value == null) return;
@@ -88,6 +91,7 @@ class BackupService {
   /// Merges remote data with local, keeping both sides' unique entries
   Future<void> mergeBackup(String uid) async {
     final ref = _userRef(uid);
+    if (ref == null) return;
     final snapshot = await ref.get();
 
     if (!snapshot.exists || snapshot.value == null) {
