@@ -1,0 +1,24 @@
+icon: assets/img/logo.png
+summary: A beautiful Hadith application with search and bookmarking features
+group: Application/Education
+vendor: MD. Ismail Hossain
+packager: MD. Ismail Hossain
+packagerEmail: md.ismailhosenismailjames@gmail.com
+license: MIT
+url: https://github.com/IsmailHosenIsmailJames/al_hadith
+display_name: Al Hadith
+
+keywords:
+  - Hadith
+  - Al-Hadith
+  - Islamic
+  - Quran
+  - Flutter
+
+generic_name: Hadith Application
+
+categories:
+  - Education
+  - Utility
+
+startup_notify: true

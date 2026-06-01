@@ -1,0 +1,18 @@
+display_name: Al Hadith
+icon: assets/img/logo.png
+
+keywords:
+  - Hadith
+  - Al-Hadith
+  - Islamic
+  - Quran
+  - Flutter
+
+generic_name: Hadith Application
+
+categories:
+  - Education
+  - Utility
+
+startup_notify: true
+include: []

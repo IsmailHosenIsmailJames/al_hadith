@@ -1,0 +1,25 @@
+display_name: Al Hadith
+package_name: al-hadith
+maintainer:
+  name: MD. Ismail Hossain
+  email: md.ismailhosenismailjames@gmail.com
+priority: optional
+section: x11
+installed_size: 68000
+essential: false
+icon: assets/img/logo.png
+
+keywords:
+  - Hadith
+  - Al-Hadith
+  - Islamic
+  - Quran
+  - Flutter
+
+generic_name: Hadith Application
+
+categories:
+  - Education
+  - Utility
+
+startup_notify: true
