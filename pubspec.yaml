@@ -41,6 +41,25 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
   icons_launcher: ^3.1.0
+  msix: ^3.16.13
+
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
+      name_windows: winsqlite3
+      name: sqlite3
+
+msix_config:
+  display_name: "Al Hadith"
+  publisher_display_name: "MD. Ismail Hosen"
+  identity_name: MD.IsmailHosen.com.ismail.alhadith
+  publisher: "CN=B9F6AC9B-F4A4-426C-9C75-82E3872E24AB"
+  msix_version: 1.3.1.0
+  logo_path: "assets/img/logo.png"
+  capabilities: "internetClient"
+  store: true
 
 flutter:
 

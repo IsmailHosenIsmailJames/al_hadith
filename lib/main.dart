@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +24,20 @@ import 'package:al_hadith/logic/auth/auth_cubit.dart';
 import 'package:al_hadith/core/utils/platform_utils.dart';
 import 'package:window_manager/window_manager.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() async {
+  // Override global HttpClient behavior to bypass CERTIFICATE_VERIFY_FAILED errors
+  if (!kIsWeb) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
+
   // Ensure Flutter engine is fully bootstrapped
   WidgetsFlutterBinding.ensureInitialized();
 
