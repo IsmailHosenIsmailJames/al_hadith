@@ -1,0 +1,51 @@
+app-id: com.ismail.al_hadith
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+command: al_hadith
+finish-args:
+  # X11 & Wayland sockets
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  # Inter-Process Communication
+  - --share=ipc
+  # Network access (needed for Hadith database downloads and updates)
+  - --share=network
+  # Audio playback (for future or current audio recitations/notifications)
+  - --socket=pulseaudio
+  # Desktop notifications
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  # System theme / GTK configuration
+  - --filesystem=xdg-config/gtk-3.0:ro
+  - --filesystem=xdg-config/kdeglobals:ro
+
+modules:
+  - name: al_hadith
+    buildsystem: simple
+    build-commands:
+      # Create necessary Flatpak structure
+      - install -d /app/bin
+      - install -d /app/lib
+      - install -d /app/share/applications
+      - install -d /app/share/icons/hicolor/256x256/apps
+      - install -d /app/share/metainfo
+
+      # Copy compiled bundle files preserving relative locations
+      - cp al_hadith /app/al_hadith
+      - cp -r lib/* /app/lib/
+      - cp -r data /app/data/
+
+      # Install metadata, desktop file and icon
+      - cp com.ismail.al_hadith.desktop /app/share/applications/com.ismail.al_hadith.desktop
+      - cp com.ismail.al_hadith.png /app/share/icons/hicolor/256x256/apps/com.ismail.al_hadith.png
+      - cp com.ismail.al_hadith.metainfo.xml /app/share/metainfo/com.ismail.al_hadith.metainfo.xml
+
+      # Create launcher script in /app/bin
+      - echo '#!/bin/sh' > /app/bin/al_hadith
+      - echo 'exec /app/al_hadith "$@"' >> /app/bin/al_hadith
+      - chmod +x /app/bin/al_hadith
+    sources:
+      - type: dir
+        path: bundle

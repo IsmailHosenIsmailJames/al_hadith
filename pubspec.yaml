@@ -1,8 +1,8 @@
 name: al_hadith
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
-version: 1.3.1+8
+version: 1.3.2+9
 environment:
   sdk: ^3.11.5
 
@@ -13,7 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_bloc: ^9.1.0
   shared_preferences: ^2.5.3
-  go_router: ^14.2.0
+  go_router: ^17.3.0
   gap: ^3.0.1
   dio: ^5.8.0+1
   archive: ^4.0.5
@@ -23,15 +23,15 @@ dependencies:
   flutter_animate: ^4.5.2
   google_fonts: ^8.0.2
   scrollable_positioned_list: ^0.3.8
-  share_plus: ^10.1.4
+  share_plus: ^13.1.0
   wakelock_plus: ^1.5.2
   url_launcher: ^6.3.1
   firebase_core: ^4.9.0
   firebase_auth: ^6.5.1
   firebase_database: ^12.4.1
-  google_sign_in: ^6.2.2
+  google_sign_in: ^7.2.0
   flutter_svg: ^2.3.0
-  package_info_plus: ^9.0.1
+  package_info_plus: ^10.1.0
   dartx: ^1.2.0
   window_manager: ^0.5.1
 
@@ -43,14 +43,6 @@ dev_dependencies:
   icons_launcher: ^3.1.0
   msix: ^3.16.13
   inno_bundle: ^0.11.2
-
-
-hooks:
-  user_defines:
-    sqlite3:
-      source: system
-      name_windows: winsqlite3
-      name: sqlite3
 
 msix_config:
   display_name: "Al Hadith"
@@ -72,9 +64,7 @@ inno_bundle:
     - english
   vcRedist: download
 
-
 flutter:
-
   uses-material-design: true
 
   assets:
@@ -91,7 +81,6 @@ flutter:
     - family: QPC Hafs
       fonts:
         - asset: assets/fonts/QPC Hafs font.ttf
-
 
 icons_launcher:
   image_path: "assets/img/logo.png"
@@ -115,4 +104,3 @@ icons_launcher:
     linux:
       enable: true
       image_path: "assets/img/logo.png"
-

@@ -78,9 +78,65 @@ else
   fi
 fi
 
+# 5. Build Flatpak
 echo "=================================================="
-echo " All 3 Linux Packages Ready inside dist/$VERSION/:"
-echo " 1. dist/$VERSION/al_hadith-$VERSION-linux.AppImage"
-echo " 2. dist/$VERSION/al_hadith-$VERSION-linux.deb"
-echo " 3. dist/$VERSION/al_hadith-$VERSION-linux.rpm"
+echo "--> Packaging Flatpak..."
+if command -v flatpak-builder >/dev/null 2>&1; then
+  # Ensure the build bundle exists
+  if [ ! -d "build/linux/x64/release/bundle" ]; then
+    echo "--> Building Flutter Linux release bundle..."
+    flutter build linux --release
+  fi
+
+  if [ -d "build/linux/x64/release/bundle" ]; then
+    echo "--> Creating local bundle workspace for Flatpak..."
+    rm -rf linux/packaging/flatpak/bundle
+    cp -r build/linux/x64/release/bundle linux/packaging/flatpak/bundle
+    cp linux/packaging/flatpak/com.ismail.al_hadith.desktop linux/packaging/flatpak/bundle/
+    cp linux/packaging/flatpak/com.ismail.al_hadith.metainfo.xml linux/packaging/flatpak/bundle/
+    convert assets/img/logo.png -resize 256x256 linux/packaging/flatpak/bundle/com.ismail.al_hadith.png
+    
+    echo "--> Running flatpak-builder..."
+    rm -rf .flatpak-builder build-dir repo
+    flatpak-builder --force-clean build-dir linux/packaging/flatpak/com.ismail.al_hadith.yaml --repo=repo
+    
+    echo "--> Generating flatpak bundle file..."
+    flatpak build-bundle repo "dist/$VERSION/al_hadith-$VERSION-linux.flatpak" com.ismail.al_hadith
+    
+    # Clean up workspace
+    rm -rf linux/packaging/flatpak/bundle build-dir repo .flatpak-builder
+    echo "--> Flatpak package built successfully."
+  else
+    echo "Error: build/linux/x64/release/bundle could not be created."
+  fi
+else
+  echo "--> flatpak-builder is not installed. Skipping local Flatpak package generation."
+  echo "    To build manually: install 'flatpak-builder' and run flatpak-builder commands."
+fi
+
+# 6. Build Snap
 echo "=================================================="
+echo "--> Packaging Snap..."
+if command -v snapcraft >/dev/null 2>&1; then
+  echo "--> Running snapcraft..."
+  sudo snapcraft clean
+  sudo snapcraft --destructive-mode
+  
+  GENERATED_SNAP=$(find . -maxdepth 1 -name "*.snap" 2>/dev/null | head -n 1 || true)
+  if [ -n "$GENERATED_SNAP" ]; then
+    sudo chown $(id -u):$(id -g) "$GENERATED_SNAP" || true
+    mv "$GENERATED_SNAP" "dist/$VERSION/"
+    echo "--> Snap package built successfully: dist/$VERSION/$(basename "$GENERATED_SNAP")"
+  else
+    echo "Error: Snap package could not be found after build."
+  fi
+else
+  echo "--> snapcraft is not installed. Skipping Snap package generation."
+  echo "    To build manually: install 'snapcraft' and run 'snapcraft' in the root directory."
+fi
+
+echo "=================================================="
+echo " Packaging Completed! Check 'dist/$VERSION/' for output packages:"
+find "dist/$VERSION/" -maxdepth 1 -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o -name "*.flatpak" -o -name "*.snap" \) -printf "  - %p\n" 2>/dev/null || ls -la "dist/$VERSION/"
+echo "=================================================="
+

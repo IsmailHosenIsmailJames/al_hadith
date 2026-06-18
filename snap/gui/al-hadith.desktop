@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Al Hadith
+Comment=A beautiful Hadith application with search and bookmarking features
+Exec=al-hadith
+Icon=${SNAP}/meta/gui/al-hadith.png
+Terminal=false
+Type=Application
+Categories=Education;Utility;GTK;

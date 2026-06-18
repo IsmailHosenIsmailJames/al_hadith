@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Al Hadith
+GenericName=Hadith Application
+Comment=A beautiful Hadith application with search and bookmarking features
+Icon=com.ismail.al_hadith
+Exec=al_hadith
+Terminal=false
+Categories=Education;Utility;GTK;
+Keywords=Hadith;Al-Hadith;Islamic;Quran;Flutter;
+StartupNotify=true

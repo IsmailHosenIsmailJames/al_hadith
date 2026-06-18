@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ismail.al_hadith</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Al Hadith</name>
+  <summary>A beautiful Hadith application with search and bookmarking features</summary>
+  <description>
+    <p>
+      Al Hadith is a comprehensive, modern, and beautiful Hadith application designed to help users read, search, and bookmark Hadith with ease.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Read Hadiths from major books.</li>
+      <li>Search Hadiths instantly.</li>
+      <li>Bookmark and organize your favorite Hadiths.</li>
+      <li>Beautiful and user-friendly interface with customizable fonts.</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">com.ismail.al_hadith.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main screen of Al Hadith application</caption>
+      <image>https://raw.githubusercontent.com/IsmailHosenIsmailJames/al_hadith/main/assets/img/logo.png</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/IsmailHosenIsmailJames/al_hadith</url>
+  <url type="bugtracker">https://github.com/IsmailHosenIsmailJames/al_hadith/issues</url>
+  <provides>
+    <binary>al_hadith</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+</component>
