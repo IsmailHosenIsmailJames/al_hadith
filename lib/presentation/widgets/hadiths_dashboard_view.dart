@@ -17,11 +17,22 @@ class HadithsDashboardView extends StatefulWidget {
 }
 
 class _HadithsDashboardViewState extends State<HadithsDashboardView> {
+  bool _animateList = true;
+
   @override
   void initState() {
     super.initState();
     // Dispatch dashboard load to sync files and history metrics on tab entry
     context.read<HadithCubit>().loadDashboard();
+
+    // Disable initial animations after 800ms to avoid re-triggering during drag & drop reordering or sort preference change
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _animateList = false;
+        });
+      }
+    });
   }
 
   @override
@@ -107,24 +118,42 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
 
               const Gap(28),
 
-              // 2. Downloaded Book Categories
+              // 2. Downloaded Book Categories Header with Sort Button
               Padding(
-                padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
-                child: Text(
-                  AppLocalization.get('your_offline_library', appLanguage),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimary,
-                    letterSpacing: 0.2,
-                  ),
+                padding: const EdgeInsets.only(left: 4.0, bottom: 4.0, right: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalization.get('your_offline_library', appLanguage),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textPrimary,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort_rounded, color: AppTheme.primaryMint),
+                      tooltip: AppLocalization.get('sort_books', appLanguage),
+                      onPressed: () => _showSortSelectorBottomSheet(
+                        context,
+                        state,
+                        appLanguage,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              ListView.builder(
+              ReorderableListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: state.downloadedBooks.length,
+                onReorderItem: (oldIndex, newIndex) {
+                  context.read<HadithCubit>().reorderBooks(oldIndex, newIndex);
+                },
+                buildDefaultDragHandles: false,
                 itemBuilder: (context, index) {
                   final book = state.downloadedBooks[index];
                   final readCount = state.readCounts[book.book] ?? 0;
@@ -139,7 +168,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                       ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2)
                       : const Color(0xFFF3F4F6);
 
-                  return GestureDetector(
+                  final Widget card = GestureDetector(
                         onTap: () {
                           context.push('/book/${book.book}');
                         },
@@ -275,11 +304,20 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                       ],
                                     ),
                                   ),
-                                  Icon(
-                                    Icons.chevron_right_rounded,
-                                    color: textSecondary,
-                                    size: 24,
-                                  ),
+                                  state.bookSortType == 'custom'
+                                      ? ReorderableDragStartListener(
+                                          index: index,
+                                          child: Icon(
+                                            Icons.drag_handle_rounded,
+                                            color: textSecondary,
+                                            size: 24,
+                                          ),
+                                        )
+                                      : Icon(
+                                          Icons.chevron_right_rounded,
+                                          color: textSecondary,
+                                          size: 24,
+                                        ),
                                 ],
                               ),
                               const Gap(16),
@@ -327,10 +365,19 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                             ],
                           ),
                         ),
-                      )
-                      .animate()
-                      .fadeIn(duration: 350.ms, delay: (index * 40).ms)
-                      .slideY(begin: 0.05, end: 0);
+                      );
+
+                  final Widget animatedCard = _animateList
+                      ? card
+                          .animate()
+                          .fadeIn(duration: 350.ms, delay: (index * 40).ms)
+                          .slideY(begin: 0.05, end: 0)
+                      : card;
+
+                  return KeyedSubtree(
+                    key: ValueKey(book.book),
+                    child: animatedCard,
+                  );
                 },
               ),
             ],
@@ -1035,6 +1082,289 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showSortSelectorBottomSheet(
+    BuildContext context,
+    HadithState state,
+    String appLanguage,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+
+    final sortTypes = ['name', 'date', 'hadithCount', 'custom'];
+    final sortIcons = {
+      'name': Icons.abc_rounded,
+      'date': Icons.calendar_today_rounded,
+      'hadithCount': Icons.format_list_numbered_rounded,
+      'custom': Icons.drag_indicator_rounded,
+    };
+
+    final sortDisplayNames = {
+      'name': AppLocalization.get('sort_name', appLanguage),
+      'date': AppLocalization.get('sort_date', appLanguage),
+      'hadithCount': AppLocalization.get('sort_hadith_count', appLanguage),
+      'custom': AppLocalization.get('sort_custom', appLanguage),
+    };
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: navBgColor,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.3,
+        maxChildSize: 0.85,
+        expand: false,
+        builder: (context, scrollController) => StatefulBuilder(
+          builder: (context, setSheetState) {
+            final activeSortType = state.bookSortType;
+            final isAscending = state.bookSortAscending;
+            final isCustom = activeSortType == 'custom';
+
+            return SingleChildScrollView(
+              controller: scrollController,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: textSecondary.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const Gap(20),
+                    Row(
+                      children: [
+                        const Icon(Icons.sort_rounded, color: AppTheme.primaryMint),
+                        const Gap(8),
+                        Text(
+                          AppLocalization.get('sort_books', appLanguage),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Gap(16),
+                    Text(
+                      AppLocalization.get('sort_by', appLanguage),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: textSecondary,
+                      ),
+                    ),
+                    const Gap(8),
+                    ...sortTypes.map((type) {
+                      final isSelected = type == activeSortType;
+                      final cardColor = isSelected
+                          ? AppTheme.primaryMint.withValues(alpha: 0.08)
+                          : Colors.transparent;
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppTheme.primaryMint
+                                : borderDividerColor,
+                            width: isSelected ? 1.5 : 1.0,
+                          ),
+                        ),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          onTap: () {
+                            // Close and apply sort type
+                            Navigator.pop(ctx);
+                            context.read<HadithCubit>().updateBookSort(sortType: type);
+                          },
+                          leading: Icon(
+                            sortIcons[type] ?? Icons.sort,
+                            color: isSelected ? AppTheme.primaryMint : textSecondary,
+                          ),
+                          title: Text(
+                            sortDisplayNames[type] ?? type,
+                            style: TextStyle(
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: textPrimary,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: AppTheme.primaryMint,
+                                )
+                              : null,
+                        ),
+                      );
+                    }),
+                    if (!isCustom) ...[
+                      const Gap(16),
+                      Text(
+                        AppLocalization.get('sort_order', appLanguage),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: textSecondary,
+                        ),
+                      ),
+                      const Gap(10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildOrderButton(
+                              context: context,
+                              isSelected: isAscending,
+                              label: AppLocalization.get('sort_ascending', appLanguage),
+                              icon: Icons.arrow_upward_rounded,
+                              onTap: () {
+                                Navigator.pop(ctx);
+                                context.read<HadithCubit>().updateBookSort(isAscending: true);
+                              },
+                            ),
+                          ),
+                          const Gap(12),
+                          Expanded(
+                            child: _buildOrderButton(
+                              context: context,
+                              isSelected: !isAscending,
+                              label: AppLocalization.get('sort_descending', appLanguage),
+                              icon: Icons.arrow_downward_rounded,
+                              onTap: () {
+                                Navigator.pop(ctx);
+                                context.read<HadithCubit>().updateBookSort(isAscending: false);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    if (isCustom) ...[
+                      const Gap(16),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppTheme.secondaryIndigo.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: AppTheme.secondaryIndigo.withValues(alpha: 0.15),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.info_outline_rounded,
+                              color: AppTheme.secondaryIndigo,
+                              size: 20,
+                            ),
+                            const Gap(10),
+                            Expanded(
+                              child: Text(
+                                AppLocalization.get('sort_custom_tip', appLanguage),
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  color: AppTheme.secondaryIndigo,
+                                  height: 1.4,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderButton({
+    required BuildContext context,
+    required bool isSelected,
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppTheme.primaryMint.withValues(alpha: 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryMint : borderDividerColor,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? AppTheme.primaryMint : textSecondary,
+            ),
+            const Gap(6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? AppTheme.primaryMint : textPrimary,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

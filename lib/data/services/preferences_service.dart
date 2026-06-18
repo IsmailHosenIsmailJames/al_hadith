@@ -17,6 +17,12 @@ class PreferencesService {
   static const String _keyArabicFontFamily = 'arabic_font_family';
   static const String _keyWakeLockEnabled = 'wake_lock_enabled';
 
+  // Sorting Keys
+  static const String _keyBookSortType = 'book_sort_type';
+  static const String _keyBookSortAscending = 'book_sort_ascending';
+  static const String _keyBookCustomOrder = 'book_custom_order';
+  static const String _keyBookDownloadTimePrefix = 'book_download_time_';
+
   // Language setting
   String? getAppLanguage() {
     return _prefs.getString(_keyLanguage);
@@ -61,22 +67,53 @@ class PreferencesService {
     return _prefs.setStringList(_keyDownloadedResources, keys);
   }
 
-  Future<bool> addDownloadedResource(String bookKey) {
+  Future<bool> addDownloadedResource(String bookKey) async {
     final downloaded = getDownloadedResources();
     if (!downloaded.contains(bookKey)) {
       downloaded.add(bookKey);
+      await _prefs.setInt('$_keyBookDownloadTimePrefix$bookKey', DateTime.now().millisecondsSinceEpoch);
       return setDownloadedResources(downloaded);
     }
-    return Future.value(true);
+    return true;
   }
 
-  Future<bool> removeDownloadedResource(String bookKey) {
+  Future<bool> removeDownloadedResource(String bookKey) async {
     final downloaded = getDownloadedResources();
     if (downloaded.contains(bookKey)) {
       downloaded.remove(bookKey);
+      await _prefs.remove('$_keyBookDownloadTimePrefix$bookKey');
       return setDownloadedResources(downloaded);
     }
-    return Future.value(true);
+    return true;
+  }
+
+  int getBookDownloadTime(String bookKey) {
+    return _prefs.getInt('$_keyBookDownloadTimePrefix$bookKey') ?? 0;
+  }
+
+  // Sorting helper methods
+  String getBookSortType() {
+    return _prefs.getString(_keyBookSortType) ?? 'name';
+  }
+
+  Future<bool> setBookSortType(String type) {
+    return _prefs.setString(_keyBookSortType, type);
+  }
+
+  bool isBookSortAscending() {
+    return _prefs.getBool(_keyBookSortAscending) ?? true;
+  }
+
+  Future<bool> setBookSortAscending(bool ascending) {
+    return _prefs.setBool(_keyBookSortAscending, ascending);
+  }
+
+  List<String> getBookCustomOrder() {
+    return _prefs.getStringList(_keyBookCustomOrder) ?? [];
+  }
+
+  Future<bool> setBookCustomOrder(List<String> order) {
+    return _prefs.setStringList(_keyBookCustomOrder, order);
   }
 
   // Setup completion status

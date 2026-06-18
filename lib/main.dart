@@ -115,6 +115,7 @@ void main() async {
               hadithRepository: hadithRepository,
               resourceRepository: resourceRepository,
               historyService: historyService,
+              prefsService: prefsService,
               authCubit: context.read<AuthCubit>(),
             ),
           ),

@@ -6,6 +6,7 @@ import 'package:al_hadith/data/models/resource_model.dart';
 import 'package:al_hadith/data/repositories/hadith_repository.dart';
 import 'package:al_hadith/data/repositories/resource_repository.dart';
 import 'package:al_hadith/data/services/history_service.dart';
+import 'package:al_hadith/data/services/preferences_service.dart';
 import 'package:al_hadith/logic/hadiths/hadith_state.dart';
 import 'package:al_hadith/logic/auth/auth_cubit.dart';
 
@@ -13,16 +14,19 @@ class HadithCubit extends Cubit<HadithState> {
   final HadithRepository _hadithRepository;
   final ResourceRepository _resourceRepository;
   final HistoryService _historyService;
+  final PreferencesService _prefsService;
   final AuthCubit? _authCubit;
 
   HadithCubit({
     required HadithRepository hadithRepository,
     required ResourceRepository resourceRepository,
     required HistoryService historyService,
+    required PreferencesService prefsService,
     AuthCubit? authCubit,
   }) : _hadithRepository = hadithRepository,
        _resourceRepository = resourceRepository,
        _historyService = historyService,
+       _prefsService = prefsService,
        _authCubit = authCubit,
        super(HadithState());
 
@@ -81,10 +85,23 @@ class HadithCubit extends Cubit<HadithState> {
       final currentStreak = streaks['current'] ?? 0;
       final longestStreak = streaks['longest'] ?? 0;
 
+      final sortType = _prefsService.getBookSortType();
+      final isAscending = _prefsService.isBookSortAscending();
+      final customOrder = _prefsService.getBookCustomOrder();
+
+      final sortedBooks = _sortBooks(
+        books: downloaded,
+        sortType: sortType,
+        isAscending: isAscending,
+        customOrder: customOrder,
+      );
+
       emit(
         state.copyWith(
           isLoading: false,
-          downloadedBooks: downloaded,
+          downloadedBooks: sortedBooks,
+          bookSortType: sortType,
+          bookSortAscending: isAscending,
           history: lastSession,
           readCounts: countsMap,
           errorMessage: null,
@@ -415,5 +432,98 @@ class HadithCubit extends Cubit<HadithState> {
         searchResultsGrouped: const {},
       ),
     );
+  }
+
+  List<HadithResource> _sortBooks({
+    required List<HadithResource> books,
+    required String sortType,
+    required bool isAscending,
+    required List<String> customOrder,
+  }) {
+    final sorted = List<HadithResource>.from(books);
+    if (sortType == 'custom') {
+      sorted.sort((a, b) {
+        int idxA = customOrder.indexOf(a.book);
+        int idxB = customOrder.indexOf(b.book);
+        if (idxA == -1 && idxB == -1) return a.name.compareTo(b.name);
+        if (idxA == -1) return 1;
+        if (idxB == -1) return -1;
+        return idxA.compareTo(idxB);
+      });
+    } else if (sortType == 'date') {
+      sorted.sort((a, b) {
+        final timeA = _prefsService.getBookDownloadTime(a.book);
+        final timeB = _prefsService.getBookDownloadTime(b.book);
+        final cmp = timeA.compareTo(timeB);
+        return isAscending ? cmp : -cmp;
+      });
+    } else if (sortType == 'hadithCount') {
+      sorted.sort((a, b) {
+        final cmp = a.hadithCount.compareTo(b.hadithCount);
+        return isAscending ? cmp : -cmp;
+      });
+    } else {
+      // name
+      sorted.sort((a, b) {
+        final nameA = a.nameNative.isNotEmpty ? a.nameNative : a.name;
+        final nameB = b.nameNative.isNotEmpty ? b.nameNative : b.name;
+        final cmp = nameA.compareTo(nameB);
+        return isAscending ? cmp : -cmp;
+      });
+    }
+    return sorted;
+  }
+
+  /// Updates the book sort option and re-sorts the downloaded list
+  Future<void> updateBookSort({
+    String? sortType,
+    bool? isAscending,
+    List<String>? customOrder,
+  }) async {
+    final newSortType = sortType ?? state.bookSortType;
+    final newIsAscending = isAscending ?? state.bookSortAscending;
+
+    if (sortType != null) {
+      await _prefsService.setBookSortType(sortType);
+    }
+    if (isAscending != null) {
+      await _prefsService.setBookSortAscending(isAscending);
+    }
+    if (customOrder != null) {
+      await _prefsService.setBookCustomOrder(customOrder);
+    }
+
+    final currentCustomOrder = _prefsService.getBookCustomOrder();
+    final sorted = _sortBooks(
+      books: state.downloadedBooks,
+      sortType: newSortType,
+      isAscending: newIsAscending,
+      customOrder: currentCustomOrder,
+    );
+
+    emit(state.copyWith(
+      downloadedBooks: sorted,
+      bookSortType: newSortType,
+      bookSortAscending: newIsAscending,
+    ));
+  }
+
+  /// Reorders books in custom drag-and-drop mode
+  Future<void> reorderBooks(int oldIndex, int newIndex) async {
+    final books = List<HadithResource>.from(state.downloadedBooks);
+
+    final item = books.removeAt(oldIndex);
+    books.insert(newIndex, item);
+
+    final keysOrder = books.map((b) => b.book).toList();
+
+    // Automatically switch to 'custom' sort type if the user drags
+    await _prefsService.setBookSortType('custom');
+    await _prefsService.setBookCustomOrder(keysOrder);
+
+    emit(state.copyWith(
+      downloadedBooks: books,
+      bookSortType: 'custom',
+    ));
   }
 }

@@ -38,6 +38,10 @@ class HadithState {
   final List<HistoryRecord> readHistory;
   final List<ReadingSessionRecord> readingSessions;
 
+  // Book Sorting Settings
+  final String bookSortType;
+  final bool bookSortAscending;
+
   HadithState({
     this.isLoading = false,
     this.downloadedBooks = const [],
@@ -63,6 +67,8 @@ class HadithState {
     this.activityDays = const [],
     this.readHistory = const [],
     this.readingSessions = const [],
+    this.bookSortType = 'name',
+    this.bookSortAscending = true,
   });
 
   HadithState copyWith({
@@ -90,6 +96,8 @@ class HadithState {
     List<String>? activityDays,
     List<HistoryRecord>? readHistory,
     List<ReadingSessionRecord>? readingSessions,
+    String? bookSortType,
+    bool? bookSortAscending,
   }) {
     return HadithState(
       isLoading: isLoading ?? this.isLoading,
@@ -116,6 +124,8 @@ class HadithState {
       activityDays: activityDays ?? this.activityDays,
       readHistory: readHistory ?? this.readHistory,
       readingSessions: readingSessions ?? this.readingSessions,
+      bookSortType: bookSortType ?? this.bookSortType,
+      bookSortAscending: bookSortAscending ?? this.bookSortAscending,
     );
   }
 
