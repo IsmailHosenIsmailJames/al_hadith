@@ -22,15 +22,21 @@ class HadithState {
   final Set<String> bookmarkedRefs;
   final Set<String> pinnedRefs;
   final Map<String, String> hadithNotes;
-  final Map<String, HadithItem>
-  collectionsHadiths; // reference -> loaded detail
+  final Map<String, HadithItem> collectionsHadiths; // reference -> loaded detail
 
   // Global FTS Search State
-  final Map<String, List<HadithItem>>
-  searchResultsGrouped; // bookKey -> results
+  final Map<String, List<HadithItem>> searchResultsGrouped; // bookKey -> results
   final Set<String> selectedSearchBooks; // books selected for search scope
   final bool isSearching;
   final String searchQuery;
+
+  // Statistics & History additions
+  final int dailyGoal;
+  final int currentStreak;
+  final int longestStreak;
+  final List<String> activityDays;
+  final List<HistoryRecord> readHistory;
+  final List<ReadingSessionRecord> readingSessions;
 
   HadithState({
     this.isLoading = false,
@@ -51,6 +57,12 @@ class HadithState {
     this.selectedSearchBooks = const {},
     this.isSearching = false,
     this.searchQuery = '',
+    this.dailyGoal = 3,
+    this.currentStreak = 0,
+    this.longestStreak = 0,
+    this.activityDays = const [],
+    this.readHistory = const [],
+    this.readingSessions = const [],
   });
 
   HadithState copyWith({
@@ -72,6 +84,12 @@ class HadithState {
     Set<String>? selectedSearchBooks,
     bool? isSearching,
     String? searchQuery,
+    int? dailyGoal,
+    int? currentStreak,
+    int? longestStreak,
+    List<String>? activityDays,
+    List<HistoryRecord>? readHistory,
+    List<ReadingSessionRecord>? readingSessions,
   }) {
     return HadithState(
       isLoading: isLoading ?? this.isLoading,
@@ -92,6 +110,12 @@ class HadithState {
       selectedSearchBooks: selectedSearchBooks ?? this.selectedSearchBooks,
       isSearching: isSearching ?? this.isSearching,
       searchQuery: searchQuery ?? this.searchQuery,
+      dailyGoal: dailyGoal ?? this.dailyGoal,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
+      activityDays: activityDays ?? this.activityDays,
+      readHistory: readHistory ?? this.readHistory,
+      readingSessions: readingSessions ?? this.readingSessions,
     );
   }
 

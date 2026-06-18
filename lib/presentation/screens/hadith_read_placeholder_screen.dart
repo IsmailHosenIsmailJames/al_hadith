@@ -59,6 +59,10 @@ class _HadithReadPlaceholderScreenState
   Timer? _dwellTimer;
   int? _dwellIndex; // index the timer is currently tracking
 
+  late HadithCubit _hadithCubit;
+  late DateTime _sessionStartTime;
+  final Set<int> _readHadithsInSession = {};
+
   @override
   void initState() {
     super.initState();
@@ -71,12 +75,27 @@ class _HadithReadPlaceholderScreenState
 
     _pageController = PageController(initialPage: 0);
     _loadSection();
+
+    _hadithCubit = context.read<HadithCubit>();
+    _sessionStartTime = DateTime.now();
   }
 
   @override
   void dispose() {
     _dwellTimer?.cancel();
     _pageController.dispose();
+
+    // Log the reading session if it lasted more than 10 seconds
+    final durationSeconds = DateTime.now().difference(_sessionStartTime).inSeconds;
+    if (durationSeconds >= 10) {
+      // Limit to max 30 minutes (1800s) to avoid idle tab background leakage
+      final loggedDuration = durationSeconds > 1800 ? 1800 : durationSeconds;
+      _hadithCubit.recordReadingSession(
+        durationSeconds: loggedDuration,
+        hadithsReadCount: _readHadithsInSession.length,
+      );
+    }
+
     super.dispose();
   }
 
@@ -232,7 +251,10 @@ class _HadithReadPlaceholderScreenState
           bookKey: widget.bookKey,
           hadithNumber: hadith.hadithNumber,
           isRead: true,
+          bookName: _bookName,
+          sectionTitle: _sectionName,
         );
+        _readHadithsInSession.add(hadith.hadithNumber);
         // Rebuild the card to reflect the new read state
         setState(() {});
       }

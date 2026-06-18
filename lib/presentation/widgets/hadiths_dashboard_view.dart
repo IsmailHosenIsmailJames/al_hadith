@@ -27,10 +27,14 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
 
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
 
@@ -71,7 +75,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                     ),
                     onPressed: () =>
                         context.read<HadithCubit>().loadDashboard(),
-                    child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
+                    child: Text(
+                      AppLocalization.get('retry_setup_download', appLanguage),
+                    ),
                   ),
                 ],
               ),
@@ -91,6 +97,11 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.all(16.0),
             children: [
+              // 0. Study Stats Panel
+              _buildStudyStatsHeader(context, state, appLanguage),
+
+              const Gap(20),
+
               // 1. History or Daily Inspiration Panel
               _buildHistoryHeader(context, state, appLanguage),
 
@@ -124,7 +135,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                       ? readCount / totalHadiths
                       : 0.0;
                   final percentageText = (ratio * 100).toStringAsFixed(2);
-                  final cardBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2) : const Color(0xFFF3F4F6);
+                  final cardBgColor = isDark
+                      ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2)
+                      : const Color(0xFFF3F4F6);
 
                   return GestureDetector(
                         onTap: () {
@@ -139,7 +152,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                             border: Border.all(color: borderDividerColor),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.02),
+                                color: Colors.black.withValues(
+                                  alpha: isDark ? 0.1 : 0.02,
+                                ),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -198,10 +213,15 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                           ),
                                         const Gap(4),
                                         Text(
-                                          AppLocalization.get('hadiths_chapters_summary', appLanguage, args: {
-                                            'hadiths': '${book.hadithCount}',
-                                            'chapters': '${book.sectionCount}'
-                                          }),
+                                          AppLocalization.get(
+                                            'hadiths_chapters_summary',
+                                            appLanguage,
+                                            args: {
+                                              'hadiths': '${book.hadithCount}',
+                                              'chapters':
+                                                  '${book.sectionCount}',
+                                            },
+                                          ),
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: textSecondary,
@@ -280,10 +300,14 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    AppLocalization.get('read_progress', appLanguage, args: {
-                                      'read': '$readCount',
-                                      'total': '$totalHadiths'
-                                    }),
+                                    AppLocalization.get(
+                                      'read_progress',
+                                      appLanguage,
+                                      args: {
+                                        'read': '$readCount',
+                                        'total': '$totalHadiths',
+                                      },
+                                    ),
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: textSecondary,
@@ -316,12 +340,20 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
     );
   }
 
-  Widget _buildHistoryHeader(BuildContext context, HadithState state, String appLanguage) {
+  Widget _buildHistoryHeader(
+    BuildContext context,
+    HadithState state,
+    String appLanguage,
+  ) {
     final history = state.history;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final borderDividerColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
     if (history != null) {
@@ -391,7 +423,11 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
             ),
             const Gap(4),
             Text(
-              AppLocalization.get('hadith_reference', appLanguage, args: {'number': '${history.hadithNumber}'}),
+              AppLocalization.get(
+                'hadith_reference',
+                appLanguage,
+                args: {'number': '${history.hadithNumber}'},
+              ),
               style: TextStyle(
                 fontSize: 14,
                 color: textSecondary,
@@ -402,19 +438,12 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               const Gap(4),
               Row(
                 children: [
-                  Icon(
-                    Icons.bookmark_outline,
-                    color: textSecondary,
-                    size: 13,
-                  ),
+                  Icon(Icons.bookmark_outline, color: textSecondary, size: 13),
                   const Gap(5),
                   Expanded(
                     child: Text(
                       history.sectionTitle,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: textSecondary,
-                      ),
+                      style: TextStyle(fontSize: 12, color: textSecondary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -450,7 +479,10 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                   const Gap(6),
                   Text(
                     AppLocalization.get('continue_reading', appLanguage),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -460,7 +492,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
       ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.98, 0.98));
     }
 
-    final quoteBgColor = isDark ? AppTheme.darkSurfaceCard.withValues(alpha: 0.12) : const Color(0xFFF3F4F6);
+    final quoteBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.12)
+        : const Color(0xFFF3F4F6);
 
     // Curated Empty Quote Panel
     return Container(
@@ -504,8 +538,10 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
   }
 
   Widget _buildEmptyState(BuildContext context, String appLanguage) {
-    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
@@ -571,6 +607,434 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  int _getHadithsReadTodayCount(HadithState state) {
+    final now = DateTime.now();
+    final todayStr =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    int count = 0;
+    for (final r in state.readHistory) {
+      final date = DateTime.fromMillisecondsSinceEpoch(r.timestamp);
+      final dateStr =
+          "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+      if (dateStr == todayStr) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  int _getTotalReadingMinutes(HadithState state) {
+    int totalSecs = 0;
+    for (final s in state.readingSessions) {
+      totalSecs += s.durationSeconds;
+    }
+    return (totalSecs / 60).round();
+  }
+
+  Widget _buildStudyStatsHeader(
+    BuildContext context,
+    HadithState state,
+    String appLanguage,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final cardBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        : const Color(0xFFF3F4F6);
+
+    final readToday = _getHadithsReadTodayCount(state);
+    final dailyGoal = state.dailyGoal;
+    final readingMins = _getTotalReadingMinutes(state);
+
+    final currentStreakText = state.currentStreak == 1
+        ? AppLocalization.get(
+            'streak_day',
+            appLanguage,
+            args: {'days': '${state.currentStreak}'},
+          )
+        : AppLocalization.get(
+            'streak_days',
+            appLanguage,
+            args: {'days': '${state.currentStreak}'},
+          );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: borderDividerColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // 1. Streak Column (Navigates to /stats)
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => context.push('/stats'),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.orangeAccent.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Colors.orangeAccent,
+                              size: 24,
+                            ),
+                          ),
+                          const Gap(8),
+                          Text(
+                            currentStreakText,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                          const Gap(2),
+                          Text(
+                            AppLocalization.get('current_streak', appLanguage),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Gap(4),
+                          Text(
+                            'Best: ${state.longestStreak}d',
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              color: textSecondary.withValues(alpha: 0.7),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Divider
+              Container(height: 60, width: 1.5, color: borderDividerColor),
+
+              // 2. Goal Column (Interactive selector)
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _showGoalSelectorBottomSheet(
+                      context,
+                      state,
+                      appLanguage,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryMint.withValues(
+                                alpha: 0.1,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.donut_large_rounded,
+                              color: AppTheme.primaryMint,
+                              size: 24,
+                            ),
+                          ),
+                          const Gap(8),
+                          Text(
+                            '$readToday / $dailyGoal',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                          const Gap(2),
+                          Text(
+                            AppLocalization.get('daily_goal', appLanguage),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Gap(4),
+                          // Progress bar representation
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: dailyGoal > 0
+                                    ? (readToday / dailyGoal).clamp(0.0, 1.0)
+                                    : 0.0,
+                                minHeight: 4,
+                                backgroundColor: borderDividerColor,
+                                color: AppTheme.primaryMint,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Divider
+              Container(height: 60, width: 1.5, color: borderDividerColor),
+
+              // 3. Reading Time Column (Navigates to /stats)
+              Expanded(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => context.push('/stats'),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.secondaryIndigo.withValues(
+                                alpha: 0.1,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.timer_outlined,
+                              color: AppTheme.secondaryIndigo,
+                              size: 24,
+                            ),
+                          ),
+                          const Gap(8),
+                          Text(
+                            '$readingMins min',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                          const Gap(2),
+                          Text(
+                            AppLocalization.get('reading_time', appLanguage),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Gap(4),
+                          Text(
+                            '${state.readingSessions.length} sessions',
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              color: textSecondary.withValues(alpha: 0.7),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Gap(16),
+          Divider(color: borderDividerColor, height: 1),
+          const Gap(12),
+          // View Detailed Analytics Link Button
+          InkWell(
+            onTap: () => context.push('/stats'),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    AppLocalization.get('view_analytics', appLanguage),
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryMint,
+                    ),
+                  ),
+                  const Gap(6),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: AppTheme.primaryMint,
+                    size: 14,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showGoalSelectorBottomSheet(
+    BuildContext context,
+    HadithState state,
+    String appLanguage,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final navBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+
+    final goals = [1, 3, 5, 10, 15, 20, 25, 30];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: navBgColor,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.3,
+        maxChildSize: 0.85,
+        expand: false,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: textSecondary.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const Gap(20),
+                Text(
+                  AppLocalization.get('daily_goal_selector_title', appLanguage),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
+                ),
+                const Gap(6),
+                Text(
+                  AppLocalization.get('daily_goal_selector_desc', appLanguage),
+                  style: TextStyle(fontSize: 13, color: textSecondary),
+                ),
+                const Gap(20),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: goals.length,
+                  itemBuilder: (context, index) {
+                    final goalOption = goals[index];
+                    final isSelected = goalOption == state.dailyGoal;
+                    final cardColor = isSelected
+                        ? AppTheme.primaryMint.withValues(alpha: 0.1)
+                        : Colors.transparent;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppTheme.primaryMint
+                              : borderDividerColor,
+                        ),
+                      ),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          context.read<HadithCubit>().updateDailyGoal(goalOption);
+                        },
+                        leading: Icon(
+                          isSelected
+                              ? Icons.check_circle_rounded
+                              : Icons.radio_button_off_rounded,
+                          color: isSelected ? AppTheme.primaryMint : textSecondary,
+                        ),
+                        title: Text(
+                          goalOption == 1
+                              ? '1 Hadith'
+                              : goalOption == 3
+                              ? '3 Hadiths (Recommended)'
+                              : '$goalOption Hadiths',
+                          style: TextStyle(
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: textPrimary,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

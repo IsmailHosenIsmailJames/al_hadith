@@ -71,6 +71,16 @@ class HadithCubit extends Cubit<HadithState> {
         }
       }
 
+      // Load Statistics & History
+      final dailyGoal = _historyService.getDailyGoal();
+      final activityDays = _historyService.getActivityDays();
+      final readHistory = _historyService.getReadHistory();
+      final readingSessions = _historyService.getReadingSessions();
+
+      final streaks = _historyService.calculateStreaks(activityDays);
+      final currentStreak = streaks['current'] ?? 0;
+      final longestStreak = streaks['longest'] ?? 0;
+
       emit(
         state.copyWith(
           isLoading: false,
@@ -82,6 +92,12 @@ class HadithCubit extends Cubit<HadithState> {
           pinnedRefs: pins,
           hadithNotes: notes,
           collectionsHadiths: detailMap,
+          dailyGoal: dailyGoal,
+          activityDays: activityDays,
+          currentStreak: currentStreak,
+          longestStreak: longestStreak,
+          readHistory: readHistory,
+          readingSessions: readingSessions,
         ),
       );
     } catch (e) {
@@ -161,9 +177,24 @@ class HadithCubit extends Cubit<HadithState> {
     required String bookKey,
     required int hadithNumber,
     required bool isRead,
+    String? bookName,
+    String? sectionTitle,
   }) async {
     if (isRead) {
-      await _historyService.markHadithAsRead(bookKey, hadithNumber);
+      String bName = bookName ?? bookKey;
+      if (bookName == null) {
+        final books = state.downloadedBooks;
+        if (books.any((b) => b.book == bookKey)) {
+          final book = books.firstWhere((b) => b.book == bookKey);
+          bName = book.nameNative.isNotEmpty ? book.nameNative : book.name;
+        }
+      }
+      await _historyService.recordHadithReadEvent(
+        bookKey: bookKey,
+        hadithNumber: hadithNumber,
+        bookName: bName,
+        sectionTitle: sectionTitle ?? '',
+      );
     } else {
       await _historyService.unmarkHadithAsRead(bookKey, hadithNumber);
     }
@@ -171,7 +202,18 @@ class HadithCubit extends Cubit<HadithState> {
     final Map<String, int> updatedCounts = Map.from(state.readCounts);
     updatedCounts[bookKey] = _historyService.getReadHadithsCount(bookKey);
 
-    emit(state.copyWith(readCounts: updatedCounts));
+    // Reload stats from history service
+    final activityDays = _historyService.getActivityDays();
+    final streaks = _historyService.calculateStreaks(activityDays);
+    final readHistory = _historyService.getReadHistory();
+
+    emit(state.copyWith(
+      readCounts: updatedCounts,
+      activityDays: activityDays,
+      currentStreak: streaks['current'] ?? 0,
+      longestStreak: streaks['longest'] ?? 0,
+      readHistory: readHistory,
+    ));
     _authCubit?.autoUpload();
   }
 
@@ -182,6 +224,43 @@ class HadithCubit extends Cubit<HadithState> {
     updatedCounts[bookKey] = 0;
 
     emit(state.copyWith(readCounts: updatedCounts));
+    _authCubit?.autoUpload();
+  }
+
+  Future<void> updateDailyGoal(int goal) async {
+    await _historyService.setDailyGoal(goal);
+    emit(state.copyWith(dailyGoal: goal));
+    _authCubit?.autoUpload();
+  }
+
+  Future<void> recordReadingSession({
+    required int durationSeconds,
+    required int hadithsReadCount,
+  }) async {
+    final sessions = _historyService.getReadingSessions();
+    final now = DateTime.now();
+
+    sessions.insert(
+      0,
+      ReadingSessionRecord(
+        timestamp: now.millisecondsSinceEpoch,
+        durationSeconds: durationSeconds,
+        hadithsReadCount: hadithsReadCount,
+      ),
+    );
+
+    if (sessions.length > 1000) {
+      sessions.removeRange(1000, sessions.length);
+    }
+    await _historyService.saveReadingSessions(sessions);
+
+    emit(state.copyWith(readingSessions: sessions));
+    _authCubit?.autoUpload();
+  }
+
+  Future<void> clearHistory() async {
+    await _historyService.clearHistory();
+    await loadDashboard();
     _authCubit?.autoUpload();
   }
 

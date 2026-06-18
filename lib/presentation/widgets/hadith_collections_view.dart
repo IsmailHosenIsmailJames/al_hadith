@@ -26,7 +26,10 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
     // Refresh collections whenever view mounts
     context.read<HadithCubit>().loadCollections();
   }
@@ -733,6 +736,14 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                 color: textPrimary,
               ),
             ),
+            actions: [
+              if (_tabController.index == 3 && state.readHistory.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent),
+                  tooltip: AppLocalization.get('clear_history', appLanguage),
+                  onPressed: () => _showClearHistoryDialog(context, appLanguage),
+                ),
+            ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: Container(
@@ -769,6 +780,11 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
                       icon: const Icon(Icons.note_alt_rounded, size: 18),
                       text: AppLocalization.get('notes', appLanguage),
                     ),
+                    Tab(
+                      iconMargin: const EdgeInsets.only(bottom: 2),
+                      icon: const Icon(Icons.history_rounded, size: 18),
+                      text: AppLocalization.get('history', appLanguage),
+                    ),
                   ],
                 ),
               ),
@@ -780,10 +796,221 @@ class _HadithCollectionsViewState extends State<HadithCollectionsView>
               _buildBookmarksTab(state),
               _buildPinnedTab(state),
               _buildNotesTab(state),
+              _buildHistoryTab(state),
             ],
           ),
         );
       },
+    );
+  }
+  Widget _buildHistoryTab(HadithState state) {
+    final appLanguage = context.read<SettingsCubit>().state.appLanguage;
+    final history = state.readHistory;
+    if (history.isEmpty) {
+      return _buildEmptyState(
+        icon: Icons.history_rounded,
+        title: AppLocalization.get('history_empty_title', appLanguage),
+        subtitle: AppLocalization.get('history_empty_desc', appLanguage),
+      );
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderDividerColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFE5E7EB);
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        : const Color(0xFFF3F4F6);
+
+    return ListView.builder(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      itemCount: history.length,
+      itemBuilder: (context, index) {
+        final record = history[index];
+        final flag = _getFlag(state, record.bookKey);
+        final date = DateTime.fromMillisecondsSinceEpoch(record.timestamp);
+        final timeAgo = _formatTimeAgo(date, appLanguage);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: cardBgColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderDividerColor),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                final encodedSection = Uri.encodeComponent(record.sectionTitle);
+                context.push(
+                  '/book/${record.bookKey}/hadith/${record.hadithNumber}?sectionName=$encodedSection',
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryMint.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppTheme.primaryMint.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(flag, style: const TextStyle(fontSize: 11)),
+                              const Gap(6),
+                              Text(
+                                record.bookName.isNotEmpty ? record.bookName : record.bookKey,
+                                style: const TextStyle(
+                                  color: AppTheme.primaryMint,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Gap(8),
+                        Text(
+                          AppLocalization.get(
+                            'hadith_no',
+                            appLanguage,
+                            args: {'number': '${record.hadithNumber}'},
+                          ),
+                          style: TextStyle(
+                            color: textSecondary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          timeAgo,
+                          style: TextStyle(
+                            color: textSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (record.sectionTitle.isNotEmpty) ...[
+                      const Gap(10),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.bookmark_outline,
+                            color: textSecondary,
+                            size: 13,
+                          ),
+                          const Gap(5),
+                          Expanded(
+                            child: Text(
+                              record.sectionTitle,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: textSecondary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ).animate()
+         .fadeIn(duration: 350.ms, delay: (index * 45).ms)
+         .slideY(begin: 0.08, end: 0);
+      },
+    );
+  }
+
+  String _formatTimeAgo(DateTime time, String appLanguage) {
+    final now = DateTime.now();
+    final diff = now.difference(time);
+    if (diff.inSeconds < 60) {
+      return AppLocalization.get('just_now', appLanguage);
+    }
+    if (diff.inMinutes < 60) {
+      return AppLocalization.get(
+        'minutes_ago',
+        appLanguage,
+        args: {'minutes': diff.inMinutes.toString()},
+      );
+    }
+    if (diff.inHours < 24) {
+      return AppLocalization.get(
+        'hours_ago',
+        appLanguage,
+        args: {'hours': diff.inHours.toString()},
+      );
+    }
+    return '${time.day}/${time.month}/${time.year}';
+  }
+
+  void _showClearHistoryDialog(BuildContext context, String appLanguage) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: cardBgColor,
+        title: Text(
+          AppLocalization.get('clear_history', appLanguage),
+          style: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          AppLocalization.get('clear_history_confirm', appLanguage),
+          style: TextStyle(color: textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              AppLocalization.get('cancel', appLanguage),
+              style: TextStyle(color: textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+            ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<HadithCubit>().clearHistory();
+            },
+            child: Text(
+              AppLocalization.get('delete', appLanguage),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

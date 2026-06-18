@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReadSession {
@@ -36,6 +37,62 @@ class ReadSession {
   }
 }
 
+class HistoryRecord {
+  final String bookKey;
+  final int hadithNumber;
+  final int timestamp;
+  final String bookName;
+  final String sectionTitle;
+
+  HistoryRecord({
+    required this.bookKey,
+    required this.hadithNumber,
+    required this.timestamp,
+    required this.bookName,
+    required this.sectionTitle,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'bookKey': bookKey,
+    'hadithNumber': hadithNumber,
+    'timestamp': timestamp,
+    'bookName': bookName,
+    'sectionTitle': sectionTitle,
+  };
+
+  factory HistoryRecord.fromJson(Map<String, dynamic> json) => HistoryRecord(
+    bookKey: json['bookKey'] as String? ?? '',
+    hadithNumber: json['hadithNumber'] as int? ?? 1,
+    timestamp: json['timestamp'] as int? ?? 0,
+    bookName: json['bookName'] as String? ?? '',
+    sectionTitle: json['sectionTitle'] as String? ?? '',
+  );
+}
+
+class ReadingSessionRecord {
+  final int timestamp;
+  final int durationSeconds;
+  final int hadithsReadCount;
+
+  ReadingSessionRecord({
+    required this.timestamp,
+    required this.durationSeconds,
+    required this.hadithsReadCount,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'timestamp': timestamp,
+    'durationSeconds': durationSeconds,
+    'hadithsReadCount': hadithsReadCount,
+  };
+
+  factory ReadingSessionRecord.fromJson(Map<String, dynamic> json) => ReadingSessionRecord(
+    timestamp: json['timestamp'] as int? ?? 0,
+    durationSeconds: json['durationSeconds'] as int? ?? 0,
+    hadithsReadCount: json['hadithsReadCount'] as int? ?? 0,
+  );
+}
+
 class HistoryService {
   final SharedPreferences _prefs;
 
@@ -53,6 +110,14 @@ class HistoryService {
   static const String _keyPins = 'collections_pins';
   static const String _keyNotesKeys = 'collections_notes_keys';
   static String _keyNoteText(String ref) => 'collections_note_text_$ref';
+
+  // Statistics and History keys
+  static const String _keyDailyGoal = 'stats_daily_goal';
+  static const String _keyActivityDays = 'stats_activity_days';
+  static const String _keyCurrentStreak = 'stats_current_streak';
+  static const String _keyLongestStreak = 'stats_longest_streak';
+  static const String _keyReadHistory = 'stats_read_history';
+  static const String _keyReadingSessions = 'stats_reading_sessions';
 
   HistoryService(this._prefs);
 
@@ -94,13 +159,196 @@ class HistoryService {
     );
   }
 
-  /// Clears reading history
+  /// Clears reading history and all study stats
   Future<void> clearHistory() async {
     await _prefs.remove(_keyLastBookKey);
     await _prefs.remove(_keyLastBookName);
     await _prefs.remove(_keyLastHadithNum);
     await _prefs.remove(_keyLastSectionTitle);
     await _prefs.remove(_keyLastTimestamp);
+
+    // Clear stats and history
+    await _prefs.remove(_keyReadHistory);
+    await _prefs.remove(_keyReadingSessions);
+    await _prefs.remove(_keyActivityDays);
+    await _prefs.remove(_keyCurrentStreak);
+    await _prefs.remove(_keyLongestStreak);
+  }
+
+  // --- Statistics and History Helpers ---
+
+  int getDailyGoal() {
+    return _prefs.getInt(_keyDailyGoal) ?? 3;
+  }
+
+  Future<bool> setDailyGoal(int goal) {
+    return _prefs.setInt(_keyDailyGoal, goal);
+  }
+
+  int getCurrentStreak() {
+    return _prefs.getInt(_keyCurrentStreak) ?? 0;
+  }
+
+  Future<bool> setCurrentStreak(int val) {
+    return _prefs.setInt(_keyCurrentStreak, val);
+  }
+
+  int getLongestStreak() {
+    return _prefs.getInt(_keyLongestStreak) ?? 0;
+  }
+
+  Future<bool> setLongestStreak(int val) {
+    return _prefs.setInt(_keyLongestStreak, val);
+  }
+
+  List<String> getActivityDays() {
+    return _prefs.getStringList(_keyActivityDays) ?? [];
+  }
+
+  Future<bool> setActivityDays(List<String> days) {
+    return _prefs.setStringList(_keyActivityDays, days);
+  }
+
+  List<HistoryRecord> getReadHistory() {
+    final list = _prefs.getStringList(_keyReadHistory) ?? [];
+    try {
+      return list
+          .map((s) => HistoryRecord.fromJson(jsonDecode(s) as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> saveReadHistory(List<HistoryRecord> records) {
+    final list = records.map((r) => jsonEncode(r.toJson())).toList();
+    return _prefs.setStringList(_keyReadHistory, list);
+  }
+
+  List<ReadingSessionRecord> getReadingSessions() {
+    final list = _prefs.getStringList(_keyReadingSessions) ?? [];
+    try {
+      return list
+          .map((s) => ReadingSessionRecord.fromJson(jsonDecode(s) as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<bool> saveReadingSessions(List<ReadingSessionRecord> sessions) {
+    final list = sessions.map((s) => jsonEncode(s.toJson())).toList();
+    return _prefs.setStringList(_keyReadingSessions, list);
+  }
+
+  /// Logs a detailed read event, updates activity days, and dynamically calculates streaks.
+  Future<bool> recordHadithReadEvent({
+    required String bookKey,
+    required int hadithNumber,
+    required String bookName,
+    required String sectionTitle,
+  }) async {
+    // 1. Mark the Hadith as read
+    await markHadithAsRead(bookKey, hadithNumber);
+
+    // 2. Add detailed history record
+    final records = getReadHistory();
+    final now = DateTime.now();
+
+    records.insert(
+      0,
+      HistoryRecord(
+        bookKey: bookKey,
+        hadithNumber: hadithNumber,
+        timestamp: now.millisecondsSinceEpoch,
+        bookName: bookName,
+        sectionTitle: sectionTitle,
+      ),
+    );
+
+    // Cap history records at 1000 items
+    if (records.length > 1000) {
+      records.removeRange(1000, records.length);
+    }
+    await saveReadHistory(records);
+
+    // 3. Update active days and streaks
+    final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    final activeDays = getActivityDays().toSet();
+    if (!activeDays.contains(todayStr)) {
+      activeDays.add(todayStr);
+      await setActivityDays(activeDays.toList());
+
+      // Recalculate streaks dynamically based on the updated active days list
+      final streaks = calculateStreaks(activeDays.toList());
+      await setCurrentStreak(streaks['current'] ?? 0);
+      await setLongestStreak(streaks['longest'] ?? 0);
+    }
+
+    return true;
+  }
+
+  /// Utility to calculate current and longest streaks from active dates.
+  Map<String, int> calculateStreaks(List<String> datesList) {
+    if (datesList.isEmpty) {
+      return {'current': 0, 'longest': 0};
+    }
+
+    // Parse to DateTime objects (only date parts), sort them
+    final List<DateTime> dates = datesList
+        .map((d) {
+          try {
+            return DateTime.parse(d);
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<DateTime>()
+        .map((d) => DateTime(d.year, d.month, d.day))
+        .toSet() // Ensure unique days
+        .toList();
+
+    if (dates.isEmpty) {
+      return {'current': 0, 'longest': 0};
+    }
+
+    dates.sort();
+
+    int longest = 0;
+    int current = 0;
+    DateTime? prev;
+
+    for (final date in dates) {
+      if (prev == null) {
+        current = 1;
+      } else {
+        final diff = date.difference(prev).inDays;
+        if (diff == 1) {
+          current++;
+        } else if (diff > 1) {
+          current = 1;
+        }
+        // if diff == 0, current remains the same
+      }
+      if (current > longest) {
+        longest = current;
+      }
+      prev = date;
+    }
+
+    // Check if the streak is still active today (active if last active day is today or yesterday)
+    if (prev != null) {
+      final now = DateTime.now();
+      final todayDateOnly = DateTime(now.year, now.month, now.day);
+      final lastDateOnly = DateTime(prev.year, prev.month, prev.day);
+      final diffFromToday = todayDateOnly.difference(lastDateOnly).inDays;
+      if (diffFromToday > 1) {
+        // Last active day was before yesterday, so the current active streak is 0
+        current = 0;
+      }
+    }
+
+    return {'current': current, 'longest': longest};
   }
 
   // --- Read Progress Tracking ---

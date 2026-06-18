@@ -7,6 +7,7 @@ import 'package:al_hadith/presentation/screens/hadith_read_placeholder_screen.da
 import 'package:al_hadith/presentation/screens/hadith_search_screen.dart';
 import 'package:al_hadith/presentation/screens/settings_screen.dart';
 import 'package:al_hadith/presentation/screens/manage_resources_screen.dart';
+import 'package:al_hadith/presentation/screens/study_analytics_screen.dart';
 
 class AppRouter {
   final PreferencesService _prefs;
@@ -40,6 +41,11 @@ class AppRouter {
         path: '/resources',
         name: 'resources',
         builder: (context, state) => const ManageResourcesScreen(),
+      ),
+      GoRoute(
+        path: '/stats',
+        name: 'stats',
+        builder: (context, state) => const StudyAnalyticsScreen(),
       ),
       GoRoute(
         path: '/book/:bookKey',

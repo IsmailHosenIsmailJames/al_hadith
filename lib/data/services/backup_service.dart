@@ -33,6 +33,13 @@ class BackupService {
       'notes': _historyService.getNotes(),
       'readProgress': _buildReadProgressMap(),
       'lastSession': _buildLastSessionMap(),
+      // Stats and History additions
+      'dailyGoal': _historyService.getDailyGoal(),
+      'activityDays': _historyService.getActivityDays(),
+      'currentStreak': _historyService.getCurrentStreak(),
+      'longestStreak': _historyService.getLongestStreak(),
+      'readHistory': _historyService.getReadHistory().map((e) => e.toJson()).toList(),
+      'readingSessions': _historyService.getReadingSessions().map((e) => e.toJson()).toList(),
     };
 
     await ref.set(payload);
@@ -85,6 +92,48 @@ class BackupService {
     if (data['lastSession'] != null) {
       final session = Map<String, dynamic>.from(data['lastSession'] as Map);
       await _restoreLastSession(session);
+    }
+
+    // Restore daily goal
+    if (data['dailyGoal'] != null) {
+      final goal = int.tryParse(data['dailyGoal'].toString()) ?? 3;
+      await _historyService.setDailyGoal(goal);
+    }
+
+    // Restore activity days
+    if (data['activityDays'] != null) {
+      final days = List<String>.from(data['activityDays'] as List);
+      await _historyService.setActivityDays(days);
+    }
+
+    // Restore current streak
+    if (data['currentStreak'] != null) {
+      final streak = int.tryParse(data['currentStreak'].toString()) ?? 0;
+      await _historyService.setCurrentStreak(streak);
+    }
+
+    // Restore longest streak
+    if (data['longestStreak'] != null) {
+      final longest = int.tryParse(data['longestStreak'].toString()) ?? 0;
+      await _historyService.setLongestStreak(longest);
+    }
+
+    // Restore read history
+    if (data['readHistory'] != null) {
+      final rawList = List<dynamic>.from(data['readHistory'] as List);
+      final records = rawList
+          .map((item) => HistoryRecord.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+      await _historyService.saveReadHistory(records);
+    }
+
+    // Restore reading sessions
+    if (data['readingSessions'] != null) {
+      final rawList = List<dynamic>.from(data['readingSessions'] as List);
+      final sessions = rawList
+          .map((item) => ReadingSessionRecord.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+      await _historyService.saveReadingSessions(sessions);
     }
   }
 
@@ -144,6 +193,76 @@ class BackupService {
         }
       }
     }
+
+    // Merge daily goal (take remote if it exists and is different)
+    if (data['dailyGoal'] != null) {
+      final remoteGoal = int.tryParse(data['dailyGoal'].toString()) ?? 3;
+      final localGoal = _historyService.getDailyGoal();
+      if (remoteGoal != localGoal) {
+        await _historyService.setDailyGoal(remoteGoal);
+      }
+    }
+
+    // Merge activity days (union of local and remote)
+    final localDays = _historyService.getActivityDays().toSet();
+    if (data['activityDays'] != null) {
+      localDays.addAll(List<String>.from(data['activityDays'] as List));
+    }
+    await _historyService.setActivityDays(localDays.toList());
+
+    // Merge read history
+    final localHistory = _historyService.getReadHistory();
+    if (data['readHistory'] != null) {
+      final rawRemote = List<dynamic>.from(data['readHistory'] as List);
+      final remoteHistory = rawRemote
+          .map((item) => HistoryRecord.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+
+      final Map<String, HistoryRecord> combinedMap = {};
+      for (final r in localHistory) {
+        combinedMap['${r.bookKey}_${r.hadithNumber}_${r.timestamp}'] = r;
+      }
+      for (final r in remoteHistory) {
+        combinedMap['${r.bookKey}_${r.hadithNumber}_${r.timestamp}'] = r;
+      }
+
+      final mergedHistory = combinedMap.values.toList();
+      mergedHistory.sort((a, b) => b.timestamp.compareTo(a.timestamp)); // descending
+      if (mergedHistory.length > 1000) {
+        mergedHistory.removeRange(1000, mergedHistory.length);
+      }
+      await _historyService.saveReadHistory(mergedHistory);
+    }
+
+    // Merge reading sessions
+    final localSessions = _historyService.getReadingSessions();
+    if (data['readingSessions'] != null) {
+      final rawRemote = List<dynamic>.from(data['readingSessions'] as List);
+      final remoteSessions = rawRemote
+          .map((item) => ReadingSessionRecord.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+
+      final Map<int, ReadingSessionRecord> combinedMap = {};
+      for (final s in localSessions) {
+        combinedMap[s.timestamp] = s;
+      }
+      for (final s in remoteSessions) {
+        combinedMap[s.timestamp] = s;
+      }
+
+      final mergedSessions = combinedMap.values.toList();
+      mergedSessions.sort((a, b) => b.timestamp.compareTo(a.timestamp)); // descending
+      if (mergedSessions.length > 1000) {
+        mergedSessions.removeRange(1000, mergedSessions.length);
+      }
+      await _historyService.saveReadingSessions(mergedSessions);
+    }
+
+    // Recalculate streaks dynamically based on the merged activity days
+    final mergedDays = _historyService.getActivityDays();
+    final recalculatedStreaks = _historyService.calculateStreaks(mergedDays);
+    await _historyService.setCurrentStreak(recalculatedStreaks['current'] ?? 0);
+    await _historyService.setLongestStreak(recalculatedStreaks['longest'] ?? 0);
 
     // After merge, upload the merged state
     await uploadBackup(uid);
