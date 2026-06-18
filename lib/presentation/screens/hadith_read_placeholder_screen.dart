@@ -449,6 +449,66 @@ class _HadithReadPlaceholderScreenState
                   color: AppTheme.primaryMint.withValues(alpha: 0.25),
                 ),
               ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.book_rounded,
+                        color: AppTheme.primaryMint,
+                        size: 20,
+                      ),
+                      const Gap(8),
+                      Expanded(
+                        child: Text(
+                          _bookName,
+                          style: TextStyle(
+                            color: textPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        AppLocalization.get(
+                          'hadith_no',
+                          appLanguage,
+                          args: {'number': '${hadith.hadithNumber}'},
+                        ),
+                        style: const TextStyle(
+                          color: AppTheme.primaryMint,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(12),
+                  Divider(
+                    color: AppTheme.primaryMint.withValues(alpha: 0.2),
+                    height: 1,
+                  ),
+                  const Gap(12),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 200),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Text(
+                        hadith.text,
+                        style: TextStyle(
+                          color: textPrimary,
+                          fontSize: 15,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const Gap(20),
             Row(

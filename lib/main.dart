@@ -23,6 +23,7 @@ import 'package:al_hadith/logic/settings/settings_state.dart';
 import 'package:al_hadith/logic/auth/auth_cubit.dart';
 import 'package:al_hadith/core/utils/platform_utils.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -41,11 +42,12 @@ void main() async {
   // Ensure Flutter engine is fully bootstrapped
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase if supported on the current platform
+  // Initialize Firebase and Google Sign-In if supported on the current platform
   if (isFirebaseSupported) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await GoogleSignIn.instance.initialize();
   }
 
   if (isDesktop) {

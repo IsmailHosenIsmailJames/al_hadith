@@ -16,40 +16,46 @@ class AuthCubit extends Cubit<AuthState> {
     required FirebaseAuth? auth,
     required BackupService backupService,
     required PreferencesService prefs,
-  })  : _auth = auth,
-        _backupService = backupService,
-        _prefs = prefs,
-        super(const AuthState()) {
+  }) : _auth = auth,
+       _backupService = backupService,
+       _prefs = prefs,
+       super(const AuthState()) {
     _init();
   }
 
   void _init() {
     if (_auth == null) {
-      emit(state.copyWith(
-        status: AuthStatus.unauthenticated,
-        clearUser: true,
-        clearError: true,
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.unauthenticated,
+          clearUser: true,
+          clearError: true,
+        ),
+      );
       return;
     }
     // Listen to auth state changes
     _authSubscription = _auth.authStateChanges().listen((user) {
       if (user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: user,
-          clearError: true,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.authenticated,
+            user: user,
+            clearError: true,
+          ),
+        );
         // Auto-sync on login if enabled
         if (_prefs.isAutoSyncEnabled()) {
           syncNow();
         }
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          clearUser: true,
-          clearError: true,
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            clearUser: true,
+            clearError: true,
+          ),
+        );
       }
     });
   }
@@ -57,49 +63,61 @@ class AuthCubit extends Cubit<AuthState> {
   /// Sign in with Google
   Future<void> signInWithGoogle() async {
     if (_auth == null) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Sync features are not supported on this platform.',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Sync features are not supported on this platform.',
+        ),
+      );
       return;
     }
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
     try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        // User cancelled
-        emit(state.copyWith(status: AuthStatus.unauthenticated));
-        return;
-      }
-
-      final googleAuth = await googleUser.authentication;
+      final googleUser = await GoogleSignIn.instance.authenticate();
+      final googleAuth = googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       await _auth.signInWithCredential(credential);
       // Auth state listener handles the rest
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        emit(state.copyWith(status: AuthStatus.unauthenticated));
+        return;
+      }
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: e.description ?? 'Google sign-in failed',
+        ),
+      );
     } on FirebaseAuthException catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.message ?? 'Google sign-in failed',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: e.message ?? 'Google sign-in failed',
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Google sign-in failed: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Google sign-in failed: ${e.toString()}',
+        ),
+      );
     }
   }
 
   /// Sign in with Email & Password
   Future<void> signInWithEmail(String email, String password) async {
     if (_auth == null) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Sync features are not supported on this platform.',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Sync features are not supported on this platform.',
+        ),
+      );
       return;
     }
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
@@ -109,25 +127,31 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: _getAuthErrorMessage(e.code),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _getAuthErrorMessage(e.code),
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Sign-in failed: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Sign-in failed: ${e.toString()}',
+        ),
+      );
     }
   }
 
   /// Register with Email & Password
   Future<void> registerWithEmail(String email, String password) async {
     if (_auth == null) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Sync features are not supported on this platform.',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Sync features are not supported on this platform.',
+        ),
+      );
       return;
     }
     emit(state.copyWith(status: AuthStatus.loading, clearError: true));
@@ -137,15 +161,19 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: _getAuthErrorMessage(e.code),
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: _getAuthErrorMessage(e.code),
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Registration failed: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Registration failed: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -170,7 +198,7 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (_) {
       // Best effort backup on sign-out
     }
-    await GoogleSignIn().signOut();
+    await GoogleSignIn.instance.signOut();
     await _auth.signOut();
   }
 
@@ -181,21 +209,21 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copyWith(isSyncing: true, clearError: true));
     try {
       await _backupService.mergeBackup(state.user!.uid);
-      emit(state.copyWith(
-        isSyncing: false,
-        lastSyncTime: DateTime.now(),
-      ));
+      emit(state.copyWith(isSyncing: false, lastSyncTime: DateTime.now()));
     } catch (e) {
-      emit(state.copyWith(
-        isSyncing: false,
-        errorMessage: 'Sync failed: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isSyncing: false,
+          errorMessage: 'Sync failed: ${e.toString()}',
+        ),
+      );
     }
   }
 
   /// Upload-only backup (used by auto-sync triggers)
   Future<void> autoUpload() async {
-    if (state.user == null || !_prefs.isAutoSyncEnabled() || _auth == null) return;
+    if (state.user == null || !_prefs.isAutoSyncEnabled() || _auth == null)
+      return;
     try {
       await _backupService.uploadBackup(state.user!.uid);
     } catch (_) {
@@ -220,24 +248,31 @@ class AuthCubit extends Cubit<AuthState> {
       await user.delete();
 
       // 3. Clear Google sign-in local state
-      await GoogleSignIn().signOut();
+      await GoogleSignIn.instance.signOut();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: 'For security, please sign out and sign back in before deleting your account.',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                'For security, please sign out and sign back in before deleting your account.',
+          ),
+        );
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: e.message ?? 'Account deletion failed.',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: e.message ?? 'Account deletion failed.',
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Account deletion failed: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Account deletion failed: ${e.toString()}',
+        ),
+      );
     }
   }
 

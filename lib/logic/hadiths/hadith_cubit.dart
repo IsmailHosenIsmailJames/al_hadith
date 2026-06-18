@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:al_hadith/data/models/hadith_model.dart';
 import 'package:al_hadith/data/models/resource_model.dart';
@@ -18,11 +20,11 @@ class HadithCubit extends Cubit<HadithState> {
     required ResourceRepository resourceRepository,
     required HistoryService historyService,
     AuthCubit? authCubit,
-  })  : _hadithRepository = hadithRepository,
-        _resourceRepository = resourceRepository,
-        _historyService = historyService,
-        _authCubit = authCubit,
-        super(HadithState());
+  }) : _hadithRepository = hadithRepository,
+       _resourceRepository = resourceRepository,
+       _historyService = historyService,
+       _authCubit = authCubit,
+       super(HadithState());
 
   /// Loads the main Hadiths dashboard list, history session, and book progress maps.
   Future<void> loadDashboard() async {
@@ -69,47 +71,58 @@ class HadithCubit extends Cubit<HadithState> {
         }
       }
 
-      emit(state.copyWith(
-        isLoading: false,
-        downloadedBooks: downloaded,
-        history: lastSession,
-        readCounts: countsMap,
-        errorMessage: null,
-        bookmarkedRefs: bookmarks,
-        pinnedRefs: pins,
-        hadithNotes: notes,
-        collectionsHadiths: detailMap,
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          downloadedBooks: downloaded,
+          history: lastSession,
+          readCounts: countsMap,
+          errorMessage: null,
+          bookmarkedRefs: bookmarks,
+          pinnedRefs: pins,
+          hadithNotes: notes,
+          collectionsHadiths: detailMap,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: 'Failed to load library dashboard: ${e.toString()}',
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage: 'Failed to load library dashboard: ${e.toString()}',
+        ),
+      );
     }
   }
 
   /// Queries all sections/chapters inside a specific offline database
   Future<void> loadBookSections(String bookKey) async {
-    emit(state.copyWith(
-      isLoadingSections: true,
-      selectedBookKey: bookKey,
-      sectionsSearchQuery: '',
-      activeSections: const [],
-      sectionsErrorMessage: null,
-    ));
+    emit(
+      state.copyWith(
+        isLoadingSections: true,
+        selectedBookKey: bookKey,
+        sectionsSearchQuery: '',
+        activeSections: const [],
+        sectionsErrorMessage: null,
+      ),
+    );
 
     try {
       final sections = await _hadithRepository.getSections(bookKey);
-      emit(state.copyWith(
-        isLoadingSections: false,
-        activeSections: sections,
-        sectionsErrorMessage: null,
-      ));
+      emit(
+        state.copyWith(
+          isLoadingSections: false,
+          activeSections: sections,
+          sectionsErrorMessage: null,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoadingSections: false,
-        sectionsErrorMessage: 'Failed to load chapters: ${e.toString()}',
-      ));
+      log('Failed to load chapters: ${e.toString()}', name: "error");
+      emit(
+        state.copyWith(
+          isLoadingSections: false,
+          sectionsErrorMessage: 'Failed to load chapters: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -138,10 +151,7 @@ class HadithCubit extends Cubit<HadithState> {
       final Map<String, int> updatedCounts = Map.from(state.readCounts);
       updatedCounts[bookKey] = _historyService.getReadHadithsCount(bookKey);
 
-      emit(state.copyWith(
-        history: lastSession,
-        readCounts: updatedCounts,
-      ));
+      emit(state.copyWith(history: lastSession, readCounts: updatedCounts));
       _authCubit?.autoUpload();
     } catch (_) {}
   }
@@ -200,12 +210,14 @@ class HadithCubit extends Cubit<HadithState> {
         }
       }
 
-      emit(state.copyWith(
-        bookmarkedRefs: bookmarks,
-        pinnedRefs: pins,
-        hadithNotes: notes,
-        collectionsHadiths: detailMap,
-      ));
+      emit(
+        state.copyWith(
+          bookmarkedRefs: bookmarks,
+          pinnedRefs: pins,
+          hadithNotes: notes,
+          collectionsHadiths: detailMap,
+        ),
+      );
     } catch (_) {}
   }
 
@@ -224,7 +236,11 @@ class HadithCubit extends Cubit<HadithState> {
   }
 
   /// Saves a custom text note for a specific Hadith
-  Future<void> saveHadithNote(String bookKey, int hadithNumber, String noteText) async {
+  Future<void> saveHadithNote(
+    String bookKey,
+    int hadithNumber,
+    String noteText,
+  ) async {
     if (noteText.trim().isEmpty) {
       await deleteHadithNote(bookKey, hadithNumber);
     } else {
@@ -266,19 +282,23 @@ class HadithCubit extends Cubit<HadithState> {
   Future<void> searchHadiths(String query) async {
     final cleanedQuery = query.trim();
     if (cleanedQuery.isEmpty) {
-      emit(state.copyWith(
-        searchQuery: '',
-        isSearching: false,
-        searchResultsGrouped: const {},
-      ));
+      emit(
+        state.copyWith(
+          searchQuery: '',
+          isSearching: false,
+          searchResultsGrouped: const {},
+        ),
+      );
       return;
     }
 
-    emit(state.copyWith(
-      isSearching: true,
-      searchQuery: cleanedQuery,
-      searchResultsGrouped: const {}, // Clear prior results
-    ));
+    emit(
+      state.copyWith(
+        isSearching: true,
+        searchQuery: cleanedQuery,
+        searchResultsGrouped: const {}, // Clear prior results
+      ),
+    );
 
     try {
       final targetBooks = state.selectedSearchBooks.isNotEmpty
@@ -287,33 +307,34 @@ class HadithCubit extends Cubit<HadithState> {
 
       final Map<String, List<HadithItem>> results = {};
 
-      await Future.wait(targetBooks.map((bookKey) async {
-        try {
-          final matches = await _hadithRepository.searchHadiths(bookKey, cleanedQuery);
-          if (matches.isNotEmpty) {
-            results[bookKey] = matches;
-          }
-        } catch (_) {}
-      }));
+      await Future.wait(
+        targetBooks.map((bookKey) async {
+          try {
+            final matches = await _hadithRepository.searchHadiths(
+              bookKey,
+              cleanedQuery,
+            );
+            if (matches.isNotEmpty) {
+              results[bookKey] = matches;
+            }
+          } catch (_) {}
+        }),
+      );
 
-      emit(state.copyWith(
-        searchResultsGrouped: results,
-        isSearching: false,
-      ));
+      emit(state.copyWith(searchResultsGrouped: results, isSearching: false));
     } catch (_) {
-      emit(state.copyWith(
-        isSearching: false,
-        searchResultsGrouped: const {},
-      ));
+      emit(state.copyWith(isSearching: false, searchResultsGrouped: const {}));
     }
   }
 
   /// Clears the global search results and query
   void clearSearch() {
-    emit(state.copyWith(
-      searchQuery: '',
-      isSearching: false,
-      searchResultsGrouped: const {},
-    ));
+    emit(
+      state.copyWith(
+        searchQuery: '',
+        isSearching: false,
+        searchResultsGrouped: const {},
+      ),
+    );
   }
 }
