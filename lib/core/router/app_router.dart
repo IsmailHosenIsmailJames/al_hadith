@@ -28,6 +28,10 @@ class AppRouter {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
+        path: '/open',
+        redirect: (context, state) => _prefs.isSetupCompleted() ? '/home' : '/setup',
+      ),
+      GoRoute(
         path: '/search',
         name: 'search',
         builder: (context, state) => const HadithSearchScreen(),
