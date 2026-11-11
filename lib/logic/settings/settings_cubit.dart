@@ -93,4 +93,20 @@ class SettingsCubit extends Cubit<SettingsState> {
     await _prefs.setAutoSyncEnabled(enabled);
     emit(state.copyWith(autoSyncEnabled: enabled));
   }
+
+  Future<void> resetToDefaults() async {
+    await _prefs.setArabicFontSize(24.0);
+    await _prefs.setTranslationFontSize(16.0);
+    await _prefs.setArabicFontFamily('Me Quran');
+    await _prefs.setWakeLockEnabled(false);
+    WakelockPlus.disable();
+    emit(state.copyWith(
+      arabicFontSize: 24.0,
+      translationFontSize: 16.0,
+      arabicFontFamily: 'Me Quran',
+      wakeLockEnabled: false,
+      autoMarkRead: true,
+      dwellTimerSeconds: 5,
+    ));
+  }
 }
