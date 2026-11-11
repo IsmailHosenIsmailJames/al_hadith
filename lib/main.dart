@@ -44,10 +44,18 @@ void main() async {
 
   // Initialize Firebase and Google Sign-In if supported on the current platform
   if (isFirebaseSupported) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    await GoogleSignIn.instance.initialize();
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      debugPrint("Firebase already initialized or initialization error: $e");
+    }
+    try {
+      await GoogleSignIn.instance.initialize();
+    } catch (e) {
+      debugPrint("GoogleSignIn init error: $e");
+    }
   }
 
   if (isDesktop) {
