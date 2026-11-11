@@ -106,40 +106,90 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
           onRefresh: () => context.read<HadithCubit>().loadDashboard(),
           child: ListView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
             children: [
               // 0. Study Stats Panel
               _buildStudyStatsHeader(context, state, appLanguage),
 
-              const Gap(20),
+              const Gap(10),
 
               // 1. History or Daily Inspiration Panel
               _buildHistoryHeader(context, state, appLanguage),
 
-              const Gap(28),
+              const Gap(16),
 
               // 2. Downloaded Book Categories Header with Sort Button
               Padding(
-                padding: const EdgeInsets.only(left: 4.0, bottom: 4.0, right: 4.0),
+                padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      AppLocalization.get('your_offline_library', appLanguage),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: textPrimary,
-                        letterSpacing: 0.2,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          AppLocalization.get('your_offline_library', appLanguage),
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.bold,
+                            color: textPrimary,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                        const Gap(8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 1.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryMint.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Text(
+                            '${state.downloadedBooks.length}',
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryMint,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.sort_rounded, color: AppTheme.primaryMint),
-                      tooltip: AppLocalization.get('sort_books', appLanguage),
-                      onPressed: () => _showSortSelectorBottomSheet(
+                    InkWell(
+                      onTap: () => _showSortSelectorBottomSheet(
                         context,
                         state,
                         appLanguage,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.sort_rounded,
+                              color: AppTheme.primaryMint,
+                              size: 16,
+                            ),
+                            const Gap(4),
+                            Text(
+                              AppLocalization.get('sort_books', appLanguage),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.primaryMint,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -165,7 +215,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                       : 0.0;
                   final percentageText = (ratio * 100).toStringAsFixed(2);
                   final cardBgColor = isDark
-                      ? AppTheme.darkSurfaceCard.withValues(alpha: 0.2)
+                      ? AppTheme.darkSurfaceCard.withValues(alpha: 0.25)
                       : const Color(0xFFF3F4F6);
 
                   final Widget card = GestureDetector(
@@ -173,19 +223,19 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                           context.push('/book/${book.book}');
                         },
                         child: Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(18),
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: cardBgColor,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: borderDividerColor),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(
-                                  alpha: isDark ? 0.1 : 0.02,
+                                  alpha: isDark ? 0.08 : 0.02,
                                 ),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -196,40 +246,92 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                 children: [
                                   // Unique book visual card logo
                                   Container(
-                                    width: 44,
-                                    height: 44,
+                                    width: 38,
+                                    height: 38,
                                     decoration: BoxDecoration(
                                       color: AppTheme.primaryMint.withValues(
                                         alpha: 0.08,
                                       ),
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                         color: AppTheme.primaryMint.withValues(
-                                          alpha: 0.3,
+                                          alpha: 0.25,
                                         ),
                                       ),
                                     ),
                                     child: const Icon(
                                       Icons.menu_book_rounded,
                                       color: AppTheme.primaryMint,
-                                      size: 20,
+                                      size: 18,
                                     ),
                                   ),
-                                  const Gap(14),
+                                  const Gap(10),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          book.nameNative.isNotEmpty
-                                              ? book.nameNative
-                                              : book.name,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: textPrimary,
-                                          ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                book.nameNative.isNotEmpty
+                                                    ? book.nameNative
+                                                    : book.name,
+                                                style: TextStyle(
+                                                  fontSize: 14.5,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: textPrimary,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            if (book.languageCode.isNotEmpty) ...[
+                                              const Gap(6),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 1.5,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: AppTheme.secondaryIndigo
+                                                      .withValues(alpha: 0.12),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                    color: AppTheme.secondaryIndigo
+                                                        .withValues(alpha: 0.25),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      book.langFlag,
+                                                      style: const TextStyle(
+                                                        fontSize: 9.5,
+                                                      ),
+                                                    ),
+                                                    const Gap(3),
+                                                    Text(
+                                                      book.languageCode == "eng"
+                                                          ? book.langDisplayName
+                                                          : book.langNativeName,
+                                                      style: const TextStyle(
+                                                        fontSize: 9,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: AppTheme
+                                                            .secondaryIndigo,
+                                                        letterSpacing: 0.2,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                         ),
                                         if (book.nameNative.isNotEmpty &&
                                             book.languageCode != "eng")
@@ -239,129 +341,73 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                                               fontSize: 10,
                                               color: textSecondary,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        const Gap(4),
-                                        Text(
-                                          AppLocalization.get(
-                                            'hadiths_chapters_summary',
-                                            appLanguage,
-                                            args: {
-                                              'hadiths': '${book.hadithCount}',
-                                              'chapters':
-                                                  '${book.sectionCount}',
-                                            },
-                                          ),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: textSecondary,
-                                          ),
-                                        ),
-                                        if (book.languageCode.isNotEmpty) ...[
-                                          const Gap(6),
-                                          // Language pill badge
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 3,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppTheme.secondaryIndigo
-                                                  .withValues(alpha: 0.12),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              border: Border.all(
-                                                color: AppTheme.secondaryIndigo
-                                                    .withValues(alpha: 0.3),
-                                                width: 1,
+                                        const Gap(2),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              AppLocalization.get(
+                                                'hadiths_chapters_summary',
+                                                appLanguage,
+                                                args: {
+                                                  'hadiths': '${book.hadithCount}',
+                                                  'chapters':
+                                                      '${book.sectionCount}',
+                                                },
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: textSecondary,
                                               ),
                                             ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  book.langFlag,
-                                                  style: const TextStyle(
-                                                    fontSize: 11,
-                                                  ),
+                                            const Spacer(),
+                                            if (totalHadiths > 0)
+                                              Text(
+                                                '$percentageText%',
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  color: AppTheme.primaryMint,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                const Gap(4),
-                                                Text(
-                                                  book.languageCode == "eng"
-                                                      ? book.langDisplayName
-                                                      : "${book.langNativeName} (${book.langDisplayName})",
-                                                  style: const TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppTheme
-                                                        .secondaryIndigo,
-                                                    letterSpacing: 0.2,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                              ),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ),
+                                  const Gap(8),
                                   state.bookSortType == 'custom'
                                       ? ReorderableDragStartListener(
                                           index: index,
                                           child: Icon(
                                             Icons.drag_handle_rounded,
                                             color: textSecondary,
-                                            size: 24,
+                                            size: 20,
                                           ),
                                         )
                                       : Icon(
                                           Icons.chevron_right_rounded,
-                                          color: textSecondary,
-                                          size: 24,
+                                          color: textSecondary.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                          size: 20,
                                         ),
                                 ],
                               ),
-                              const Gap(16),
-
-                              // Custom Linear Progress bar
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: LinearProgressIndicator(
-                                  value: ratio,
-                                  minHeight: 5,
-                                  backgroundColor: borderDividerColor,
-                                  color: AppTheme.primaryMint,
+                              if (totalHadiths > 0) ...[
+                                const Gap(8),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: ratio,
+                                    minHeight: 3.5,
+                                    backgroundColor: borderDividerColor,
+                                    color: AppTheme.primaryMint,
+                                  ),
                                 ),
-                              ),
-                              const Gap(8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    AppLocalization.get(
-                                      'read_progress',
-                                      appLanguage,
-                                      args: {
-                                        'read': '$readCount',
-                                        'total': '$totalHadiths',
-                                      },
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: textSecondary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '$percentageText%',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppTheme.primaryMint,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              ],
                             ],
                           ),
                         ),
@@ -404,137 +450,177 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
 
     if (history != null) {
-      // Premium interactive resume card
-      return Container(
-        padding: const EdgeInsets.all(20.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppTheme.primaryMint.withValues(alpha: 0.15),
-              AppTheme.secondaryIndigo.withValues(alpha: 0.04),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: AppTheme.primaryMint.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryMint.withValues(alpha: 0.05),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
+      // Sleek compact resume card
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            final encodedSection = Uri.encodeComponent(
+              history.sectionTitle,
+            );
+            context.push(
+              '/book/${history.bookKey}/hadith/${history.hadithNumber}?sectionName=$encodedSection',
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 11.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.primaryMint.withValues(alpha: 0.12),
+                  AppTheme.secondaryIndigo.withValues(alpha: 0.03),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryMint.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+            child: Row(
               children: [
-                // Pulsing read dot
+                // Icon Avatar
                 Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primaryMint,
-                        shape: BoxShape.circle,
-                      ),
-                    )
-                    .animate(
-                      onPlay: (controller) => controller.repeat(reverse: true),
-                    )
-                    .scale(end: const Offset(1.5, 1.5), duration: 1000.ms),
-                const Gap(8),
-                Text(
-                  AppLocalization.get('resume_reading', appLanguage),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMint.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppTheme.primaryMint.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_rounded,
                     color: AppTheme.primaryMint,
-                    letterSpacing: 1.2,
+                    size: 19,
+                  ),
+                ),
+                const Gap(12),
+                // Text details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: AppTheme.primaryMint,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const Gap(5),
+                          Text(
+                            AppLocalization.get('resume_reading', appLanguage),
+                            style: const TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryMint,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Gap(2),
+                      Text(
+                        history.bookName,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Gap(1),
+                      Row(
+                        children: [
+                          Text(
+                            AppLocalization.get(
+                              'hadith_reference',
+                              appLanguage,
+                              args: {'number': '${history.hadithNumber}'},
+                            ),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (history.sectionTitle.isNotEmpty) ...[
+                            Text(
+                              ' • ',
+                              style: TextStyle(fontSize: 11, color: textSecondary),
+                            ),
+                            Expanded(
+                              child: Text(
+                                history.sectionTitle,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const Gap(8),
+                // Compact Action Pill Button
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryMint,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.play_arrow_rounded,
+                        size: 16,
+                        color: tickColor,
+                      ),
+                      const Gap(3),
+                      Text(
+                        AppLocalization.get('continue_reading', appLanguage),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                          color: tickColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const Gap(14),
-            Text(
-              history.bookName,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: textPrimary,
-              ),
-            ),
-            const Gap(4),
-            Text(
-              AppLocalization.get(
-                'hadith_reference',
-                appLanguage,
-                args: {'number': '${history.hadithNumber}'},
-              ),
-              style: TextStyle(
-                fontSize: 14,
-                color: textSecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (history.sectionTitle.isNotEmpty) ...[
-              const Gap(4),
-              Row(
-                children: [
-                  Icon(Icons.bookmark_outline, color: textSecondary, size: 13),
-                  const Gap(5),
-                  Expanded(
-                    child: Text(
-                      history.sectionTitle,
-                      style: TextStyle(fontSize: 12, color: textSecondary),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            const Gap(20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryMint,
-                foregroundColor: tickColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                elevation: 0,
-              ),
-              onPressed: () {
-                final encodedSection = Uri.encodeComponent(
-                  history.sectionTitle,
-                );
-                context.push(
-                  '/book/${history.bookKey}/hadith/${history.hadithNumber}?sectionName=$encodedSection',
-                );
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.play_arrow_rounded, size: 18),
-                  const Gap(6),
-                  Text(
-                    AppLocalization.get('continue_reading', appLanguage),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.98, 0.98));
     }
@@ -543,40 +629,57 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
         ? AppTheme.darkSurfaceCard.withValues(alpha: 0.12)
         : const Color(0xFFF3F4F6);
 
-    // Curated Empty Quote Panel
+    // Compact Curated Empty Quote Panel
     return Container(
-      padding: const EdgeInsets.all(22.0),
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
       decoration: BoxDecoration(
         color: quoteBgColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderDividerColor),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.format_quote_rounded,
-            color: AppTheme.primaryMint,
-            size: 32,
-          ),
-          const Gap(12),
-          Text(
-            AppLocalization.get('daily_inspiration_quote', appLanguage),
-            style: TextStyle(
-              fontSize: 14.5,
-              fontWeight: FontWeight.w500,
-              fontStyle: FontStyle.italic,
-              color: textPrimary,
-              height: 1.5,
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryMint.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.format_quote_rounded,
+              color: AppTheme.primaryMint,
+              size: 18,
             ),
           ),
-          const Gap(12),
-          Text(
-            AppLocalization.get('daily_inspiration_source', appLanguage),
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: textSecondary,
+          const Gap(10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppLocalization.get('daily_inspiration_quote', appLanguage),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.italic,
+                    color: textPrimary,
+                    height: 1.35,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Gap(4),
+                Text(
+                  AppLocalization.get('daily_inspiration_source', appLanguage),
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.bold,
+                    color: textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -697,268 +800,276 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
         ? const Color(0xFF1E293B)
         : const Color(0xFFE5E7EB);
     final cardBgColor = isDark
-        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.3)
+        ? AppTheme.darkSurfaceCard.withValues(alpha: 0.25)
         : const Color(0xFFF3F4F6);
 
     final readToday = _getHadithsReadTodayCount(state);
     final dailyGoal = state.dailyGoal;
     final readingMins = _getTotalReadingMinutes(state);
 
-    final currentStreakText = state.currentStreak == 1
-        ? AppLocalization.get(
-            'streak_day',
-            appLanguage,
-            args: {'days': '${state.currentStreak}'},
-          )
-        : AppLocalization.get(
-            'streak_days',
-            appLanguage,
-            args: {'days': '${state.currentStreak}'},
-          );
-
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
       decoration: BoxDecoration(
         color: cardBgColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderDividerColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: isDark ? 0.08 : 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Header Row with "DAILY ACTIVITY" and "Analytics ›"
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // 1. Streak Column (Navigates to /stats)
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => context.push('/stats'),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.orangeAccent.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.local_fire_department_rounded,
-                              color: Colors.orangeAccent,
-                              size: 24,
-                            ),
-                          ),
-                          const Gap(8),
-                          Text(
-                            currentStreakText,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: textPrimary,
-                            ),
-                          ),
-                          const Gap(2),
-                          Text(
-                            AppLocalization.get('current_streak', appLanguage),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const Gap(4),
-                          Text(
-                            'Best: ${state.longestStreak}d',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              color: textSecondary.withValues(alpha: 0.7),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+              Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primaryMint,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                ),
-              ),
-
-              // Divider
-              Container(height: 60, width: 1.5, color: borderDividerColor),
-
-              // 2. Goal Column (Interactive selector)
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _showGoalSelectorBottomSheet(
-                      context,
-                      state,
-                      appLanguage,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryMint.withValues(
-                                alpha: 0.1,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.donut_large_rounded,
-                              color: AppTheme.primaryMint,
-                              size: 24,
-                            ),
-                          ),
-                          const Gap(8),
-                          Text(
-                            '$readToday / $dailyGoal',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: textPrimary,
-                            ),
-                          ),
-                          const Gap(2),
-                          Text(
-                            AppLocalization.get('daily_goal', appLanguage),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const Gap(4),
-                          // Progress bar representation
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: dailyGoal > 0
-                                    ? (readToday / dailyGoal).clamp(0.0, 1.0)
-                                    : 0.0,
-                                minHeight: 4,
-                                backgroundColor: borderDividerColor,
-                                color: AppTheme.primaryMint,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  const Gap(6),
+                  Text(
+                    'DAILY ACTIVITY',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                      color: textSecondary,
                     ),
                   ),
-                ),
+                ],
               ),
-
-              // Divider
-              Container(height: 60, width: 1.5, color: borderDividerColor),
-
-              // 3. Reading Time Column (Navigates to /stats)
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => context.push('/stats'),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.secondaryIndigo.withValues(
-                                alpha: 0.1,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.timer_outlined,
-                              color: AppTheme.secondaryIndigo,
-                              size: 24,
-                            ),
-                          ),
-                          const Gap(8),
-                          Text(
-                            '$readingMins min',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: textPrimary,
-                            ),
-                          ),
-                          const Gap(2),
-                          Text(
-                            AppLocalization.get('reading_time', appLanguage),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const Gap(4),
-                          Text(
-                            '${state.readingSessions.length} sessions',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              color: textSecondary.withValues(alpha: 0.7),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+              InkWell(
+                onTap: () => context.push('/stats'),
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        AppLocalization.get('view_analytics', appLanguage),
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryMint,
+                        ),
                       ),
-                    ),
+                      const Gap(2),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: AppTheme.primaryMint,
+                        size: 13,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
-          const Gap(16),
-          Divider(color: borderDividerColor, height: 1),
-          const Gap(12),
-          // View Detailed Analytics Link Button
-          InkWell(
-            onTap: () => context.push('/stats'),
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    AppLocalization.get('view_analytics', appLanguage),
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryMint,
+          const Gap(7),
+          // 3 Metrics in a Compact Row
+          Row(
+            children: [
+              // 1. Streak
+              Expanded(
+                child: InkWell(
+                  onTap: () => context.push('/stats'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 2),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5.5),
+                          decoration: BoxDecoration(
+                            color: Colors.orangeAccent.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.local_fire_department_rounded,
+                            color: Colors.orangeAccent,
+                            size: 16,
+                          ),
+                        ),
+                        const Gap(6),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '${state.currentStreak}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: textPrimary,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: ' d',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                AppLocalization.get('current_streak', appLanguage),
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  color: textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const Gap(6),
-                  const Icon(
-                    Icons.arrow_forward_rounded,
-                    color: AppTheme.primaryMint,
-                    size: 14,
-                  ),
-                ],
+                ),
               ),
-            ),
+              Container(height: 26, width: 1, color: borderDividerColor),
+              // 2. Goal
+              Expanded(
+                child: InkWell(
+                  onTap: () => _showGoalSelectorBottomSheet(
+                    context,
+                    state,
+                    appLanguage,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 2),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5.5),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryMint.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.check_circle_outline_rounded,
+                            color: AppTheme.primaryMint,
+                            size: 16,
+                          ),
+                        ),
+                        const Gap(6),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$readToday / $dailyGoal',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: textPrimary,
+                                ),
+                              ),
+                              Text(
+                                AppLocalization.get('daily_goal', appLanguage),
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  color: textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Container(height: 26, width: 1, color: borderDividerColor),
+              // 3. Time
+              Expanded(
+                child: InkWell(
+                  onTap: () => context.push('/stats'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 2),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5.5),
+                          decoration: BoxDecoration(
+                            color: AppTheme.secondaryIndigo.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.timer_outlined,
+                            color: AppTheme.secondaryIndigo,
+                            size: 16,
+                          ),
+                        ),
+                        const Gap(6),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '$readingMins',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: textPrimary,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: ' m',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                AppLocalization.get('reading_time', appLanguage),
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  color: textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1102,8 +1213,9 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
         ? const Color(0xFF1E293B)
         : const Color(0xFFE5E7EB);
 
-    final sortTypes = ['name', 'date', 'hadithCount', 'custom'];
+    final sortTypes = ['popularity', 'name', 'date', 'hadithCount', 'custom'];
     final sortIcons = {
+      'popularity': Icons.star_rounded,
       'name': Icons.abc_rounded,
       'date': Icons.calendar_today_rounded,
       'hadithCount': Icons.format_list_numbered_rounded,
@@ -1111,6 +1223,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
     };
 
     final sortDisplayNames = {
+      'popularity': AppLocalization.get('sort_popularity', appLanguage),
       'name': AppLocalization.get('sort_name', appLanguage),
       'date': AppLocalization.get('sort_date', appLanguage),
       'hadithCount': AppLocalization.get('sort_hadith_count', appLanguage),
@@ -1125,7 +1238,7 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.55,
+        initialChildSize: 0.64,
         minChildSize: 0.3,
         maxChildSize: 0.85,
         expand: false,
@@ -1243,8 +1356,16 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                             child: _buildOrderButton(
                               context: context,
                               isSelected: isAscending,
-                              label: AppLocalization.get('sort_ascending', appLanguage),
-                              icon: Icons.arrow_upward_rounded,
+                              label: activeSortType == 'popularity'
+                                  ? (appLanguage == 'ben' ? 'জনপ্রিয়তা (বেশি)' : 'Most Popular')
+                                  : (activeSortType == 'name'
+                                      ? 'A → Z'
+                                      : (activeSortType == 'hadithCount'
+                                          ? (appLanguage == 'ben' ? 'বেশি হাদিস' : 'Most Hadiths')
+                                          : AppLocalization.get('sort_ascending', appLanguage))),
+                              icon: activeSortType == 'popularity'
+                                  ? Icons.star_rounded
+                                  : Icons.arrow_upward_rounded,
                               onTap: () {
                                 Navigator.pop(ctx);
                                 context.read<HadithCubit>().updateBookSort(isAscending: true);
@@ -1256,8 +1377,16 @@ class _HadithsDashboardViewState extends State<HadithsDashboardView> {
                             child: _buildOrderButton(
                               context: context,
                               isSelected: !isAscending,
-                              label: AppLocalization.get('sort_descending', appLanguage),
-                              icon: Icons.arrow_downward_rounded,
+                              label: activeSortType == 'popularity'
+                                  ? (appLanguage == 'ben' ? 'জনপ্রিয়তা (কম)' : 'Least Popular')
+                                  : (activeSortType == 'name'
+                                      ? 'Z → A'
+                                      : (activeSortType == 'hadithCount'
+                                          ? (appLanguage == 'ben' ? 'কম হাদিস' : 'Fewest Hadiths')
+                                          : AppLocalization.get('sort_descending', appLanguage))),
+                              icon: activeSortType == 'popularity'
+                                  ? Icons.star_border_rounded
+                                  : Icons.arrow_downward_rounded,
                               onTap: () {
                                 Navigator.pop(ctx);
                                 context.read<HadithCubit>().updateBookSort(isAscending: false);

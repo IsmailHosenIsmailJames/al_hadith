@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/core/localization/app_localization.dart';
 import 'package:al_hadith/logic/settings/settings_cubit.dart';
+import 'package:al_hadith/logic/hadiths/hadith_cubit.dart';
+import 'package:al_hadith/logic/hadiths/hadith_state.dart';
 import 'package:al_hadith/presentation/widgets/hadiths_dashboard_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_sections_view.dart';
 import 'package:al_hadith/presentation/widgets/hadith_collections_view.dart';
@@ -53,10 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: isWideScreen
           ? null
           : AppBar(
+              toolbarHeight: 52,
               leading: Builder(
                 builder: (context) {
                   return IconButton(
-                    icon: const Icon(Icons.menu, color: AppTheme.primaryMint),
+                    icon: const Icon(Icons.menu, color: AppTheme.primaryMint, size: 22),
                     onPressed: () => Scaffold.of(context).openDrawer(),
                   );
                 },
@@ -66,22 +69,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   color: textPrimary,
                   fontWeight: FontWeight.bold,
+                  fontSize: 18.5,
+                  letterSpacing: -0.3,
                 ),
-              ).animate().fadeIn(duration: 600.ms).scale(delay: 100.ms),
+              ).animate().fadeIn(duration: 500.ms),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.search, color: AppTheme.primaryMint),
+                  icon: const Icon(Icons.search, color: AppTheme.primaryMint, size: 22),
                   onPressed: () {
                     context.push('/search');
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.settings_outlined, color: textSecondary),
+                  icon: Icon(Icons.settings_outlined, color: textSecondary, size: 22),
                   onPressed: () {
                     context.push('/settings');
                   },
                 ),
-                const Gap(8),
+                const Gap(4),
               ],
             ),
       drawer: _buildDrawer(context, isWideScreen),
@@ -253,13 +258,16 @@ class _HomeScreenState extends State<HomeScreen> {
           : Container(
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: borderDividerColor, width: 1.5),
+                  top: BorderSide(
+                    color: borderDividerColor.withValues(alpha: 0.8),
+                    width: 0.8,
+                  ),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, -5),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, -3),
                   ),
                 ],
               ),
@@ -270,15 +278,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 selectedItemColor: AppTheme.primaryMint,
                 unselectedItemColor: textSecondary,
                 type: BottomNavigationBarType.fixed,
+                iconSize: 22,
+                selectedFontSize: 11,
+                unselectedFontSize: 11,
                 selectedLabelStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w500,
                 ),
                 elevation: 0,
                 items: [
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.book_outlined),
+                    icon: const Icon(Icons.menu_book_outlined),
                     activeIcon: const Icon(
-                      Icons.book,
+                      Icons.menu_book_rounded,
                       color: AppTheme.primaryMint,
                     ),
                     label: AppLocalization.getTabName('hadiths', appLanguage),
@@ -286,15 +300,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.grid_view_outlined),
                     activeIcon: const Icon(
-                      Icons.grid_view,
+                      Icons.grid_view_rounded,
                       color: AppTheme.primaryMint,
                     ),
                     label: AppLocalization.getTabName('chapters', appLanguage),
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.bookmark_outline),
+                    icon: const Icon(Icons.bookmark_outline_rounded),
                     activeIcon: const Icon(
-                      Icons.bookmark,
+                      Icons.bookmark_rounded,
                       color: AppTheme.primaryMint,
                     ),
                     label: AppLocalization.getTabName(
@@ -303,9 +317,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.person_outline),
+                    icon: const Icon(Icons.person_outline_rounded),
                     activeIcon: const Icon(
-                      Icons.person,
+                      Icons.person_rounded,
                       color: AppTheme.primaryMint,
                     ),
                     label: AppLocalization.getTabName('profile', appLanguage),
@@ -410,8 +424,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  int _getHadithsReadTodayCount(HadithState state) {
+    final now = DateTime.now();
+    final todayStr =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    int count = 0;
+    for (final r in state.readHistory) {
+      final date = DateTime.fromMillisecondsSinceEpoch(r.timestamp);
+      final dateStr =
+          "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+      if (dateStr == todayStr) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   Widget _buildDrawer(BuildContext context, bool isWideScreen) {
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
+    final themeMode = context.watch<SettingsCubit>().state.themeMode;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
     final surfaceColor = Theme.of(context).colorScheme.surface;
@@ -423,125 +454,249 @@ class _HomeScreenState extends State<HomeScreen> {
     final textSecondary =
         Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
+    final hadithState = context.watch<HadithCubit>().state;
+    final booksCount = hadithState.downloadedBooks.length;
+    final readToday = _getHadithsReadTodayCount(hadithState);
+    final dailyGoal = hadithState.dailyGoal;
+    final streak = hadithState.currentStreak;
+
     return Drawer(
       backgroundColor: canvasColor,
       child: Container(
         decoration: BoxDecoration(
           border: Border(
-            right: BorderSide(color: borderDividerColor, width: 1.5),
+            right: BorderSide(color: borderDividerColor, width: 1.2),
           ),
         ),
         child: Column(
           children: [
-            Stack(
-              children: [
-                UserAccountsDrawerHeader(
-                  decoration: BoxDecoration(
-                    color: surfaceColor,
-                    border: Border(
-                      bottom: BorderSide(color: borderDividerColor, width: 1.5),
-                    ),
-                  ),
-                  currentAccountPicture: Container(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: AppTheme.primaryGradient,
-                    ),
-                    child: Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.asset(
-                          'assets/img/logo.png',
-                          height: 100,
-                          width: 100,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                                Icons.book,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  accountName: Text(
-                    'Al Hadith',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: textPrimary,
-                    ),
-                  ),
-                  accountEmail: Text(
-                    AppLocalization.get('drawer_tagline', appLanguage),
-                    style: TextStyle(color: textSecondary, fontSize: 13),
-                  ),
+            // Brand Hero Header
+            Container(
+              padding: EdgeInsets.fromLTRB(
+                18,
+                MediaQuery.of(context).padding.top + 16,
+                18,
+                16,
+              ),
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                border: Border(
+                  bottom: BorderSide(color: borderDividerColor, width: 1),
                 ),
-                Container(
-                  alignment: const Alignment(1, -0.6),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      FutureBuilder(
-                        future: PackageInfo.fromPlatform(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Text(
-                              'Version ${snapshot.data!.version}',
-                              style: TextStyle(
-                                color: textSecondary,
-                                fontSize: 12,
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: AppTheme.primaryGradient,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image.asset(
+                              'assets/img/logo.png',
+                              height: 44,
+                              width: 44,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.auto_stories_rounded,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                            ),
+                          ),
+                        ),
                       ),
-                      if (isWideScreen) const Gap(16),
-                      if (isWideScreen)
-                        IconButton(
-                          icon: const Icon(
-                            Icons.search,
-                            color: AppTheme.primaryMint,
-                          ),
-                          onPressed: () {
-                            context.push('/search');
-                          },
+                      const Gap(12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'Al Hadith',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: textPrimary,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                                const Spacer(),
+                                FutureBuilder<PackageInfo>(
+                                  future: PackageInfo.fromPlatform(),
+                                  builder: (context, snapshot) {
+                                    final version =
+                                        snapshot.data?.version ?? '1.0.0';
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 7,
+                                        vertical: 2.5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? const Color(0xFF1E293B)
+                                            : const Color(0xFFF1F5F9),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: borderDividerColor,
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'v$version',
+                                        style: TextStyle(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: textSecondary,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            const Gap(2),
+                            const Text(
+                              'الحديث النبوي الشريف • Offline Study',
+                              style: TextStyle(
+                                color: AppTheme.primaryMint,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                      if (isWideScreen)
-                        IconButton(
-                          icon: Icon(
-                            Icons.settings_outlined,
-                            color: textSecondary,
-                          ),
-                          onPressed: () {
-                            context.push('/settings');
-                          },
-                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
+                  const Gap(14),
+                  // Spiritual Streak & Goal Capsule Pill
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/stats');
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF0F172A)
+                            : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF334155)
+                              : const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_fire_department_rounded,
+                            color: streak > 0
+                                ? Colors.orangeAccent
+                                : textSecondary,
+                            size: 16,
+                          ),
+                          const Gap(5),
+                          Text(
+                            '${streak}d Streak',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 7),
+                            child: Text(
+                              '•',
+                              style: TextStyle(
+                                color: textSecondary,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.check_circle_outline_rounded,
+                            color: AppTheme.primaryMint,
+                            size: 15,
+                          ),
+                          const Gap(5),
+                          Text(
+                            '$readToday/$dailyGoal Daily Goal',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: textSecondary,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: textSecondary.withValues(alpha: 0.5),
+                            size: 11,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            // Menu Items List
             Expanded(
               child: ListView(
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
+                  _buildDrawerSectionHeader('LIBRARY & STUDY'),
                   _buildDrawerItem(
                     context,
-                    icon: Icons.library_books,
+                    icon: Icons.auto_stories_rounded,
                     title: AppLocalization.getTabName(
                       'manage_resources',
                       appLanguage,
                     ),
-                    subtitle: AppLocalization.getTabName(
-                      'manage_resources_desc',
-                      appLanguage,
+                    subtitle: 'Download, update & offline files',
+                    badge: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryMint.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '$booksCount Books',
+                        style: const TextStyle(
+                          color: AppTheme.primaryMint,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     onTap: () {
                       Navigator.pop(context);
@@ -550,60 +705,93 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Icons.bug_report_outlined,
-                    title: AppLocalization.getTabName(
-                      'send_bug_report',
-                      appLanguage,
-                    ),
-                    subtitle: AppLocalization.getTabName(
-                      'send_bug_report_desc',
-                      appLanguage,
+                    icon: Icons.insights_rounded,
+                    title: 'Reading Analytics',
+                    subtitle: 'Streaks, insights & progress',
+                    trailing: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 12,
                     ),
                     onTap: () {
                       Navigator.pop(context);
-                      _launchUrl(
-                        'https://github.com/IsmailHosenIsmailJames/al_hadith/issues',
-                      );
+                      context.push('/stats');
                     },
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Icons.feedback_outlined,
-                    title: AppLocalization.getTabName(
-                      'dataset_feedback',
-                      appLanguage,
-                    ),
-                    subtitle: AppLocalization.getTabName(
-                      'dataset_feedback_desc',
-                      appLanguage,
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchUrl('https://github.com/fawazahmed0/hadith-api');
-                    },
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.star_rate_outlined,
-                    title: AppLocalization.getTabName('rate_app', appLanguage),
-                    subtitle: AppLocalization.getTabName(
-                      'rate_app_desc',
-                      appLanguage,
+                    icon: Icons.settings_suggest_rounded,
+                    title: 'Settings & Studio',
+                    subtitle: 'Fonts, reading modes & storage',
+                    trailing: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 12,
                     ),
                     onTap: () {
                       Navigator.pop(context);
-                      _launchUrl(
-                        'https://play.google.com/store/apps/details?id=com.ismail.al_hadith',
-                      );
+                      context.push('/settings');
                     },
                   ),
+                  const Gap(8),
+                  _buildDrawerSectionHeader('QUICK APPEARANCE'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: surfaceColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: borderDividerColor),
+                      ),
+                      child: Row(
+                        children: [
+                          _buildThemeModePill(
+                            context: context,
+                            title: 'Light',
+                            icon: Icons.light_mode_rounded,
+                            isActive: themeMode == 'light',
+                            onTap: () => context
+                                .read<SettingsCubit>()
+                                .setThemeMode('light'),
+                          ),
+                          _buildThemeModePill(
+                            context: context,
+                            title: 'Dark',
+                            icon: Icons.dark_mode_rounded,
+                            isActive: themeMode == 'dark',
+                            onTap: () => context
+                                .read<SettingsCubit>()
+                                .setThemeMode('dark'),
+                          ),
+                          _buildThemeModePill(
+                            context: context,
+                            title: 'System',
+                            icon: Icons.brightness_auto_rounded,
+                            isActive: themeMode == 'system',
+                            onTap: () => context
+                                .read<SettingsCubit>()
+                                .setThemeMode('system'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Gap(8),
+                  _buildDrawerSectionHeader('COMMUNITY & SUPPORT'),
                   _buildDrawerItem(
                     context,
-                    icon: Icons.star_border,
+                    icon: Icons.star_rounded,
+                    iconColor: Colors.amber,
                     title: AppLocalization.get('star_on_github', appLanguage),
-                    subtitle: AppLocalization.get(
-                      'show_support_github',
-                      appLanguage,
+                    subtitle: 'Star and contribute on GitHub',
+                    trailing: Icon(
+                      Icons.open_in_new_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 14,
                     ),
                     onTap: () {
                       Navigator.pop(context);
@@ -614,14 +802,86 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Icons.privacy_tip_outlined,
+                    icon: Icons.bug_report_outlined,
+                    title: AppLocalization.getTabName(
+                      'send_bug_report',
+                      appLanguage,
+                    ),
+                    subtitle: 'Report issues or suggest features',
+                    trailing: Icon(
+                      Icons.open_in_new_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 14,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl(
+                        'https://github.com/IsmailHosenIsmailJames/al_hadith/issues',
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.dataset_outlined,
+                    title: AppLocalization.getTabName(
+                      'dataset_feedback',
+                      appLanguage,
+                    ),
+                    subtitle: 'Hadith API dataset sources',
+                    trailing: Icon(
+                      Icons.open_in_new_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 14,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl('https://github.com/fawazahmed0/hadith-api');
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.thumb_up_alt_outlined,
+                    title: AppLocalization.getTabName('rate_app', appLanguage),
+                    subtitle: 'Share your feedback on Google Play',
+                    trailing: Icon(
+                      Icons.open_in_new_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 14,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchUrl(
+                        'https://play.google.com/store/apps/details?id=com.ismail.al_hadith',
+                      );
+                    },
+                  ),
+                  const Gap(8),
+                  _buildDrawerSectionHeader('ABOUT & LEGAL'),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.info_outline_rounded,
+                    title: AppLocalization.getTabName(
+                      'about_app_drawer',
+                      appLanguage,
+                    ),
+                    subtitle: 'App details, license & mission',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showAboutDialog(appLanguage);
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.shield_outlined,
                     title: AppLocalization.getTabName(
                       'privacy_policy',
                       appLanguage,
                     ),
-                    subtitle: AppLocalization.getTabName(
-                      'privacy_policy_desc',
-                      appLanguage,
+                    subtitle: 'Data protection and usage terms',
+                    trailing: Icon(
+                      Icons.open_in_new_rounded,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      size: 14,
                     ),
                     onTap: () {
                       Navigator.pop(context);
@@ -630,22 +890,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                  Divider(color: borderDividerColor, thickness: 1),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.info_outline,
-                    title: AppLocalization.getTabName(
-                      'about_app_drawer',
-                      appLanguage,
+                ],
+              ),
+            ),
+            // Sleek Footer
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                border: Border(
+                  top: BorderSide(color: borderDividerColor, width: 1),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.favorite_rounded,
+                    color: AppTheme.primaryMint,
+                    size: 14,
+                  ),
+                  const Gap(8),
+                  Text(
+                    'Built for the Ummah • Free & Open Source',
+                    style: TextStyle(
+                      color: textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
                     ),
-                    subtitle: AppLocalization.getTabName(
-                      'about_app_drawer_desc',
-                      appLanguage,
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showAboutDialog(appLanguage);
-                    },
                   ),
                 ],
               ),
@@ -656,33 +927,145 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildDrawerSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 4),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.1,
+          color: AppTheme.primaryMint.withValues(alpha: 0.85),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDrawerItem(
     BuildContext context, {
     required IconData icon,
+    Color? iconColor,
     required String title,
     required String subtitle,
+    Widget? badge,
+    Widget? trailing,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textSecondary =
         Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final textPrimary =
         Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final iconBgColor = isDark
+        ? const Color(0xFF1E293B)
+        : const Color(0xFFF1F5F9);
 
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryMint, size: 24),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-          color: textPrimary,
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: iconBgColor,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Center(
+                child: Icon(
+                  icon,
+                  color: iconColor ?? AppTheme.primaryMint,
+                  size: 18,
+                ),
+              ),
+            ),
+            const Gap(12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
+                      color: textPrimary,
+                    ),
+                  ),
+                  const Gap(1.5),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            if (badge != null) ...[
+              const Gap(8),
+              badge,
+            ] else if (trailing != null) ...[
+              const Gap(8),
+              trailing,
+            ],
+          ],
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(color: textSecondary, fontSize: 12),
+    );
+  }
+
+  Widget _buildThemeModePill({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    final textPrimary =
+        Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
+    final textSecondary =
+        Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(9),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: isActive ? AppTheme.primaryMint : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 14,
+                color: isActive ? AppTheme.darkCanvas : textSecondary,
+              ),
+              const Gap(4),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                  color: isActive ? AppTheme.darkCanvas : textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      onTap: onTap,
     );
   }
 }
