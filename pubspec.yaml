@@ -2,7 +2,7 @@ name: al_hadith
 description: "A new Flutter project."
 publish_to: "none"
 
-version: 1.4.0+10
+version: 1.5.0+14
 environment:
   sdk: ^3.11.5
 
