@@ -67,7 +67,7 @@ class HadithState {
     this.activityDays = const [],
     this.readHistory = const [],
     this.readingSessions = const [],
-    this.bookSortType = 'name',
+    this.bookSortType = 'popularity',
     this.bookSortAscending = true,
   });
 

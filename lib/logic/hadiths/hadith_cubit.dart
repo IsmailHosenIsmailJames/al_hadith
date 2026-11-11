@@ -434,6 +434,34 @@ class HadithCubit extends Cubit<HadithState> {
     );
   }
 
+  /// Canonical Islamic scholarship popularity rank for Hadith collections
+  static int getBookPopularityRank(String bookKey) {
+    final key = bookKey.toLowerCase();
+    // 1. Sahih al-Bukhari (Top canonical authority)
+    if (key.contains('bukhari')) return 1;
+    // 2. Sahih Muslim (Sahihayn)
+    if (key.contains('muslim')) return 2;
+    // 3. Sunan an-Nasa'i
+    if (key.contains('nasai')) return 3;
+    // 4. Sunan Abi Dawud
+    if (key.contains('abudawud') || key.contains('abu-dawud') || key.contains('abu_dawud')) return 4;
+    // 5. Jami' at-Tirmidhi
+    if (key.contains('tirmidhi')) return 5;
+    // 6. Sunan Ibn Majah
+    if (key.contains('ibnmajah') || key.contains('ibn-majah') || key.contains('ibn_majah')) return 6;
+    // 7. Muwatta Imam Malik
+    if (key.contains('malik') || key.contains('muwatta')) return 7;
+    // 8. Forty Hadith of an-Nawawi
+    if (key.contains('nawawi')) return 8;
+    // 9. Forty Hadith Qudsi
+    if (key.contains('qudsi')) return 9;
+    // 10. Forty Hadith of Shah Waliullah Dehlawi
+    if (key.contains('dehlawi') || key.contains('waliullah')) return 10;
+    if (key.contains('ahmad')) return 11;
+    if (key.contains('darimi')) return 12;
+    return 100;
+  }
+
   List<HadithResource> _sortBooks({
     required List<HadithResource> books,
     required String sortType,
@@ -441,7 +469,20 @@ class HadithCubit extends Cubit<HadithState> {
     required List<String> customOrder,
   }) {
     final sorted = List<HadithResource>.from(books);
-    if (sortType == 'custom') {
+    if (sortType == 'popularity') {
+      sorted.sort((a, b) {
+        final rankA = getBookPopularityRank(a.book);
+        final rankB = getBookPopularityRank(b.book);
+        if (rankA != rankB) {
+          return isAscending ? rankA.compareTo(rankB) : rankB.compareTo(rankA);
+        }
+        final countCmp = b.hadithCount.compareTo(a.hadithCount);
+        if (countCmp != 0) return countCmp;
+        final nameA = a.nameNative.isNotEmpty ? a.nameNative : a.name;
+        final nameB = b.nameNative.isNotEmpty ? b.nameNative : b.name;
+        return nameA.compareTo(nameB);
+      });
+    } else if (sortType == 'custom') {
       sorted.sort((a, b) {
         int idxA = customOrder.indexOf(a.book);
         int idxB = customOrder.indexOf(b.book);
@@ -481,7 +522,12 @@ class HadithCubit extends Cubit<HadithState> {
     List<String>? customOrder,
   }) async {
     final newSortType = sortType ?? state.bookSortType;
-    final newIsAscending = isAscending ?? state.bookSortAscending;
+    bool newIsAscending = isAscending ?? state.bookSortAscending;
+
+    if (sortType != null && sortType == 'popularity' && isAscending == null) {
+      newIsAscending = true;
+      await _prefsService.setBookSortAscending(true);
+    }
 
     if (sortType != null) {
       await _prefsService.setBookSortType(sortType);

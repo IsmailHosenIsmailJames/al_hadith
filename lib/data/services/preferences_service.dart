@@ -22,6 +22,7 @@ class PreferencesService {
   static const String _keyBookSortAscending = 'book_sort_ascending';
   static const String _keyBookCustomOrder = 'book_custom_order';
   static const String _keyBookDownloadTimePrefix = 'book_download_time_';
+  static const String _keyBookSortMigratedToPopularity = 'book_sort_migrated_v3';
 
   // Language setting
   String? getAppLanguage() {
@@ -93,7 +94,14 @@ class PreferencesService {
 
   // Sorting helper methods
   String getBookSortType() {
-    return _prefs.getString(_keyBookSortType) ?? 'name';
+    final migrated = _prefs.getBool(_keyBookSortMigratedToPopularity) ?? false;
+    if (!migrated) {
+      _prefs.setBool(_keyBookSortMigratedToPopularity, true);
+      _prefs.setString(_keyBookSortType, 'popularity');
+      _prefs.setBool(_keyBookSortAscending, true);
+      return 'popularity';
+    }
+    return _prefs.getString(_keyBookSortType) ?? 'popularity';
   }
 
   Future<bool> setBookSortType(String type) {
@@ -189,6 +197,35 @@ class PreferencesService {
 
   Future<bool> setHadithViewMode(String mode) {
     return _prefs.setString(_keyHadithViewMode, mode);
+  }
+
+  // Recent Hadith Searches
+  static const String _keyRecentSearches = 'recent_hadith_searches';
+
+  List<String> getRecentSearches() {
+    return _prefs.getStringList(_keyRecentSearches) ?? [];
+  }
+
+  Future<bool> addRecentSearch(String query) async {
+    final cleaned = query.trim();
+    if (cleaned.isEmpty) return false;
+    final list = getRecentSearches().toList();
+    list.removeWhere((item) => item.toLowerCase() == cleaned.toLowerCase());
+    list.insert(0, cleaned);
+    if (list.length > 8) {
+      list.removeRange(8, list.length);
+    }
+    return _prefs.setStringList(_keyRecentSearches, list);
+  }
+
+  Future<bool> removeRecentSearch(String query) async {
+    final list = getRecentSearches().toList();
+    list.removeWhere((item) => item.toLowerCase() == query.trim().toLowerCase());
+    return _prefs.setStringList(_keyRecentSearches, list);
+  }
+
+  Future<bool> clearRecentSearches() {
+    return _prefs.remove(_keyRecentSearches);
   }
 
   // Clear preferences (useful for reset / testing)
