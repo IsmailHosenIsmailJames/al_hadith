@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:al_hadith/core/theme/app_theme.dart';
 import 'package:al_hadith/logic/setup/setup_cubit.dart';
 import 'package:al_hadith/logic/setup/setup_state.dart';
@@ -32,7 +33,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   @override
   Widget build(BuildContext context) {
     final appLanguage = context.watch<SettingsCubit>().state.appLanguage;
-    bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
+    final isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
     final canvasColor = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
@@ -76,22 +77,22 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
 
             // Render Success State when complete
             if (state.isCompletedStep) {
-              return _buildSuccessScreen(context, appLanguage);
+              return _buildSuccessScreen(context, state, appLanguage);
             }
 
             return Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 16.0,
+                horizontal: 20.0,
+                vertical: 14.0,
               ),
               child: Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(right: isWideWindow ? 80.0 : 0.0),
+                    padding: EdgeInsets.only(right: isWideWindow ? 90.0 : 0.0),
                     child: Column(
                       children: [
-                        if (!isWideWindow) _buildHeaderProgress(state, false, appLanguage),
-                        if (!isWideWindow) const Gap(24),
+                        if (!isWideWindow) _buildSacredStepperCapsule(state, false, appLanguage),
+                        if (!isWideWindow) const Gap(16),
                         Expanded(
                           child: AnimatedSwitcher(
                             duration: 300.ms,
@@ -105,7 +106,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                   if (isWideWindow)
                     Align(
                       alignment: Alignment.centerRight,
-                      child: _buildHeaderProgress(state, true, appLanguage),
+                      child: _buildSacredStepperCapsule(state, true, appLanguage),
                     ),
                 ],
               ),
@@ -116,102 +117,178 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  // Header progress/stepper widget
-  Widget _buildHeaderProgress(SetupState state, bool isWideWindow, String appLanguage) {
+  // Sacred Stepper Header: Floating capsule with distinct Completed / Active / Upcoming states
+  Widget _buildSacredStepperCapsule(SetupState state, bool isWideWindow, String appLanguage) {
     int activeIndex = 0;
     if (state.isSecondStep) activeIndex = 1;
     if (state.isDownloadingStep) activeIndex = 2;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final capsuleBg = isDark ? AppTheme.darkSurface : Colors.white;
+    final capsuleBorder = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
+
+    final steps = [
+      {'label': AppLocalization.get('language', appLanguage), 'icon': Icons.language_rounded},
+      {'label': AppLocalization.get('resources', appLanguage), 'icon': Icons.menu_book_rounded},
+      {'label': AppLocalization.get('install', appLanguage), 'icon': Icons.cloud_download_rounded},
+    ];
+
     if (isWideWindow) {
-      return Column(
-        children: [
-          _buildStepIndicator(0, AppLocalization.get('language', appLanguage), activeIndex >= 0),
-          _buildLineConnector(activeIndex >= 1, isWideWindow),
-          _buildStepIndicator(1, AppLocalization.get('resources', appLanguage), activeIndex >= 1),
-          _buildLineConnector(activeIndex >= 2, isWideWindow),
-          _buildStepIndicator(2, AppLocalization.get('install', appLanguage), activeIndex >= 2),
-        ],
-      ).animate().fadeIn(duration: 400.ms);
-    } else {
-      return Row(
-        children: [
-          _buildStepIndicator(0, AppLocalization.get('language', appLanguage), activeIndex >= 0),
-          _buildLineConnector(activeIndex >= 1, isWideWindow),
-          _buildStepIndicator(1, AppLocalization.get('resources', appLanguage), activeIndex >= 1),
-          _buildLineConnector(activeIndex >= 2, isWideWindow),
-          _buildStepIndicator(2, AppLocalization.get('install', appLanguage), activeIndex >= 2),
-        ],
-      ).animate().fadeIn(duration: 400.ms);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
+        decoration: BoxDecoration(
+          color: capsuleBg,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: capsuleBorder),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int i = 0; i < steps.length; i++) ...[
+              _buildStepPill(
+                index: i,
+                label: steps[i]['label'] as String,
+                icon: steps[i]['icon'] as IconData,
+                isCompleted: activeIndex > i,
+                isActive: activeIndex == i,
+              ),
+              if (i < steps.length - 1)
+                _buildLineConnector(isDone: activeIndex > i, isWideWindow: true),
+            ],
+          ],
+        ),
+      ).animate().fadeIn(duration: 350.ms);
     }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: capsuleBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: capsuleBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          for (int i = 0; i < steps.length; i++) ...[
+            _buildStepPill(
+              index: i,
+              label: steps[i]['label'] as String,
+              icon: steps[i]['icon'] as IconData,
+              isCompleted: activeIndex > i,
+              isActive: activeIndex == i,
+            ),
+            if (i < steps.length - 1)
+              _buildLineConnector(isDone: activeIndex > i, isWideWindow: false),
+          ],
+        ],
+      ),
+    ).animate().fadeIn(duration: 350.ms);
   }
 
-  Widget _buildStepIndicator(int index, String label, bool isCompleted) {
+  Widget _buildStepPill({
+    required int index,
+    required String label,
+    required IconData icon,
+    required bool isCompleted,
+    required bool isActive,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
-    final inactiveBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFF3F4F6);
-    final inactiveBorderColor = isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
-    final inactiveTextColor = isDark ? Colors.white : AppTheme.textDark;
     final tickColor = isDark ? AppTheme.darkCanvas : Colors.white;
+
+    Color circleBg;
+    Color circleBorder;
+    Widget iconWidget;
+
+    if (isCompleted) {
+      circleBg = AppTheme.primaryMint;
+      circleBorder = AppTheme.primaryMint;
+      iconWidget = Icon(Icons.check_rounded, color: tickColor, size: 16);
+    } else if (isActive) {
+      circleBg = AppTheme.primaryMint.withValues(alpha: 0.15);
+      circleBorder = AppTheme.primaryMint;
+      iconWidget = Icon(icon, color: AppTheme.primaryMint, size: 16);
+    } else {
+      circleBg = isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+      circleBorder = isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+      iconWidget = Icon(
+        icon,
+        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+        size: 15,
+      );
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         AnimatedContainer(
-          duration: 300.ms,
-          width: 36,
-          height: 36,
+          duration: 250.ms,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isCompleted ? AppTheme.primaryMint : inactiveBgColor,
-            border: Border.all(
-              color: isCompleted
-                  ? AppTheme.primaryMint
-                  : inactiveBorderColor,
-              width: 1.5,
-            ),
-          ),
-          child: Center(
-            child: isCompleted
-                ? Icon(Icons.check, color: tickColor, size: 18)
-                : Text(
-                    '${index + 1}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: inactiveTextColor,
+            color: circleBg,
+            border: Border.all(color: circleBorder, width: isActive ? 1.8 : 1.2),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      spreadRadius: 1,
                     ),
-                  ),
+                  ]
+                : null,
           ),
+          child: Center(child: iconWidget),
         ),
-        const Gap(6),
+        const Gap(4),
         Text(
           label,
           style: TextStyle(
-            fontSize: 11,
-            color: isCompleted ? AppTheme.primaryMint : textSecondary,
-            fontWeight: FontWeight.bold,
+            fontSize: 10.5,
+            color: isActive
+                ? AppTheme.primaryMint
+                : (isCompleted
+                    ? (isDark ? Colors.white : AppTheme.textDark)
+                    : textSecondary),
+            fontWeight: isActive || isCompleted ? FontWeight.bold : FontWeight.w500,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLineConnector(bool isDone, bool isWideWindow) {
+  Widget _buildLineConnector({required bool isDone, required bool isWideWindow}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final connectorColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final connectorColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
 
     if (isWideWindow) {
-      return Expanded(
-        child: AnimatedContainer(
-          duration: 300.ms,
-          width: 2,
-          color: isDone ? AppTheme.primaryMint : connectorColor,
-        ),
+      return Container(
+        width: 2,
+        height: 24,
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        color: isDone ? AppTheme.primaryMint : connectorColor,
       );
     } else {
       return Expanded(
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
+          padding: const EdgeInsets.only(bottom: 14.0, left: 6.0, right: 6.0),
           child: AnimatedContainer(
-            duration: 300.ms,
+            duration: 250.ms,
             height: 2,
             color: isDone ? AppTheme.primaryMint : connectorColor,
           ),
@@ -238,6 +315,12 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
           state: state,
           onToggle: (bookKey) =>
               context.read<SetupCubit>().toggleResourceSelection(bookKey),
+          onSelectRecommended: () =>
+              context.read<SetupCubit>().selectRecommendedResources(),
+          onSelectAll: () =>
+              context.read<SetupCubit>().selectAllResources(),
+          onClearAll: () =>
+              context.read<SetupCubit>().clearAllResources(),
         );
       case SetupStep.downloading:
         return DownloadStep(key: const ValueKey('download_step'), state: state);
@@ -250,7 +333,7 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   Widget _buildBottomNavBar(BuildContext context, SetupState state, String appLanguage) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
-    final outlineBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final outlineBorderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
 
     if (state.isDownloadingStep) {
       // In downloading step: if we hit an error, let the user retry
@@ -259,17 +342,19 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
       );
       if (hasError) {
         return Padding(
-          padding: const EdgeInsets.only(top: 16.0),
+          padding: const EdgeInsets.only(top: 14.0),
           child: Row(
             children: [
               Expanded(
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: () => context.read<SetupCubit>().startDownload(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
                     shadowColor: Colors.redAccent.withValues(alpha: 0.3),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: Text(AppLocalization.get('retry_setup_download', appLanguage)),
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(AppLocalization.get('retry_setup_download', appLanguage)),
                 ),
               ),
             ],
@@ -282,35 +367,52 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     final isFirst = state.isFirstStep;
 
     return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
+      padding: const EdgeInsets.only(top: 14.0),
       child: Row(
         children: [
           if (!isFirst) ...[
             Expanded(
               flex: 1,
-              child: OutlinedButton(
+              child: OutlinedButton.icon(
                 onPressed: () => context.read<SetupCubit>().previousStep(),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: textPrimary,
                   side: BorderSide(color: outlineBorderColor, width: 1.5),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: Text(AppLocalization.get('back', appLanguage)),
+                icon: const Icon(Icons.arrow_back_rounded, size: 17),
+                label: Text(
+                  AppLocalization.get('back', appLanguage),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-            const Gap(16),
+            const Gap(12),
           ],
           Expanded(
             flex: 2,
-            child: ElevatedButton(
+            child: ElevatedButton.icon(
               onPressed: () => context.read<SetupCubit>().nextStep(),
-              child: Text(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              icon: Icon(
+                isFirst ? Icons.arrow_forward_rounded : Icons.cloud_download_rounded,
+                size: 18,
+              ),
+              label: Text(
                 isFirst
                     ? AppLocalization.get('continue_to_resources', appLanguage)
                     : AppLocalization.get('download_offline_library', appLanguage, args: {'size': state.formattedTotalSize}),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -319,98 +421,266 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     );
   }
 
-  // Setup completion visual dashboard
-  Widget _buildSuccessScreen(BuildContext context, String appLanguage) {
+  // Setup completion visual dashboard & celebration launchpad
+  Widget _buildSuccessScreen(BuildContext context, SetupState state, String appLanguage) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
+    final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Glowing checkmark decoration
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppTheme.primaryMint.withValues(alpha: 0.12),
-              border: Border.all(color: AppTheme.primaryMint, width: 2.0),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primaryMint.withValues(alpha: 0.2),
-                  blurRadius: 32,
-                ),
-              ],
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.done_all,
-                color: AppTheme.primaryMint,
-                size: 48,
+    final selectedBooksCount = state.selectedResources.length;
+
+    return SingleChildScrollView(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Gap(20),
+
+            // Glowing checkmark decoration
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.primaryMint.withValues(alpha: 0.12),
+                border: Border.all(color: AppTheme.primaryMint, width: 2.2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                    blurRadius: 36,
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
-            ),
-          ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
-          const Gap(32),
+              child: const Center(
+                child: Icon(
+                  Icons.verified_rounded,
+                  color: AppTheme.primaryMint,
+                  size: 52,
+                ),
+              ),
+            ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
 
-          Text(
-            AppLocalization.get('library_ready', appLanguage),
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: textPrimary,
-            ),
-          ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
+            const Gap(24),
 
-          const Gap(12),
-          Text(
-            AppLocalization.get('setup_success_desc', appLanguage),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: textSecondary,
-              height: 1.5,
-            ),
-          ).animate().fadeIn(duration: 450.ms, delay: 200.ms),
+            Text(
+              AppLocalization.get('library_ready', appLanguage),
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+                letterSpacing: 0.2,
+              ),
+            ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
 
-          const Gap(48),
+            const Gap(8),
+            Text(
+              AppLocalization.get('setup_success_desc', appLanguage),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13.5,
+                color: textSecondary,
+                height: 1.45,
+              ),
+            ).animate().fadeIn(duration: 450.ms, delay: 180.ms),
 
-          SizedBox(
-            width: double.infinity,
-            child:
-                ElevatedButton(
-                      onPressed: () {
-                        // Navigate to main home view
-                        context.go('/home');
-                      },
-                      child: Text(AppLocalization.get('enter_hadith_library', appLanguage)),
-                    )
-                    .animate(
-                      onPlay: (controller) => controller.repeat(reverse: true),
-                    )
-                    .custom(
-                      duration: 1.5.seconds,
-                      builder: (context, value, child) => Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryMint.withValues(
-                                alpha: 0.15 + (value * 0.15),
-                              ),
-                              blurRadius: 10 + (value * 12),
-                              spreadRadius: value * 3,
-                            ),
-                          ],
-                        ),
-                        child: child,
-                      ),
+            const Gap(24),
+
+            // Installed Library Summary Strip
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: cardBgColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildSummaryMetric(
+                    icon: Icons.menu_book_rounded,
+                    value: '$selectedBooksCount',
+                    label: 'Books Ready',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                  ),
+                  Container(
+                    width: 1,
+                    height: 36,
+                    color: borderColor,
+                  ),
+                  _buildSummaryMetric(
+                    icon: Icons.search_rounded,
+                    value: 'Instant',
+                    label: 'Offline Search',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                  ),
+                  Container(
+                    width: 1,
+                    height: 36,
+                    color: borderColor,
+                  ),
+                  _buildSummaryMetric(
+                    icon: Icons.offline_pin_rounded,
+                    value: '100%',
+                    label: 'No Internet',
+                    textPrimary: textPrimary,
+                    textSecondary: textSecondary,
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 450.ms, delay: 240.ms),
+
+            const Gap(24),
+
+            // Sacred Prophetic Hadith Quote on Knowledge
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [
+                          AppTheme.primaryMint.withValues(alpha: 0.1),
+                          AppTheme.darkSurfaceCard,
+                        ]
+                      : [
+                          const Color(0xFFE8FAF5),
+                          Colors.white,
+                        ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.primaryMint.withValues(alpha: 0.25),
+                  width: 1.2,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.amiri(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryMint,
+                      height: 1.6,
                     ),
-          ).animate().fadeIn(duration: 400.ms, delay: 350.ms),
-        ],
+                  ),
+                  const Gap(6),
+                  Text(
+                    '"Whoever travels a path in search of sacred knowledge, Allah will make easy for him a path to Paradise."',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      fontSize: 12.5,
+                      color: textPrimary,
+                      height: 1.35,
+                    ),
+                  ),
+                  const Gap(4),
+                  Text(
+                    '— Sahih Muslim',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 450.ms, delay: 300.ms),
+
+            const Gap(32),
+
+            // Pulsing Primary CTA
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  context.go('/home');
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                icon: const Icon(Icons.menu_book_rounded, size: 20),
+                label: Text(
+                  AppLocalization.get('enter_hadith_library', appLanguage),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+              .animate(
+                onPlay: (controller) => controller.repeat(reverse: true),
+              )
+              .custom(
+                duration: 1.6.seconds,
+                builder: (context, value, child) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryMint.withValues(
+                          alpha: 0.15 + (value * 0.18),
+                        ),
+                        blurRadius: 10 + (value * 14),
+                        spreadRadius: value * 3,
+                      ),
+                    ],
+                  ),
+                  child: child,
+                ),
+              ),
+            ).animate().fadeIn(duration: 400.ms, delay: 360.ms),
+
+            const Gap(20),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSummaryMetric({
+    required IconData icon,
+    required String value,
+    required String label,
+    required Color textPrimary,
+    required Color textSecondary,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: AppTheme.primaryMint, size: 20),
+        const Gap(4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }

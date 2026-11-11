@@ -61,6 +61,7 @@ class SetupCubit extends Cubit<SetupState> {
       }
 
       emit(state.copyWith(
+        step: SetupStep.languageSelection,
         languages: languages,
         selectedLanguage: initialLanguage,
         selectedResources: selectedResources,
@@ -127,6 +128,46 @@ class SetupCubit extends Cubit<SetupState> {
 
     emit(state.copyWith(
       selectedResources: currentSelection,
+      errorMessage: null,
+    ));
+  }
+
+  /// Selects recommended foundational books (Sahihayn + Nawawi)
+  void selectRecommendedResources() {
+    if (state.selectedLanguage == null) return;
+    final recommendedKeys = <String>{};
+    for (final res in state.selectedLanguage!.resources) {
+      final key = res.book.toLowerCase();
+      if (key.contains('bukhari') || key.contains('muslim') || key.contains('nawawi')) {
+        recommendedKeys.add(res.book);
+      }
+    }
+    // Fallback if none matched
+    if (recommendedKeys.isEmpty) {
+      for (final res in state.selectedLanguage!.resources.take(2)) {
+        recommendedKeys.add(res.book);
+      }
+    }
+    emit(state.copyWith(
+      selectedResources: recommendedKeys,
+      errorMessage: null,
+    ));
+  }
+
+  /// Selects all available books for the current language
+  void selectAllResources() {
+    if (state.selectedLanguage == null) return;
+    final allKeys = state.selectedLanguage!.resources.map((r) => r.book).toSet();
+    emit(state.copyWith(
+      selectedResources: allKeys,
+      errorMessage: null,
+    ));
+  }
+
+  /// Clears all selected resources
+  void clearAllResources() {
+    emit(state.copyWith(
+      selectedResources: <String>{},
       errorMessage: null,
     ));
   }

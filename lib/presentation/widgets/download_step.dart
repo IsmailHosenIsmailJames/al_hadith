@@ -23,90 +23,87 @@ class DownloadStep extends StatelessWidget {
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
 
-    bool isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
+    final isWideWindow = MediaQuery.of(context).size.width > AppTheme.wideWidth;
 
-    return isWideWindow
-        ? Row(
-            children: [
-              SizedBox(
-                width: 300,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    OverallProgress(state: state).animate().scale(
-                      duration: 400.ms,
-                      curve: Curves.easeOutBack,
-                    ),
-                    const Gap(12),
-                    Text(
-                      AppLocalization.get('downloading_library', appLanguage),
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: textPrimary,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      AppLocalization.get('download_desc', appLanguage),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: textSecondary,
-                        height: 1.4,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+    if (isWideWindow) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 320,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                OverallProgress(state: state),
+                const Gap(16),
+                Text(
+                  AppLocalization.get('downloading_library', appLanguage),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
                 ),
-              ),
-              const Gap(10),
-
-              IndividualResourcesAndProgress(
-                targetResources: targetResources,
-                state: state,
-              ),
-            ],
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Gap(16),
-              // Premium Circular Overall Progress
-              OverallProgress(
-                state: state,
-              ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
-
-              const Gap(24),
-              Text(
-                AppLocalization.get('downloading_library', appLanguage),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
+                const Gap(6),
+                Text(
+                  AppLocalization.get('download_desc', appLanguage),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: textSecondary,
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const Gap(8),
-              Text(
-                AppLocalization.get('download_desc', appLanguage),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: textSecondary,
-                  height: 1.4,
-                ),
-              ),
-              const Gap(28),
+              ],
+            ),
+          ),
+          const Gap(20),
+          Expanded(
+            child: IndividualResourcesAndProgress(
+              targetResources: targetResources,
+              state: state,
+            ),
+          ),
+        ],
+      );
+    }
 
-              // Progress List
-              IndividualResourcesAndProgress(
-                targetResources: targetResources,
-                state: state,
-              ),
-            ],
-          );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Gap(8),
+        OverallProgress(state: state),
+        const Gap(16),
+        Text(
+          AppLocalization.get('downloading_library', appLanguage),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+        ),
+        const Gap(4),
+        Text(
+          AppLocalization.get('download_desc', appLanguage),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12.5,
+            color: textSecondary,
+            height: 1.4,
+          ),
+        ),
+        const Gap(16),
+        Expanded(
+          child: IndividualResourcesAndProgress(
+            targetResources: targetResources,
+            state: state,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -127,146 +124,165 @@ class IndividualResourcesAndProgress extends StatelessWidget {
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final cardBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
-    final inactiveCircleColor = isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+    final borderColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
 
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cardBgColor,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: borderColor),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+      ),
+      child: ListView.separated(
+        itemCount: targetResources.length,
+        separatorBuilder: (context, index) => Divider(
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+          height: 14,
         ),
-        child: ListView.builder(
-          itemCount: targetResources.length,
-          itemBuilder: (context, index) {
-            final res = targetResources[index];
-            final progress = state.downloadProgress[res.book] ?? 0.0;
-            final status = state.downloadStatus[res.book] ?? 'Pending';
+        itemBuilder: (context, index) {
+          final res = targetResources[index];
+          final progress = state.downloadProgress[res.book] ?? 0.0;
+          final status = state.downloadStatus[res.book] ?? 'Pending';
 
-            final isCompleted = status.contains('Completed');
-            final isDownloading =
-                status == 'Downloading...' || status == 'Extracting...';
-            final isError = status == 'Error';
+          final isCompleted = status.contains('Completed');
+          final isDownloading =
+              status == 'Downloading...' || status == 'Extracting...';
+          final isError = status == 'Error';
 
-            Color statusColor = textSecondary;
-            Widget statusIcon = Icon(
-              Icons.circle_outlined,
-              color: inactiveCircleColor,
-              size: 20,
-            );
+          Color statusColor = textSecondary;
+          Widget statusIcon;
 
-            if (isCompleted) {
-              statusColor = AppTheme.primaryMint;
-              statusIcon = const Icon(
-                Icons.check_circle,
+          if (isCompleted) {
+            statusColor = AppTheme.primaryMint;
+            statusIcon = Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryMint.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_rounded,
                 color: AppTheme.primaryMint,
-                size: 22,
-              );
-            } else if (isDownloading) {
-              statusColor = AppTheme.secondaryIndigo;
-              statusIcon = const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: AppTheme.secondaryIndigo,
-                ),
-              );
-            } else if (isError) {
-              statusColor = Colors.redAccent;
-              statusIcon = const Icon(
-                Icons.error,
-                color: Colors.redAccent,
-                size: 22,
-              );
-            }
-
-            String localizedStatus = status;
-            if (status == 'Pending') {
-              localizedStatus = AppLocalization.get('pending', appLanguage);
-            } else if (status == 'Downloading...') {
-              localizedStatus = AppLocalization.get('downloading', appLanguage);
-            } else if (status == 'Extracting...') {
-              localizedStatus = AppLocalization.get('extracting', appLanguage);
-            } else if (status == 'Completed') {
-              localizedStatus = AppLocalization.get('completed', appLanguage);
-            } else if (status == 'Completed (Skipped)') {
-              localizedStatus = AppLocalization.get('completed_skipped', appLanguage);
-            } else if (status == 'Error') {
-              localizedStatus = AppLocalization.get('error', appLanguage);
-            }
-
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                children: [
-                  statusIcon,
-                  const Gap(12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    res.nameNative,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const Gap(2),
-                                  Text(
-                                    res.name,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: textSecondary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              localizedStatus,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: statusColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (isDownloading) ...[
-                          const Gap(6),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: progress,
-                              minHeight: 4,
-                              backgroundColor: borderColor,
-                              color: AppTheme.secondaryIndigo,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
+                size: 14,
               ),
             );
-          },
-        ),
+          } else if (isDownloading) {
+            statusColor = AppTheme.primaryMint;
+            statusIcon = const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.2,
+                color: AppTheme.primaryMint,
+              ),
+            );
+          } else if (isError) {
+            statusColor = Colors.redAccent;
+            statusIcon = const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.redAccent,
+              size: 20,
+            );
+          } else {
+            statusIcon = Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                  width: 1.5,
+                ),
+              ),
+            );
+          }
+
+          String localizedStatus = status;
+          if (status == 'Pending') {
+            localizedStatus = AppLocalization.get('pending', appLanguage);
+          } else if (status == 'Downloading...') {
+            localizedStatus = AppLocalization.get('downloading', appLanguage);
+          } else if (status == 'Extracting...') {
+            localizedStatus = AppLocalization.get('extracting', appLanguage);
+          } else if (status == 'Completed') {
+            localizedStatus = AppLocalization.get('completed', appLanguage);
+          } else if (status == 'Completed (Skipped)') {
+            localizedStatus = AppLocalization.get('completed_skipped', appLanguage);
+          } else if (status == 'Error') {
+            localizedStatus = AppLocalization.get('error', appLanguage);
+          }
+
+          return Row(
+            children: [
+              statusIcon,
+              const Gap(12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            res.nameNative,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                              color: textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          localizedStatus,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: statusColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Gap(3),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          res.formattedZipSize,
+                          style: TextStyle(fontSize: 11, color: textSecondary),
+                        ),
+                        if (isDownloading)
+                          Text(
+                            '${(progress * 100).toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.primaryMint,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (isDownloading) ...[
+                      const Gap(6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 4,
+                          backgroundColor: isDark
+                              ? const Color(0xFF1E293B)
+                              : const Color(0xFFE2E8F0),
+                          color: AppTheme.primaryMint,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -284,50 +300,55 @@ class OverallProgress extends StatelessWidget {
     final textPrimary = Theme.of(context).textTheme.bodyLarge?.color ?? AppTheme.textPrimary;
     final textSecondary = Theme.of(context).textTheme.bodyMedium?.color ?? AppTheme.textSecondary;
     final circleBgColor = isDark ? AppTheme.darkSurface : Colors.white;
-    final barBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB);
+    final barBgColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
+
+    final percentInt = (state.overallProgress * 100).toInt();
 
     return Stack(
       alignment: Alignment.center,
       children: [
         Container(
-          width: 140,
-          height: 140,
+          width: 136,
+          height: 136,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: circleBgColor,
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryMint.withValues(alpha: 0.05),
-                blurRadius: 24,
+                color: AppTheme.primaryMint.withValues(alpha: 0.12),
+                blurRadius: 28,
+                spreadRadius: 2,
               ),
             ],
           ),
         ),
         SizedBox(
-          width: 130,
-          height: 130,
+          width: 124,
+          height: 124,
           child: CircularProgressIndicator(
             value: state.overallProgress,
             strokeWidth: 8,
             backgroundColor: barBgColor,
             color: AppTheme.primaryMint,
+            strokeCap: StrokeCap.round,
           ),
         ),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '${(state.overallProgress * 100).toStringAsFixed(0)}%',
+              '$percentInt%',
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: textPrimary,
               ),
             ),
+            const Gap(2),
             Text(
               AppLocalization.get('complete', appLanguage),
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11.5,
                 color: textSecondary,
                 fontWeight: FontWeight.w600,
               ),
@@ -335,6 +356,6 @@ class OverallProgress extends StatelessWidget {
           ],
         ),
       ],
-    );
+    ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack);
   }
 }
